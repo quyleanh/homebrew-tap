@@ -3,6 +3,15 @@ name: Build Bottles
 on:
   # Chạy thủ công từ GitHub Actions tab
   workflow_dispatch:
+    inputs:
+      force_build:
+        description: "Force rebuild tất cả packages (bỏ qua version check)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
   # Tự động chạy mỗi tuần vào Chủ nhật 2:00 AM UTC
   schedule:
@@ -47,47 +56,52 @@ jobs:
         run: chmod +x scripts/*.sh
 
       - name: Build bottles
+        id: build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
+          # Đặt FORCE_BUILD=true khi chạy thủ công nếu muốn rebuild tất cả
+          FORCE_BUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_build || 'false' }}
         run: ./scripts/build.sh
 
       - name: List built bottles
         run: |
           echo "=== Built bottles ==="
-          ls -lh bottles/ || echo "No bottles found"
+          ls -lh bottles/ 2>/dev/null || echo "No new bottles built"
 
-      - name: Create or update stable release + upload bottles
+      - name: Upload bottles to release
+        if: steps.build.outputs.BUILT_COUNT != '0'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: stable
           name: "Stable Bottles"
           body: |
-            Auto-built Homebrew bottles for macOS Monterey (12) and Ventura (13).
-            Built with `MACOSX_DEPLOYMENT_TARGET=12.0` on `macos-13` runner.
-            Last updated: ${{ github.run_id }}
+            Auto-built Homebrew bottles cho macOS Monterey (12) và Ventura (13).
+            Built với `MACOSX_DEPLOYMENT_TARGET=12.0` trên `macos-13` runner.
+            Last updated: run #${{ github.run_number }}
           prerelease: false
           make_latest: true
           fail_on_unmatched_files: false
-          # Xóa assets cũ cùng tên trước khi upload mới
           files: bottles/*.bottle.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update formula files
+        if: steps.build.outputs.BUILT_COUNT != '0'
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           BOTTLES_DIR: ${{ github.workspace }}/bottles
         run: ./scripts/update_formula.sh
 
       - name: Commit updated formulas
+        if: steps.build.outputs.BUILT_COUNT != '0'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add Formula/
 
-          # Chỉ commit nếu có thay đổi
           if git diff --staged --quiet; then
             echo "No formula changes to commit."
           else
@@ -101,12 +115,20 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## ✅ Build Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-          for f in bottles/*.bottle.tar.gz; do
-            [ -f "$f" ] || continue
-            size=$(du -h "$f" | cut -f1)
-            echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
-          done
+          built=${{ steps.build.outputs.BUILT_COUNT || '0' }}
+          failed=${{ steps.build.outputs.FAILED_COUNT || '0' }}
+
+          if [ "$built" = "0" ] && [ "$failed" = "0" ]; then
+            echo "## ⏭️ All packages up to date" >> $GITHUB_STEP_SUMMARY
+            echo "No new versions found — nothing to build." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ✅ Build Complete" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+            for f in bottles/*.bottle.tar.gz; do
+              [ -f "$f" ] || continue
+              size=$(du -h "$f" | cut -f1)
+              echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
+            done
+          fi

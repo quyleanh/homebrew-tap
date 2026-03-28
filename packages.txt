@@ -2,21 +2,24 @@
 # Mỗi dòng một package tên theo Homebrew formula
 # Dòng bắt đầu bằng # là comment
 
-# Media tools
+# CLI / download tools
+argon2
+aria2
+wget
+fzf
+jq
+tree
+yt-dlp
+rclone
+
+# Shell
+bash
+tmux
+
+# Media
 ffmpeg
 
-# Dev tools
-git
-
-# Runtimes
-python@3.13
+# Dev / runtimes
+go
 node
-
-# CLI tools
-wget
-curl
-jq
-htop
-tree
-ripgrep
-fd
+hugo
