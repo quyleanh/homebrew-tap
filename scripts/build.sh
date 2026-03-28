@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # build.sh — Build Homebrew bottles, chỉ build những package có version mới
-# Chạy trên GitHub Actions macos-13 runner (Ventura, Intel x86_64)
-# Binary build với MACOSX_DEPLOYMENT_TARGET=12.0 để tương thích Monterey+
+# Chạy trên GitHub Actions macos-15-intel runner (Sequoia, Intel x86_64)
+# Target: MacBook Pro 2017 chạy macOS Ventura (13)
 
 set -euo pipefail
 
@@ -10,20 +10,16 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PACKAGES_FILE="$REPO_ROOT/packages.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
-FORCE_BUILD="${FORCE_BUILD:-false}"  # Set true để build lại tất cả
+FORCE_BUILD="${FORCE_BUILD:-false}"
 
-# macOS deployment target — tương thích từ Monterey (12.0) trở lên
-export MACOSX_DEPLOYMENT_TARGET="12.0"
-export HOMEBREW_MACOS_VERSION_FORMULA_TARGET="12"
 export HOMEBREW_NO_AUTO_UPDATE="1"
 export HOMEBREW_NO_INSTALL_CLEANUP="1"
 
 mkdir -p "$OUTPUT_DIR"
 
 echo "=== Homebrew Bottle Builder ==="
-echo "Deployment target : $MACOSX_DEPLOYMENT_TARGET"
-echo "Output dir        : $OUTPUT_DIR"
-echo "Force build       : $FORCE_BUILD"
+echo "Output dir  : $OUTPUT_DIR"
+echo "Force build : $FORCE_BUILD"
 echo ""
 
 # ──────────────────────────────────────────────────────────────
