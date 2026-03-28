@@ -62,7 +62,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_build || 'false' }}
-        run: /opt/homebrew/bin/bash scripts/build.sh
+        run: /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles
         run: |
