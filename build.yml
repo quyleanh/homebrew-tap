@@ -1,0 +1,112 @@
+name: Build Bottles
+
+on:
+  # Chạy thủ công từ GitHub Actions tab
+  workflow_dispatch:
+
+  # Tự động chạy mỗi tuần vào Chủ nhật 2:00 AM UTC
+  schedule:
+    - cron: "0 2 * * 0"
+
+  # Chạy khi có thay đổi packages.txt
+  push:
+    paths:
+      - "packages.txt"
+    branches:
+      - main
+
+permissions:
+  contents: write  # Cần để commit formula và update release
+
+jobs:
+  build:
+    name: Build Bottles (macOS 13 / Intel)
+    runs-on: macos-13
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set deployment target (Monterey compatible)
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=12.0" >> $GITHUB_ENV
+          echo "HOMEBREW_MACOS_VERSION_FORMULA_TARGET=12" >> $GITHUB_ENV
+          echo "HOMEBREW_NO_AUTO_UPDATE=1" >> $GITHUB_ENV
+          echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
+
+      - name: Update Homebrew
+        run: brew update --quiet
+
+      - name: Install build dependencies
+        run: |
+          brew install jq  # cần cho update_formula.sh
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Build bottles
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          OUTPUT_DIR: ${{ github.workspace }}/bottles
+        run: ./scripts/build.sh
+
+      - name: List built bottles
+        run: |
+          echo "=== Built bottles ==="
+          ls -lh bottles/ || echo "No bottles found"
+
+      - name: Create or update stable release + upload bottles
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: stable
+          name: "Stable Bottles"
+          body: |
+            Auto-built Homebrew bottles for macOS Monterey (12) and Ventura (13).
+            Built with `MACOSX_DEPLOYMENT_TARGET=12.0` on `macos-13` runner.
+            Last updated: ${{ github.run_id }}
+          prerelease: false
+          make_latest: true
+          fail_on_unmatched_files: false
+          # Xóa assets cũ cùng tên trước khi upload mới
+          files: bottles/*.bottle.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update formula files
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          BOTTLES_DIR: ${{ github.workspace }}/bottles
+        run: ./scripts/update_formula.sh
+
+      - name: Commit updated formulas
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add Formula/
+
+          # Chỉ commit nếu có thay đổi
+          if git diff --staged --quiet; then
+            echo "No formula changes to commit."
+          else
+            git commit -m "chore: update bottles [skip ci]
+
+          Built by GitHub Actions run #${{ github.run_number }}
+          Runner: macos-13 (Ventura/Intel)
+          Deployment target: macOS 12.0 (Monterey+)"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          echo "## ✅ Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          for f in bottles/*.bottle.tar.gz; do
+            [ -f "$f" ] || continue
+            size=$(du -h "$f" | cut -f1)
+            echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
+          done

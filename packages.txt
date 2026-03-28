@@ -1,0 +1,22 @@
+# Danh sách packages cần build bottle
+# Mỗi dòng một package tên theo Homebrew formula
+# Dòng bắt đầu bằng # là comment
+
+# Media tools
+ffmpeg
+
+# Dev tools
+git
+
+# Runtimes
+python@3.13
+node
+
+# CLI tools
+wget
+curl
+jq
+htop
+tree
+ripgrep
+fd
