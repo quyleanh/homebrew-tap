@@ -1,6 +1,6 @@
-# Danh sách packages cần build bottle
-# Mỗi dòng một package tên theo Homebrew formula
-# Dòng bắt đầu bằng # là comment
+# Package list for bottle builds.
+# One package per line (Homebrew formula names).
+# Lines starting with # are comments.
 
 # CLI / download tools
 argon2

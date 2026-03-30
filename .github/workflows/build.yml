@@ -1,11 +1,11 @@
 name: Build Bottles
 
 on:
-  # Chạy thủ công từ GitHub Actions tab
+  # Trigger manually from the GitHub Actions tab
   workflow_dispatch:
     inputs:
       force_build:
-        description: "Force rebuild tất cả packages (bỏ qua version check)"
+        description: "Force rebuild all packages (skip version check)"
         required: false
         default: "false"
         type: choice
@@ -13,11 +13,11 @@ on:
           - "false"
           - "true"
 
-  # Tự động chạy mỗi tuần vào Chủ nhật 2:00 AM UTC
+  # Run automatically every Sunday at 2:00 AM UTC
   schedule:
     - cron: "0 2 * * 0"
 
-  # Chạy khi có thay đổi packages.txt
+  # Run when packages.txt is changed
   push:
     paths:
       - "packages.txt"
@@ -25,7 +25,7 @@ on:
       - main
 
 permissions:
-  contents: write  # Cần để commit formula và update release
+  contents: write  # Required to commit formula updates and manage releases
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install bash jq  # bash 5+ và jq cho scripts
+          brew install bash jq  # bash 5+ and jq required by build scripts
 
       - name: Make scripts executable
         run: |
@@ -71,13 +71,13 @@ jobs:
 
       - name: Upload bottles to release
         if: steps.build.outputs.BUILT_COUNT != '0'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: stable
           name: "Stable Bottles"
           body: |
-            Auto-built Homebrew bottles cho macOS Ventura (13) trên Intel x86_64.
-            Built trên `macos-15-intel` runner.
+            Auto-built Homebrew bottles for macOS Ventura (13) on Intel x86_64.
+            Built on `macos-15-intel` runner.
             Last updated: run #${{ github.run_number }}
           prerelease: false
           make_latest: true
@@ -107,8 +107,7 @@ jobs:
             git commit -m "chore: update bottles [skip ci]
 
           Built by GitHub Actions run #${{ github.run_number }}
-          Runner: macos-15-intel (Sequoia/Intel x86_64)
-          Deployment target: macOS 12.0 (Monterey+)"
+          Runner: macos-15-intel (Sequoia, Intel x86_64)"
             git push
           fi
 

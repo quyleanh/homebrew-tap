@@ -1,82 +1,86 @@
 # homebrew-tap
 
-Private Homebrew Tap với pre-built bottles cho macOS Monterey (12) và Ventura (13) trên Intel x86_64.
+Private Homebrew Tap with pre-built bottles for macOS Ventura (13) on Intel x86_64.
 
-Giải quyết vấn đề Homebrew không còn hỗ trợ đầy đủ binary cho các máy Mac Intel đời 2017.
+Solves the problem of Homebrew dropping full binary support for 2017 Intel Macs.
 
-## Máy được hỗ trợ
+## Supported machine
 
-| Máy | macOS | Chip |
-|-----|-------|------|
-| MacBook Air 2017 | Monterey 12 | Intel Core i5/i7 |
+| Machine | macOS | Chip |
+|---------|-------|------|
 | MacBook Pro 2017 | Ventura 13 | Intel Core i5/i7 |
 
-## Cài đặt lần đầu
+## Initial setup
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/homebrew-tap/main/install.sh)"
 ```
 
-Hoặc thủ công:
+Or manually:
 
 ```bash
 brew tap YOUR_USERNAME/tap https://github.com/YOUR_USERNAME/homebrew-tap
 ```
 
-## Cách dùng
+## Usage
 
 ```bash
-# Cài một package
+# Install a package
 brew install YOUR_USERNAME/tap/ffmpeg
 
-# Update tất cả
+# Update all
 brew update && brew upgrade
 
-# Xem danh sách package có sẵn
+# List available packages
 brew tap-info YOUR_USERNAME/tap
 ```
 
-## Packages mặc định
+## Default packages
 
-Xem và chỉnh sửa danh sách tại [`packages.txt`](./packages.txt).
+See and edit the list at [`packages.txt`](./packages.txt).
 
-| Package | Mô tả |
-|---------|-------|
-| ffmpeg | Xử lý audio/video |
-| git | Version control |
-| python@3.13 | Python runtime |
-| node | Node.js runtime |
-| wget | Download files |
-| curl | HTTP client |
+| Package | Description |
+|---------|-------------|
+| ffmpeg | Audio/video processing |
+| aria2 | Download manager |
+| bash | Latest bash shell |
+| fzf | Fuzzy finder |
+| go | Go runtime |
+| hugo | Static site generator |
 | jq | JSON processor |
-| htop | Process monitor |
+| node | Node.js runtime |
+| rclone | Cloud storage sync |
+| tmux | Terminal multiplexer |
 | tree | Directory tree |
-| ripgrep | Fast search (rg) |
-| fd | Fast find |
+| wget | File downloader |
+| yt-dlp | Video downloader |
+| argon2 | Password hashing |
 
-## Cách thêm/bớt package
+## Adding or removing packages
 
-1. Chỉnh sửa [`packages.txt`](./packages.txt)
-2. Push lên GitHub
-3. GitHub Actions tự động build bottles mới
-4. Chạy `brew update && brew upgrade` trên máy
+1. Edit [`packages.txt`](./packages.txt)
+2. Push to GitHub
+3. GitHub Actions automatically builds new bottles
+4. Run `brew update && brew upgrade` on your machine
 
-## Build thủ công
+## Manual build
 
-Vào tab **Actions** trên GitHub → chọn **Build Bottles** → **Run workflow**.
+Go to the **Actions** tab on GitHub → select **Build Bottles** → **Run workflow**.
 
-## Cách hoạt động
+Use the `force_build = true` option to rebuild all packages regardless of version.
+
+## How it works
 
 ```
-packages.txt (bạn chỉnh)
+packages.txt  (you edit this)
       ↓
-GitHub Actions (macos-13, Intel)
-build với MACOSX_DEPLOYMENT_TARGET=12.0
+GitHub Actions (macos-15-intel, Intel x86_64)
+builds each package with --build-bottle
       ↓
-Upload bottles lên Release "stable"
+Bottles packed from Cellar and uploaded to Release "stable"
       ↓
-Tự động update Formula/ với SHA256 mới
+Formula/ auto-updated with new SHA256 and URLs
       ↓
-brew update && brew upgrade trên máy bạn
-→ tải bottle về, không build gì cả
+brew update && brew upgrade on your machine
+→ downloads the bottle, no local compilation
 ```
