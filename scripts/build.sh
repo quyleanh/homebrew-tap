@@ -149,9 +149,13 @@ for pkg in "${PACKAGES[@]}"; do
   if brew install --build-bottle "$pkg"; then
     echo "  ✅ Install OK, creating bottle..."
 
-    # Resolve installed version and Cellar path
-    pkg_version=$(brew info --json=v1 "$pkg" | jq -r '.[0].versions.stable')
-    cellar_path="$(brew --cellar)/$pkg/$pkg_version"
+    # Resolve the actual installed version directory from Cellar.
+    # brew info returns the base version (e.g. 20190702) but the Cellar
+    # directory may include a revision suffix (e.g. 20190702_1), so we
+    # read the real path directly instead of constructing it from the version.
+    pkg_cellar="$(brew --cellar)/$pkg"
+    cellar_path=$(ls -dt "$pkg_cellar"/*/  2>/dev/null | head -1 | sed 's|/$||')
+    pkg_version=$(basename "$cellar_path")
 
     if [ ! -d "$cellar_path" ]; then
       echo "  ⚠️  Cellar path not found: $cellar_path"
