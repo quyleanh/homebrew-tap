@@ -61,8 +61,10 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
-          FORCE_BUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_build || 'false' }}
-        run: /usr/local/bin/bash scripts/build.sh
+          FORCE_BUILD: ${{ inputs.force_build || 'false' }}
+        run: |
+          echo "FORCE_BUILD=${FORCE_BUILD}"
+          /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles
         run: |
