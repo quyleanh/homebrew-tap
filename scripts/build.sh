@@ -53,6 +53,7 @@ resolve_ordered() {
   # brew deps --topological on multiple packages gives the right order
   local all_deps
   all_deps=$(brew deps --topological --include-build "${leaves[@]}" 2>/dev/null | \
+    grep -v '^\s*$' | \
     awk '!seen[$0]++')
 
   # Build the final ordered list:
@@ -61,7 +62,7 @@ resolve_ordered() {
   {
     echo "$all_deps"
     printf '%s\n' "${leaves[@]}"
-  } | awk '!seen[$0]++'
+  } | grep -v '^\s*$' | awk '!seen[$0]++'
 }
 
 mapfile -t ORDERED < <(resolve_ordered "${LEAVES[@]}")
@@ -123,7 +124,9 @@ fetch_released_versions() {
   }
 
   while IFS= read -r asset_name; do
-    if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^.]+)\. ]]; then
+    # Bottle filename format: aria2--1.37.0_1.sequoia.bottle.tar.gz
+    # Capture everything between -- and the first OS tag (.sequoia. / .ventura. etc.)
+    if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^/]+)\.(sequoia|ventura|sonoma|monterey)\. ]]; then
       local pkg="${BASH_REMATCH[1]}"
       local ver="${BASH_REMATCH[2]}"
       echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
