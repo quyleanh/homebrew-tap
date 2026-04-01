@@ -1,6 +1,6 @@
-# Package list for bottle builds.
-# One package per line (Homebrew formula names).
-# Lines starting with # are comments.
+# packages.txt — top-level packages only (your brew leaves)
+# Edit this file to add/remove packages.
+# Dependencies are resolved automatically by build.sh at CI runtime.
 
 # CLI / download tools
 argon2
