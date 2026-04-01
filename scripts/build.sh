@@ -148,7 +148,7 @@ get_released_version() {
 needs_build() {
   local pkg="$1"
 
-  if [ "$FORCE_BUILD" = "true" ]; then
+  if [ "$FORCE_BUILD" = true ]; then
     echo "  → Force build enabled"
     return 0
   fi
