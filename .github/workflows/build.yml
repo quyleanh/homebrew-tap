@@ -63,7 +63,11 @@ jobs:
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ inputs.force_build || 'false' }}
         run: |
-          echo "FORCE_BUILD=${FORCE_BUILD}"
+          echo "=== ENV DEBUG ==="
+          echo "FORCE_BUILD=[${FORCE_BUILD}]"
+          echo "event_name=${{ github.event_name }}"
+          echo "inputs.force_build=${{ inputs.force_build }}"
+          echo "================="
           /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles

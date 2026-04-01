@@ -20,14 +20,12 @@ OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 
-export HOMEBREW_NO_AUTO_UPDATE="1"
-export HOMEBREW_NO_INSTALL_CLEANUP="1"
-
-mkdir -p "$OUTPUT_DIR"
-
+# Debug: print exact value and byte representation
 echo "=== Homebrew Bottle Builder ==="
 echo "Output dir  : $OUTPUT_DIR"
-echo "Force build : $FORCE_BUILD"
+echo "Force build : [${FORCE_BUILD}]"
+echo "Force build length: ${#FORCE_BUILD}"
+printf 'Force build bytes: '; printf '%s' "$FORCE_BUILD" | od -c | head -1
 echo ""
 
 # ──────────────────────────────────────────────────────────────
@@ -148,7 +146,7 @@ get_released_version() {
 needs_build() {
   local pkg="$1"
 
-  if [ "$FORCE_BUILD" = true ]; then
+  if [ "$FORCE_BUILD" = "true" ]; then
     echo "  → Force build enabled"
     return 0
   fi
