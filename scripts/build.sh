@@ -1,191 +1,228 @@
 #!/usr/bin/env bash
+
 # build.sh — Resolve full dependency graph then build Homebrew bottles
+
 # in topological order so each dependency is available before its dependents.
-#
+
+# 
+
 # Flow:
-#   1. Read top-level packages from packages.txt
-#   2. Run `brew deps` to resolve the full graph (writes packages_resolved.txt)
-#   3. Topological sort via `brew deps --topological`
-#   4. Build + bottle each package; skip if already up to date in the release
-#
+
+# 1. Read top-level packages from packages.txt
+
+# 2. Run `brew deps` to resolve the full graph (writes packages_resolved.txt)
+
+# 3. Topological sort via `brew deps --topological`
+
+# 4. Build + bottle each package; skip if already up to date in the release
+
+# 
+
 # Runs on GitHub Actions macos-15-intel (Sequoia, Intel x86_64).
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PACKAGES_FILE="$REPO_ROOT/packages.txt"
-RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
-OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
-GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
-FORCE_BUILD="${FORCE_BUILD:-false}"
+SCRIPT_DIR=”$(cd “$(dirname “${BASH_SOURCE[0]}”)” && pwd)”
+REPO_ROOT=”$(cd “$SCRIPT_DIR/..” && pwd)”
+PACKAGES_FILE=”$REPO_ROOT/packages.txt”
+RESOLVED_FILE=”$REPO_ROOT/packages_resolved.txt”
+OUTPUT_DIR=”${OUTPUT_DIR:-$REPO_ROOT/bottles}”
+GITHUB_REPOSITORY=”${GITHUB_REPOSITORY:-}”
+FORCE_BUILD=”${FORCE_BUILD:-false}”
 
 # Debug: print exact value and byte representation
-echo "=== Homebrew Bottle Builder ==="
-echo "Output dir  : $OUTPUT_DIR"
-echo "Force build : [${FORCE_BUILD}]"
-echo "Force build length: ${#FORCE_BUILD}"
-printf 'Force build bytes: '; printf '%s' "$FORCE_BUILD" | od -c | head -1
-echo ""
+
+echo “=== Homebrew Bottle Builder ===”
+echo “Output dir  : $OUTPUT_DIR”
+echo “Force build : [${FORCE_BUILD}]”
+echo “Force build length: ${#FORCE_BUILD}”
+printf ’Force build bytes: ’; printf ‘%s’ “$FORCE_BUILD” | od -c | head -1
+echo “”
 
 # ──────────────────────────────────────────────────────────────
+
 # Step 1: Read top-level packages
-# ──────────────────────────────────────────────────────────────
-mapfile -t LEAVES < <(grep -v '^\s*#' "$PACKAGES_FILE" | grep -v '^\s*$')
-
-echo "📋 Top-level packages (${#LEAVES[@]}):"
-printf '  %s\n' "${LEAVES[@]}"
-echo ""
 
 # ──────────────────────────────────────────────────────────────
+
+mapfile -t LEAVES < <(grep -v ‘^\s*#’ “$PACKAGES_FILE” | grep -v ‘^\s*$’)
+
+echo “📋 Top-level packages (${#LEAVES[@]}):”
+printf ’  %s\n’ “${LEAVES[@]}”
+echo “”
+
+# ──────────────────────────────────────────────────────────────
+
 # Step 2: Resolve full dependency graph using brew deps
-# brew deps --topological prints dependencies before dependents
-# --include-build includes build-time deps (needed on CI)
+
+# brew deps –topological prints dependencies before dependents
+
+# –include-build includes build-time deps (needed on CI)
+
 # ──────────────────────────────────────────────────────────────
-echo "🔍 Resolving full dependency graph..."
+
+echo “🔍 Resolving full dependency graph…”
 
 resolve_ordered() {
-  local leaves=("$@")
+local leaves=(”$@”)
 
-  # Collect all unique deps in topological order for the full set
-  # brew deps --topological on multiple packages gives the right order
-  local all_deps
-  all_deps=$(brew deps --topological --include-build "${leaves[@]}" 2>/dev/null | \
-    grep -v '^\s*$' | \
-    awk '!seen[$0]++')
+# Collect all unique deps in topological order for the full set
 
-  # Build the final ordered list:
-  # 1. Dependencies first (topological order)
-  # 2. Then leaves that weren't already listed as a dep of something else
-  {
-    echo "$all_deps"
-    printf '%s\n' "${leaves[@]}"
-  } | grep -v '^\s*$' | awk '!seen[$0]++'
+# brew deps –topological on multiple packages gives the right order
+
+local all_deps
+all_deps=$(brew deps –topological –include-build “${leaves[@]}” 2>/dev/null |   
+grep -v ‘^\s*$’ |   
+awk ‘!seen[$0]++’)
+
+# Build the final ordered list:
+
+# 1. Dependencies first (topological order)
+
+# 2. Then leaves that weren’t already listed as a dep of something else
+
+{
+echo “$all_deps”
+printf ‘%s\n’ “${leaves[@]}”
+} | grep -v ‘^\s*$’ | awk ‘!seen[$0]++’
 }
 
-mapfile -t ORDERED < <(resolve_ordered "${LEAVES[@]}")
+mapfile -t ORDERED < <(resolve_ordered “${LEAVES[@]}”)
 
-echo "📦 Resolved build order (${#ORDERED[@]} total packages):"
-for pkg in "${ORDERED[@]}"; do
-  is_leaf=false
-  for leaf in "${LEAVES[@]}"; do
-    [ "$pkg" = "$leaf" ] && is_leaf=true && break
-  done
-  if $is_leaf; then
-    echo "  $pkg  [leaf]"
-  else
-    echo "  $pkg"
-  fi
+echo “📦 Resolved build order (${#ORDERED[@]} total packages):”
+for pkg in “${ORDERED[@]}”; do
+is_leaf=false
+for leaf in “${LEAVES[@]}”; do
+[ “$pkg” = “$leaf” ] && is_leaf=true && break
 done
-echo ""
+if $is_leaf; then
+echo “  $pkg  [leaf]”
+else
+echo “  $pkg”
+fi
+done
+echo “”
 
 # Write resolved list to file for reference / debugging
+
 {
-  echo "# packages_resolved.txt — auto-generated by build.sh"
-  echo "# Do not edit manually. Edit packages.txt instead."
-  echo "# Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-  echo "# Total: ${#ORDERED[@]} packages (${#LEAVES[@]} leaves + dependencies)"
-  echo ""
-  for pkg in "${ORDERED[@]}"; do
-    is_leaf=false
-    for leaf in "${LEAVES[@]}"; do
-      [ "$pkg" = "$leaf" ] && is_leaf=true && break
-    done
-    $is_leaf && echo "$pkg  # [leaf]" || echo "$pkg"
-  done
-} > "$RESOLVED_FILE"
+echo “# packages_resolved.txt — auto-generated by build.sh”
+echo “# Do not edit manually. Edit packages.txt instead.”
+echo “# Generated: $(date -u ‘+%Y-%m-%d %H:%M:%S UTC’)”
+echo “# Total: ${#ORDERED[@]} packages (${#LEAVES[@]} leaves + dependencies)”
+echo “”
+for pkg in “${ORDERED[@]}”; do
+is_leaf=false
+for leaf in “${LEAVES[@]}”; do
+[ “$pkg” = “$leaf” ] && is_leaf=true && break
+done
+$is_leaf && echo “$pkg  # [leaf]” || echo “$pkg”
+done
+} > “$RESOLVED_FILE”
 
-echo "📝 Resolved list written to: packages_resolved.txt"
-echo ""
+echo “📝 Resolved list written to: packages_resolved.txt”
+echo “”
 
 # ──────────────────────────────────────────────────────────────
+
 # Step 3: Version cache (temp files, bash 3.2 compatible)
+
 # ──────────────────────────────────────────────────────────────
-VERSIONS_CACHE_DIR="$(mktemp -d)"
+
+VERSIONS_CACHE_DIR=”$(mktemp -d)”
 
 fetch_released_versions() {
-  if [ -z "$GITHUB_REPOSITORY" ]; then
-    echo "⚠️  GITHUB_REPOSITORY not set — will build all packages"
-    return
-  fi
+if [ -z “$GITHUB_REPOSITORY” ]; then
+echo “⚠️  GITHUB_REPOSITORY not set — will build all packages”
+return
+fi
 
-  echo "🔍 Fetching released asset list from GitHub..."
+echo “🔍 Fetching released asset list from GitHub…”
 
-  local api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/stable"
-  local response
-  response=$(curl -sf \
-    -H "Authorization: Bearer ${GITHUB_TOKEN:-}" \
-    -H "Accept: application/vnd.github+json" \
-    "$api_url" 2>/dev/null) || {
-    echo "⚠️  Could not fetch release info — will build all packages"
-    return
-  }
+local api_url=“https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/stable”
+local response
+response=$(curl -sf   
+-H “Authorization: Bearer ${GITHUB_TOKEN:-}”   
+-H “Accept: application/vnd.github+json”   
+“$api_url” 2>/dev/null) || {
+echo “⚠️  Could not fetch release info — will build all packages”
+return
+}
 
-  while IFS= read -r asset_name; do
-    # Bottle filename format: aria2--1.37.0_1.sequoia.bottle.tar.gz
-    # Capture everything between -- and the first OS tag (.sequoia. / .ventura. etc.)
-    if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^/]+)\.(sequoia|ventura|sonoma|monterey)\. ]]; then
-      local pkg="${BASH_REMATCH[1]}"
-      local ver="${BASH_REMATCH[2]}"
-      echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
-      echo "  $pkg @ $ver"
-    fi
-  done < <(echo "$response" | jq -r '.assets[].name // empty')
+while IFS= read -r asset_name; do
+# Bottle filename format: aria2–1.37.0_1.sequoia.bottle.tar.gz
+# Capture everything between – and the first OS tag (.sequoia. / .ventura. etc.)
+if [[ “$asset_name” =~ ^([a-zA-Z0-9_@.-]+)–([^/]+).(sequoia|ventura|sonoma|monterey). ]]; then
+local pkg=”${BASH_REMATCH[1]}”
+local ver=”${BASH_REMATCH[2]}”
+echo “$ver” > “$VERSIONS_CACHE_DIR/$pkg”
+echo “  $pkg @ $ver”
+fi
+done < <(echo “$response” | jq -r ‘.assets[].name // empty’)
 
-  echo ""
+echo “”
 }
 
 get_released_version() {
-  local f="$VERSIONS_CACHE_DIR/$1"
-  [ -f "$f" ] && cat "$f" || echo ""
+local f=”$VERSIONS_CACHE_DIR/$1”
+[ -f “$f” ] && cat “$f” || echo “”
 }
 
 # ──────────────────────────────────────────────────────────────
+
 # Step 4: Determine if a package needs rebuilding
+
 # ──────────────────────────────────────────────────────────────
+
 needs_build() {
-  local pkg="$1"
+local pkg=”$1”
 
-  if [ "$FORCE_BUILD" = "true" ]; then
-    echo "  → Force build enabled"
-    return 0
-  fi
+echo “  → [debug] FORCE_BUILD=’${FORCE_BUILD}’ (len=${#FORCE_BUILD})”
+echo “  → [debug] test result: $([ “$FORCE_BUILD” = “true” ] && echo MATCH || echo NO_MATCH)”
 
-  local latest
-  latest=$(brew info --json=v1 "$pkg" 2>/dev/null | \
-    jq -r '.[0].versions.stable // empty')
+if [ “$FORCE_BUILD” = “true” ]; then
+echo “  → Force build enabled”
+return 0
+fi
 
-  if [ -z "$latest" ]; then
-    echo "  → Could not determine version, building to be safe"
-    return 0
-  fi
+local latest
+latest=$(brew info –json=v1 “$pkg” 2>/dev/null |   
+jq -r ‘.[0].versions.stable // empty’)
 
-  local released
-  released=$(get_released_version "$pkg")
+if [ -z “$latest” ]; then
+echo “  → Could not determine version, building to be safe”
+return 0
+fi
 
-  echo "  → Latest  : $latest"
-  echo "  → Released: ${released:-<none>}"
+local released
+released=$(get_released_version “$pkg”)
 
-  if [ -z "$released" ]; then
-    echo "  → Not in release yet, will build"
-    return 0
-  fi
+echo “  → Latest  : $latest”
+echo “  → Released: ${released:-<none>}”
 
-  if [ "$latest" = "$released" ]; then
-    echo "  → Up to date, skipping ✓"
-    return 1
-  fi
+if [ -z “$released” ]; then
+echo “  → Not in release yet, will build”
+return 0
+fi
 
-  echo "  → New version available, will build"
-  return 0
+if [ “$latest” = “$released” ]; then
+echo “  → Up to date, skipping ✓”
+return 1
+fi
+
+echo “  → New version available, will build”
+return 0
 }
 
 # ──────────────────────────────────────────────────────────────
+
 # Step 5: Build loop
+
 # ──────────────────────────────────────────────────────────────
-echo "🔄 Updating Homebrew..."
-brew update --quiet
-echo ""
+
+echo “🔄 Updating Homebrew…”
+brew update –quiet
+echo “”
 
 fetch_released_versions
 
@@ -193,95 +230,104 @@ BUILT=()
 SKIPPED=()
 FAILED=()
 
-for pkg in "${ORDERED[@]}"; do
-  echo "──────────────────────────────────────"
-  echo "📦 $pkg"
-  echo "──────────────────────────────────────"
+for pkg in “${ORDERED[@]}”; do
+echo “──────────────────────────────────────”
+echo “📦 $pkg”
+echo “──────────────────────────────────────”
 
-  if ! needs_build "$pkg"; then
-    SKIPPED+=("$pkg")
+if ! needs_build “$pkg”; then
+SKIPPED+=(”$pkg”)
 
-    # Ensure package is installed locally so dependents can link against it
-    if ! brew list --formula "$pkg" &>/dev/null; then
-      echo "  ℹ️  Installing locally so dependents can link..."
-      brew install "$pkg" 2>/dev/null || true
-    else
-      echo "  ℹ️  Already installed locally ✓"
-    fi
+```
+# Ensure package is installed locally so dependents can link against it
+if ! brew list --formula "$pkg" &>/dev/null; then
+  echo "  ℹ️  Installing locally so dependents can link..."
+  brew install "$pkg" 2>/dev/null || true
+else
+  echo "  ℹ️  Already installed locally ✓"
+fi
 
-    echo ""
-    continue
-  fi
+echo ""
+continue
+```
 
-  # Uninstall for a clean build
-  brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
+fi
 
-  if brew install --build-bottle "$pkg"; then
-    echo "  ✅ Installed, packing bottle..."
+# Uninstall for a clean build
 
-    # Resolve actual Cellar path — may include revision suffix (_1, _2...)
-    cellar_path=$(ls -dt "$(brew --cellar)/$pkg/"*/ 2>/dev/null | head -1 | sed 's|/$||')
-    pkg_version=$(basename "$cellar_path")
+brew uninstall –ignore-dependencies “$pkg” 2>/dev/null || true
 
-    if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
-      echo "  ⚠️  Cellar path not found for $pkg"
-      FAILED+=("$pkg")
-      echo ""
-      continue
-    fi
+if brew install –build-bottle “$pkg”; then
+echo “  ✅ Installed, packing bottle…”
 
-    bottle_name="${pkg}--${pkg_version}.sequoia.bottle.tar.gz"
-    bottle_path="$OUTPUT_DIR/$bottle_name"
+```
+# Resolve actual Cellar path — may include revision suffix (_1, _2...)
+cellar_path=$(ls -dt "$(brew --cellar)/$pkg/"*/ 2>/dev/null | head -1 | sed 's|/$||')
+pkg_version=$(basename "$cellar_path")
 
-    echo "  📦 Packing: $bottle_name"
-    tar -czf "$bottle_path" \
-      -C "$(brew --cellar)" \
-      "$pkg/$pkg_version"
-
-    # Generate JSON metadata for update_formula.sh
-    brew bottle \
-      --json \
-      --root-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/stable" \
-      "$pkg" 2>/dev/null || true
-
-    find . -maxdepth 1 -name "*.bottle.json" -exec mv {} "$OUTPUT_DIR/" \;
-
-    echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
-    BUILT+=("$pkg")
-
-    # Package stays installed in Cellar — next packages link against it for free
-
-  else
-    echo "  ❌ Build failed: $pkg"
-    FAILED+=("$pkg")
-  fi
-
+if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
+  echo "  ⚠️  Cellar path not found for $pkg"
+  FAILED+=("$pkg")
   echo ""
+  continue
+fi
+
+bottle_name="${pkg}--${pkg_version}.sequoia.bottle.tar.gz"
+bottle_path="$OUTPUT_DIR/$bottle_name"
+
+echo "  📦 Packing: $bottle_name"
+tar -czf "$bottle_path" \
+  -C "$(brew --cellar)" \
+  "$pkg/$pkg_version"
+
+# Generate JSON metadata for update_formula.sh
+brew bottle \
+  --json \
+  --root-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/stable" \
+  "$pkg" 2>/dev/null || true
+
+find . -maxdepth 1 -name "*.bottle.json" -exec mv {} "$OUTPUT_DIR/" \;
+
+echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
+BUILT+=("$pkg")
+
+# Package stays installed in Cellar — next packages link against it for free
+```
+
+else
+echo “  ❌ Build failed: $pkg”
+FAILED+=(”$pkg”)
+fi
+
+echo “”
 done
 
-rm -rf "$VERSIONS_CACHE_DIR"
+rm -rf “$VERSIONS_CACHE_DIR”
 
 # ──────────────────────────────────────────────────────────────
+
 # Summary
+
 # ──────────────────────────────────────────────────────────────
-echo "══════════════════════════════════════"
-echo "Build Summary"
-echo "══════════════════════════════════════"
-echo "✅ Built   (${#BUILT[@]}): ${BUILT[*]:-none}"
-echo "⏭️  Skipped (${#SKIPPED[@]}): ${SKIPPED[*]:-none}"
-echo "❌ Failed  (${#FAILED[@]}): ${FAILED[*]:-none}"
-echo ""
 
-[ ${#BUILT[@]} -eq 0 ] && [ ${#FAILED[@]} -eq 0 ] && \
-  echo "Nothing new to build — all packages are up to date."
+echo “══════════════════════════════════════”
+echo “Build Summary”
+echo “══════════════════════════════════════”
+echo “✅ Built   (${#BUILT[@]}): ${BUILT[*]:-none}”
+echo “⏭️  Skipped (${#SKIPPED[@]}): ${SKIPPED[*]:-none}”
+echo “❌ Failed  (${#FAILED[@]}): ${FAILED[*]:-none}”
+echo “”
 
-ls -lh "$OUTPUT_DIR/"*.bottle.tar.gz 2>/dev/null || echo "No bottles in output dir."
+[ ${#BUILT[@]} -eq 0 ] && [ ${#FAILED[@]} -eq 0 ] &&   
+echo “Nothing new to build — all packages are up to date.”
 
-echo "BUILT_COUNT=${#BUILT[@]}"   >> "${GITHUB_OUTPUT:-/dev/null}"
-echo "FAILED_COUNT=${#FAILED[@]}" >> "${GITHUB_OUTPUT:-/dev/null}"
+ls -lh “$OUTPUT_DIR/”*.bottle.tar.gz 2>/dev/null || echo “No bottles in output dir.”
+
+echo “BUILT_COUNT=${#BUILT[@]}”   >> “${GITHUB_OUTPUT:-/dev/null}”
+echo “FAILED_COUNT=${#FAILED[@]}” >> “${GITHUB_OUTPUT:-/dev/null}”
 
 if [ ${#FAILED[@]} -gt 0 ]; then
-  echo ""
-  echo "⚠️  Some packages failed. Check logs above."
-  exit 1
+echo “”
+echo “⚠️  Some packages failed. Check logs above.”
+exit 1
 fi
