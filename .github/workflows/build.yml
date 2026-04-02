@@ -52,6 +52,9 @@ jobs:
 
       - name: Make scripts executable
         run: |
+          # Fix line endings in case of CRLF corruption on checkout
+          sed -i 's/\r//' scripts/build.sh
+          sed -i 's/\r//' scripts/update_formula.sh
           chmod +x scripts/build.sh
           chmod +x scripts/update_formula.sh
 
