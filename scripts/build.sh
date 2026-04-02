@@ -22,7 +22,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=”$(cd “$(dirname “${BASH_SOURCE[0]}”)” && pwd)”
+SCRIPT_DIR=”$(dirname “$0”)”
+SCRIPT_DIR=”$(cd “$SCRIPT_DIR” && pwd)”
 REPO_ROOT=”$(cd “$SCRIPT_DIR/..” && pwd)”
 PACKAGES_FILE=”$REPO_ROOT/packages.txt”
 RESOLVED_FILE=”$REPO_ROOT/packages_resolved.txt”
