@@ -31,6 +31,8 @@ OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 
+mkdir -p "$OUTPUT_DIR"
+
 echo "=== Homebrew Bottle Builder ==="
 echo "Output dir  : $OUTPUT_DIR"
 echo "Force build : ${FORCE_BUILD}"
