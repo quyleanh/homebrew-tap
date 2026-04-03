@@ -42,7 +42,7 @@ echo ""
 
 # ──────────────────────────────────────────────────────────────
 
-mapfile -t LEAVES < <(grep -v '^\s*#' "$PACKAGES_FILE" | grep -v '^\s*$')
+mapfile -t LEAVES < <(awk '!/^[ \t]*#/ && !/^[ \t]*$/' "$PACKAGES_FILE")
 
 echo "📋 Top-level packages (${#LEAVES[@]}):"
 printf '  %s\n' "${LEAVES[@]}"
@@ -68,8 +68,8 @@ local leaves=("$@")
 # brew deps --topological on multiple packages gives the right order
 
 local all_deps
-all_deps=$(brew deps --topological --include-build "${leaves[@]}" 2>/dev/null |   
-grep -v '^\s*$' |   
+all_deps=$(brew deps --topological --include-build "${leaves[@]}" 2>/dev/null |
+awk '!/^[ \t]*$/' |
 awk '!seen[$0]++')
 
 # Build the final ordered list:
@@ -81,7 +81,7 @@ awk '!seen[$0]++')
 {
 echo "$all_deps"
 printf '%s\n' "${leaves[@]}"
-} | grep -v '^\s*$' | awk '!seen[$0]++'
+} | awk '!/^[ \t]*$/' | awk '!seen[$0]++'
 }
 
 mapfile -t ORDERED < <(resolve_ordered "${LEAVES[@]}")
@@ -138,9 +138,9 @@ echo "🔍 Fetching released asset list from GitHub…"
 
 local api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/stable"
 local response
-response=$(curl -sf   
--H "Authorization: Bearer ${GITHUB_TOKEN:-}"   
--H "Accept: application/vnd.github+json"   
+response=$(curl -sf \
+-H "Authorization: Bearer ${GITHUB_TOKEN:-}" \
+-H "Accept: application/vnd.github+json" \
 "$api_url" 2>/dev/null) || {
 echo "⚠️  Could not fetch release info — will build all packages"
 return
