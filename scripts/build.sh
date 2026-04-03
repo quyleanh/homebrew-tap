@@ -30,6 +30,7 @@ RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
+MAX_BUILD_TIME=$((5 * 3600 + 30 * 60)) # 5.5 hours in seconds
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -135,14 +136,12 @@ echo "⚠️  GITHUB_REPOSITORY not set — will build all packages"
 return
 fi
 
-echo "🔍 Fetching released asset list from GitHub…"
+echo "🔍 Fetching released asset list from GitHub using gh CLI…"
+export GH_TOKEN="${GITHUB_TOKEN:-}"
 
-local api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/stable"
-local response
-response=$(curl -sf \
--H "Authorization: Bearer ${GITHUB_TOKEN:-}" \
--H "Accept: application/vnd.github+json" \
-"$api_url" 2>/dev/null) || {
+# Use gh feature to fetch ALL assets instead of just the first 30 (curl pagination limit)
+local assets
+assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null) || {
 echo "⚠️  Could not fetch release info — will build all packages"
 return
 }
@@ -156,7 +155,7 @@ local ver="${BASH_REMATCH[2]}"
 echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
 echo "  $pkg @ $ver"
 fi
-done < <(echo "$response" | jq -r '.assets[].name // empty')
+done <<< "$assets"
 
 echo ""
 }
@@ -224,8 +223,21 @@ fetch_released_versions
 BUILT=()
 SKIPPED=()
 FAILED=()
+START_TIME=$(date +%s)
 
 for pkg in "${ORDERED[@]}"; do
+CURRENT_TIME=$(date +%s)
+ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
+
+if [ "$ELAPSED_TIME" -gt "$MAX_BUILD_TIME" ]; then
+  echo "──────────────────────────────────────"
+  echo "⚠️ Time limit reached (5.5 hours). Stopping loop gracefully."
+  echo "This saves our progress so the CI can commit formulas and releases."
+  echo "Run the workflow again to pick up where it left off!"
+  echo "──────────────────────────────────────"
+  break
+fi
+
 echo "──────────────────────────────────────"
 echo "📦 $pkg"
 echo "──────────────────────────────────────"

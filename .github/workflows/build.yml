@@ -15,7 +15,8 @@ on:
 
   # Run automatically every Sunday at 2:00 AM UTC
   schedule:
-    - cron: "0 2 * * 0"
+    # Run every 6 hours
+    - cron: "0 */6 * * *"
 
   # Run when packages.txt is changed
   push:
