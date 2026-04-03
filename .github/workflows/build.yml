@@ -53,8 +53,9 @@ jobs:
       - name: Make scripts executable
         run: |
           # Fix line endings in case of CRLF corruption on checkout
-          sed -i 's/\r//' scripts/build.sh
-          sed -i 's/\r//' scripts/update_formula.sh
+          sed -i.bak 's/\r$//' scripts/build.sh
+          sed -i.bak 's/\r$//' scripts/update_formula.sh
+          rm -f scripts/*.bak
           chmod +x scripts/build.sh
           chmod +x scripts/update_formula.sh
 
@@ -66,11 +67,6 @@ jobs:
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ inputs.force_build || 'false' }}
         run: |
-          echo "=== ENV DEBUG ==="
-          echo "FORCE_BUILD=[${FORCE_BUILD}]"
-          echo "event_name=${{ github.event_name }}"
-          echo "inputs.force_build=${{ inputs.force_build }}"
-          echo "================="
           /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles

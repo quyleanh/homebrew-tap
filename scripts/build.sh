@@ -31,13 +31,9 @@ OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 
-# Debug: print exact value and byte representation
-
 echo "=== Homebrew Bottle Builder ==="
 echo "Output dir  : $OUTPUT_DIR"
-echo "Force build : [${FORCE_BUILD}]"
-echo "Force build length: ${#FORCE_BUILD}"
-printf 'Force build bytes: '; printf '%s' "$FORCE_BUILD" | od -c | head -1
+echo "Force build : ${FORCE_BUILD}"
 echo ""
 
 # ──────────────────────────────────────────────────────────────
@@ -178,9 +174,6 @@ local f="$VERSIONS_CACHE_DIR/$1"
 needs_build() {
 local pkg="$1"
 
-echo "  → [debug] FORCE_BUILD='${FORCE_BUILD}' (len=${#FORCE_BUILD})"
-echo "  → [debug] test result: $([ "$FORCE_BUILD" = "true" ] && echo MATCH || echo NO_MATCH)"
-
 if [ "$FORCE_BUILD" = "true" ]; then
 echo "  → Force build enabled"
 return 0
@@ -238,8 +231,6 @@ echo "────────────────────────�
 
 if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
-
-```
 # Ensure package is installed locally so dependents can link against it
 if ! brew list --formula "$pkg" &>/dev/null; then
   echo "  ℹ️  Installing locally so dependents can link..."
@@ -250,7 +241,6 @@ fi
 
 echo ""
 continue
-```
 
 fi
 
@@ -261,7 +251,6 @@ brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 if brew install --build-bottle "$pkg"; then
 echo "  ✅ Installed, packing bottle…"
 
-```
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
 cellar_path=$(ls -dt "$(brew --cellar)/$pkg/"*/ 2>/dev/null | head -1 | sed 's|/$||')
 pkg_version=$(basename "$cellar_path")
@@ -293,7 +282,6 @@ echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
 BUILT+=("$pkg")
 
 # Package stays installed in Cellar — next packages link against it for free
-```
 
 else
 echo "  ❌ Build failed: $pkg"
