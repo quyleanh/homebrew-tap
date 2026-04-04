@@ -13,9 +13,9 @@ on:
           - "false"
           - "true"
 
-  # Run automatically every 6 hours (11AM JST / 5PM JST / 11PM JST / 5AM JST)
+  # Run automatically every 8 hours
   schedule:
-    - cron: '47 2,8,14,20 * * *'
+    - cron: '13 5,13,21 * * *'
 
   # Run when packages.txt, scripts, or this workflow file are changed
   push:
