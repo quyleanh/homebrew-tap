@@ -7,16 +7,16 @@ class Upcre2 < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pcre2--10.47_1.sequoia.bottle.tar.gz"
-  sha256 "45b83e1da18dc350295a6be4b82f333170771819e5fe2fae97f4f1b45aece260"
+  sha256 "ed6ee4fc884e613a25d3c3cb4456204d8c3397bfe8ea68cea44e3a52953da2e4"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "45b83e1da18dc350295a6be4b82f333170771819e5fe2fae97f4f1b45aece260"
-    sha256 ventura: "45b83e1da18dc350295a6be4b82f333170771819e5fe2fae97f4f1b45aece260"
-    sha256 monterey: "45b83e1da18dc350295a6be4b82f333170771819e5fe2fae97f4f1b45aece260"
+    sha256 sequoia: "ed6ee4fc884e613a25d3c3cb4456204d8c3397bfe8ea68cea44e3a52953da2e4"
+    sha256 ventura: "ed6ee4fc884e613a25d3c3cb4456204d8c3397bfe8ea68cea44e3a52953da2e4"
+    sha256 monterey: "ed6ee4fc884e613a25d3c3cb4456204d8c3397bfe8ea68cea44e3a52953da2e4"
   end
 
   def install
