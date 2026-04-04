@@ -13,10 +13,9 @@ on:
           - "false"
           - "true"
 
-  # Run automatically every Sunday at 2:00 AM UTC
+  # Run automatically every 6 hours (11AM JST / 5PM JST / 11PM JST / 5AM JST)
   schedule:
-    # Run every 6 hours
-    - cron: "0 */6 * * *"
+    - cron: '0 2,8,14,20 * * *'
 
   # Run when packages.txt is changed
   push:
@@ -24,6 +23,9 @@ on:
       - "packages.txt"
     branches:
       - main
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write  # Required to commit formula updates and manage releases
@@ -35,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,7 +79,7 @@ jobs:
 
       - name: Upload bottles to release
         if: steps.build.outputs.BUILT_COUNT != '0'
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: stable
           name: "Stable Bottles"
