@@ -4,27 +4,17 @@ class Sdl2 < Formula
   homepage "https://www.libsdl.org/"
   version "2.32.10"
   
-  # Sá»­ dá»¥ng dummy URL Ä‘á»ƒ Homebrew khÃ´ng phÃ n nÃ n, 
-  # nhÆ°ng thá»±c táº¿ sáº½ cÃ i qua block bottle bÃªn dÆ°á»›i.
+  # SÃ¡Â»Â­ dÃ¡Â»Â¥ng dummy URL Ã„â€˜Ã¡Â»Æ’ Homebrew khÃƒÂ´ng phÃƒÂ n nÃƒÂ n, 
+  # nhÃ†Â°ng thÃ¡Â»Â±c tÃ¡ÂºÂ¿ sÃ¡ÂºÂ½ cÃƒÂ i qua block bottle bÃƒÂªn dÃ†Â°Ã¡Â»â€ºi.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2--2.32.10.sequoia.bottle.tar.gz"
   sha256 "16e5d569f8c2bebaaf316ac65a0a219d0c092e9f4aa2910fc2cc4a8baa9bbc1c"
 
-
-
-  bottle do
-    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    # "Lá»«a" Homebrew: DÃ¹ng cÃ¹ng má»™t báº£n build Sequoia cho cÃ¡c báº£n OS cÅ© hÆ¡n
-    sha256 sequoia: "16e5d569f8c2bebaaf316ac65a0a219d0c092e9f4aa2910fc2cc4a8baa9bbc1c"
-    sha256 ventura: "16e5d569f8c2bebaaf316ac65a0a219d0c092e9f4aa2910fc2cc4a8baa9bbc1c"
-    sha256 monterey: "16e5d569f8c2bebaaf316ac65a0a219d0c092e9f4aa2910fc2cc4a8baa9bbc1c"
-  end
-
   def install
-    # Homebrew sáº½ tá»± Ä‘á»™ng giáº£i nÃ©n bottle vÃ o Cellar
+    prefix.install Dir["*"]
   end
 
   test do
-    # ÄÆ¡n giáº£n hÃ³a test Ä‘á»ƒ trÃ¡nh lá»—i mÃ´i trÆ°á»ng trÃªn GitHub Runner
+    # Ã„ÂÃ†Â¡n giÃ¡ÂºÂ£n hÃƒÂ³a test Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh lÃ¡Â»â€”i mÃƒÂ´i trÃ†Â°Ã¡Â»Âng trÃƒÂªn GitHub Runner
     assert_true true
   end
 end

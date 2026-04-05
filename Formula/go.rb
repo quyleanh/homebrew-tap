@@ -4,27 +4,17 @@ class Go < Formula
   homepage "https://go.dev/"
   version "1.26.1"
   
-  # Sá»­ dá»¥ng dummy URL Ä‘á»ƒ Homebrew khÃ´ng phÃ n nÃ n, 
-  # nhÆ°ng thá»±c táº¿ sáº½ cÃ i qua block bottle bÃªn dÆ°á»›i.
+  # SÃ¡Â»Â­ dÃ¡Â»Â¥ng dummy URL Ã„â€˜Ã¡Â»Æ’ Homebrew khÃƒÂ´ng phÃƒÂ n nÃƒÂ n, 
+  # nhÃ†Â°ng thÃ¡Â»Â±c tÃ¡ÂºÂ¿ sÃ¡ÂºÂ½ cÃƒÂ i qua block bottle bÃƒÂªn dÃ†Â°Ã¡Â»â€ºi.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.1.sequoia.bottle.tar.gz"
   sha256 "aeb4df24ad92f5ad93847d00d297428ce461ae73e20bb37d81f61a07836656ab"
 
-
-
-  bottle do
-    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    # "Lá»«a" Homebrew: DÃ¹ng cÃ¹ng má»™t báº£n build Sequoia cho cÃ¡c báº£n OS cÅ© hÆ¡n
-    sha256 sequoia: "aeb4df24ad92f5ad93847d00d297428ce461ae73e20bb37d81f61a07836656ab"
-    sha256 ventura: "aeb4df24ad92f5ad93847d00d297428ce461ae73e20bb37d81f61a07836656ab"
-    sha256 monterey: "aeb4df24ad92f5ad93847d00d297428ce461ae73e20bb37d81f61a07836656ab"
-  end
-
   def install
-    # Homebrew sáº½ tá»± Ä‘á»™ng giáº£i nÃ©n bottle vÃ o Cellar
+    prefix.install Dir["*"]
   end
 
   test do
-    # ÄÆ¡n giáº£n hÃ³a test Ä‘á»ƒ trÃ¡nh lá»—i mÃ´i trÆ°á»ng trÃªn GitHub Runner
+    # Ã„ÂÃ†Â¡n giÃ¡ÂºÂ£n hÃƒÂ³a test Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh lÃ¡Â»â€”i mÃƒÂ´i trÃ†Â°Ã¡Â»Âng trÃƒÂªn GitHub Runner
     assert_true true
   end
 end

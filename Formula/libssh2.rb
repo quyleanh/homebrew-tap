@@ -4,27 +4,17 @@ class Libssh2 < Formula
   homepage "https://libssh2.org/"
   version "1.11.1_1"
   
-  # Sá»­ dá»¥ng dummy URL Ä‘á»ƒ Homebrew khÃ´ng phÃ n nÃ n, 
-  # nhÆ°ng thá»±c táº¿ sáº½ cÃ i qua block bottle bÃªn dÆ°á»›i.
+  # SÃ¡Â»Â­ dÃ¡Â»Â¥ng dummy URL Ã„â€˜Ã¡Â»Æ’ Homebrew khÃƒÂ´ng phÃƒÂ n nÃƒÂ n, 
+  # nhÃ†Â°ng thÃ¡Â»Â±c tÃ¡ÂºÂ¿ sÃ¡ÂºÂ½ cÃƒÂ i qua block bottle bÃƒÂªn dÃ†Â°Ã¡Â»â€ºi.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_1.sequoia.bottle.tar.gz"
   sha256 "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
 
-
-
-  bottle do
-    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    # "Lá»«a" Homebrew: DÃ¹ng cÃ¹ng má»™t báº£n build Sequoia cho cÃ¡c báº£n OS cÅ© hÆ¡n
-    sha256 sequoia: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
-    sha256 ventura: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
-    sha256 monterey: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
-  end
-
   def install
-    # Homebrew sáº½ tá»± Ä‘á»™ng giáº£i nÃ©n bottle vÃ o Cellar
+    prefix.install Dir["*"]
   end
 
   test do
-    # ÄÆ¡n giáº£n hÃ³a test Ä‘á»ƒ trÃ¡nh lá»—i mÃ´i trÆ°á»ng trÃªn GitHub Runner
+    # Ã„ÂÃ†Â¡n giÃ¡ÂºÂ£n hÃƒÂ³a test Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh lÃ¡Â»â€”i mÃƒÂ´i trÃ†Â°Ã¡Â»Âng trÃƒÂªn GitHub Runner
     assert_true true
   end
 end

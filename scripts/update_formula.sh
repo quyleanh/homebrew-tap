@@ -56,23 +56,15 @@ class ${class_name} < Formula
   homepage "$homepage"
   version "$version"
   
-  # Sử dụng dummy URL để Homebrew không phàn nàn, 
-  # nhưng thực tế sẽ cài qua block bottle bên dưới.
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "$RELEASE_URL/${pkg_name}--${version}.sequoia.bottle.tar.gz"
   sha256 "$sha256"
 
 ${deps}
 
-  bottle do
-    root_url "$RELEASE_URL"
-    # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "$sha256"
-    sha256 ventura: "$sha256"
-    sha256 monterey: "$sha256"
-  end
-
   def install
-    # Homebrew sẽ tự động giải nén bottle vào Cellar
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
+    prefix.install Dir["*"]
   end
 
   test do
