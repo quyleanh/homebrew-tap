@@ -29,8 +29,14 @@ for json_file in "${JSON_FILES[@]}"; do
   homepage=$(jq -r --arg pkg "$pkg_name" '.[$pkg].formula.homepage' "$json_file")
   desc=$(jq -r --arg pkg "$pkg_name" '.[$pkg].formula.desc' "$json_file")
 
-  # 2. Xử lý Class Name (Python@3.13 -> PythonAt313)
-  class_name=$(echo "$pkg_name" | sed 's/@/At/g; s/+/Plus/g; s/^./\U&/; s/[_-]./\U&/g; s/[_-]//g')
+  # 2. Xử lý Class Name (Python@3.14 -> PythonAT314, ada-url -> AdaUrl)
+  class_name=$(ruby -e '
+    name = ARGV[0].capitalize
+    name.gsub!(/[-_.\s]([a-zA-Z0-9])/) { Regexp.last_match(1).upcase }
+    name.tr!("+", "x")
+    name.sub!(/(.)@(\d)/, "\\1AT\\2")
+    puts name
+  ' "$pkg_name")
 
   # 3. HIJACK DEPENDENCIES: Trỏ mọi dependency về Tap của bạn
   # Điều này cực kỳ quan trọng để máy khách không chạy sang Homebrew Core
