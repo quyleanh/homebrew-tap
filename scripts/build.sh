@@ -276,20 +276,33 @@ if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
 fi
 
 bottle_name="${pkg}--${pkg_version}.sequoia.bottle.tar.gz"
-bottle_path="$OUTPUT_DIR/$bottle_name"
 
-echo "  📦 Packing: $bottle_name"
-tar -czf "$bottle_path" \
-  -C "$(brew --cellar)" \
-  "$pkg/$pkg_version"
+echo "  📦 Packing bottle via Homebrew..."
 
-# Generate JSON metadata for update_formula.sh
+# Let brew bottle generate BOTH the JSON and the deterministic tar.gz archive
+# This ensures the SHA256 checksums mathematically match in the future!
 brew bottle \
   --json \
   --root-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/stable" \
   "$pkg" 2>/dev/null || true
 
+# Move BOTH the natively generated tar.gz bottle and the JSON file to OUTPUT_DIR
 find . -maxdepth 1 -name "*.bottle.json" -exec mv {} "$OUTPUT_DIR/" \;
+find . -maxdepth 1 -name "*.bottle.tar.gz" -exec mv {} "$OUTPUT_DIR/" \;
+
+bottle_path="$OUTPUT_DIR/$bottle_name"
+if [ ! -f "$bottle_path" ]; then
+  # Fallback: Find any generated bottle tar.gz just in case naming was slightly different
+  generated_tar=$(find "$OUTPUT_DIR" -maxdepth 1 -name "${pkg}--*.tar.gz" | head -n 1)
+  if [ -n "$generated_tar" ]; then
+    bottle_path="$generated_tar"
+  else
+    echo "  ⚠️  brew bottle failed to generate the archive for $pkg"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
+fi
 
 echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
 BUILT+=("$pkg")
