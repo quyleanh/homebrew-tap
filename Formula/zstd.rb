@@ -7,16 +7,16 @@ class Uzstd < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/zstd--1.5.7_1.sequoia.bottle.tar.gz"
-  sha256 "24281c93a9d05ef952fcc2412f66e7a38380c15fb080c8cf8795582903860d6f"
+  sha256 "58c015655ebbe11b5bc5cb21f434b69e8ea563cdc72ced001de4b6f35592897b"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "24281c93a9d05ef952fcc2412f66e7a38380c15fb080c8cf8795582903860d6f"
-    sha256 ventura: "24281c93a9d05ef952fcc2412f66e7a38380c15fb080c8cf8795582903860d6f"
-    sha256 monterey: "24281c93a9d05ef952fcc2412f66e7a38380c15fb080c8cf8795582903860d6f"
+    sha256 sequoia: "58c015655ebbe11b5bc5cb21f434b69e8ea563cdc72ced001de4b6f35592897b"
+    sha256 ventura: "58c015655ebbe11b5bc5cb21f434b69e8ea563cdc72ced001de4b6f35592897b"
+    sha256 monterey: "58c015655ebbe11b5bc5cb21f434b69e8ea563cdc72ced001de4b6f35592897b"
   end
 
   def install

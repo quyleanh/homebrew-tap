@@ -7,16 +7,16 @@ class UpythonAt3.14 < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.3_1.sequoia.bottle.tar.gz"
-  sha256 "6fa8835e3070e9d427b4dd0a8a26b82f9da14b6a125f95bc20120ab1bf7c30f9"
+  sha256 "8d98c13bf5a8df307c40f7c0fadba480f21d0c3606506360de7bc1aab68587c8"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "6fa8835e3070e9d427b4dd0a8a26b82f9da14b6a125f95bc20120ab1bf7c30f9"
-    sha256 ventura: "6fa8835e3070e9d427b4dd0a8a26b82f9da14b6a125f95bc20120ab1bf7c30f9"
-    sha256 monterey: "6fa8835e3070e9d427b4dd0a8a26b82f9da14b6a125f95bc20120ab1bf7c30f9"
+    sha256 sequoia: "8d98c13bf5a8df307c40f7c0fadba480f21d0c3606506360de7bc1aab68587c8"
+    sha256 ventura: "8d98c13bf5a8df307c40f7c0fadba480f21d0c3606506360de7bc1aab68587c8"
+    sha256 monterey: "8d98c13bf5a8df307c40f7c0fadba480f21d0c3606506360de7bc1aab68587c8"
   end
 
   def install

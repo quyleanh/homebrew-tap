@@ -7,16 +7,16 @@ class Ulibssh2 < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_1.sequoia.bottle.tar.gz"
-  sha256 "c045210278cc0a45bd5e1ed41471f9f3754f15ccae0a2247393da13dec0d343f"
+  sha256 "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "c045210278cc0a45bd5e1ed41471f9f3754f15ccae0a2247393da13dec0d343f"
-    sha256 ventura: "c045210278cc0a45bd5e1ed41471f9f3754f15ccae0a2247393da13dec0d343f"
-    sha256 monterey: "c045210278cc0a45bd5e1ed41471f9f3754f15ccae0a2247393da13dec0d343f"
+    sha256 sequoia: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
+    sha256 ventura: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
+    sha256 monterey: "6fdaaf0ecf865c3f1c84b43eb5797430824d68dd0f2a8727e57989bb2c2a0bb4"
   end
 
   def install

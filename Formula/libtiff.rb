@@ -7,16 +7,16 @@ class Ulibtiff < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.1_1.sequoia.bottle.tar.gz"
-  sha256 "c64d263798a99556b466237da8e32cbe861240b38c28bb07ee3530f2d7a8f931"
+  sha256 "b71f8cf126f36416414ddcbe2c396b9bf73b987c68e0ab05de113fae51e599dc"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "c64d263798a99556b466237da8e32cbe861240b38c28bb07ee3530f2d7a8f931"
-    sha256 ventura: "c64d263798a99556b466237da8e32cbe861240b38c28bb07ee3530f2d7a8f931"
-    sha256 monterey: "c64d263798a99556b466237da8e32cbe861240b38c28bb07ee3530f2d7a8f931"
+    sha256 sequoia: "b71f8cf126f36416414ddcbe2c396b9bf73b987c68e0ab05de113fae51e599dc"
+    sha256 ventura: "b71f8cf126f36416414ddcbe2c396b9bf73b987c68e0ab05de113fae51e599dc"
+    sha256 monterey: "b71f8cf126f36416414ddcbe2c396b9bf73b987c68e0ab05de113fae51e599dc"
   end
 
   def install

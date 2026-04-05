@@ -7,16 +7,16 @@ class Ulibgit2 < Formula
   # Sử dụng dummy URL để Homebrew không phàn nàn, 
   # nhưng thực tế sẽ cài qua block bottle bên dưới.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libgit2--1.9.2_1.sequoia.bottle.tar.gz"
-  sha256 "8e3a4b0251e7dfa8227a7c6e4d629aa0cbc0dca0d9a27942c80736dc61da4cf2"
+  sha256 "a71d682036b7fe9542572dcc1fdd45ddaf3e089aaba4e14a4e05347a164f4d89"
 
 
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     # "Lừa" Homebrew: Dùng cùng một bản build Sequoia cho các bản OS cũ hơn
-    sha256 sequoia: "8e3a4b0251e7dfa8227a7c6e4d629aa0cbc0dca0d9a27942c80736dc61da4cf2"
-    sha256 ventura: "8e3a4b0251e7dfa8227a7c6e4d629aa0cbc0dca0d9a27942c80736dc61da4cf2"
-    sha256 monterey: "8e3a4b0251e7dfa8227a7c6e4d629aa0cbc0dca0d9a27942c80736dc61da4cf2"
+    sha256 sequoia: "a71d682036b7fe9542572dcc1fdd45ddaf3e089aaba4e14a4e05347a164f4d89"
+    sha256 ventura: "a71d682036b7fe9542572dcc1fdd45ddaf3e089aaba4e14a4e05347a164f4d89"
+    sha256 monterey: "a71d682036b7fe9542572dcc1fdd45ddaf3e089aaba4e14a4e05347a164f4d89"
   end
 
   def install
