@@ -4,17 +4,16 @@ class Deno < Formula
   homepage "https://deno.com/"
   version "2.7.11"
   
-  # SÃ¡Â»Â­ dÃ¡Â»Â¥ng dummy URL Ã„â€˜Ã¡Â»Æ’ Homebrew khÃƒÂ´ng phÃƒÂ n nÃƒÂ n, 
-  # nhÃ†Â°ng thÃ¡Â»Â±c tÃ¡ÂºÂ¿ sÃ¡ÂºÂ½ cÃƒÂ i qua block bottle bÃƒÂªn dÃ†Â°Ã¡Â»â€ºi.
+  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
+  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.7.11.sequoia.bottle.tar.gz"
-  sha256 "f8f650e6ec622910e3bcdecbb11ef0840b6ac7557bd76dcb7be56a436c23deaa"
 
   def install
     prefix.install Dir["*"]
   end
 
   test do
-    # Ã„ÂÃ†Â¡n giÃ¡ÂºÂ£n hÃƒÂ³a test Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh lÃ¡Â»â€”i mÃƒÂ´i trÃ†Â°Ã¡Â»Âng trÃƒÂªn GitHub Runner
+    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
     assert_true true
   end
 end

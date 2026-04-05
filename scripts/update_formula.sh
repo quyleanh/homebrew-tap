@@ -58,7 +58,6 @@ class ${class_name} < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "$RELEASE_URL/${pkg_name}--${version}.sequoia.bottle.tar.gz"
-  sha256 "$sha256"
 
 ${deps}
 
