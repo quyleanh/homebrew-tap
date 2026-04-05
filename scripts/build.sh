@@ -287,8 +287,8 @@ brew bottle \
   "$pkg" 2>/dev/null || true
 
 # Move BOTH the natively generated tar.gz bottle and the JSON file to OUTPUT_DIR
-find . -maxdepth 1 -name "*.bottle.json" -exec mv {} "$OUTPUT_DIR/" \;
-find . -maxdepth 1 -name "*.bottle.tar.gz" -exec mv {} "$OUTPUT_DIR/" \;
+find . -maxdepth 1 -name "${pkg}--*.json" -exec mv {} "$OUTPUT_DIR/" \;
+find . -maxdepth 1 -name "${pkg}--*.tar.gz" -exec mv {} "$OUTPUT_DIR/" \;
 
 bottle_path="$OUTPUT_DIR/$bottle_name"
 if [ ! -f "$bottle_path" ]; then
