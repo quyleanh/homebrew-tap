@@ -6,7 +6,7 @@ class Libssh2 < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_1.sequoia.bottle.1.tar.gz"
-  sha256 "f7417e1aeee95cb7b610eb7d803abaf661e7cd93b0f9bdba56c297d14edb7054"
+  sha256 "5ae5c1f799d94dfa0967b56e491829ef60dbc81ff0e28dfa5efc2e337fcf6a42"
 
 
 

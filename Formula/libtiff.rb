@@ -6,7 +6,7 @@ class Libtiff < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.1_1.sequoia.bottle.1.tar.gz"
-  sha256 "df814d9eec439ef5584c67b1831e3dee2ccd0edc12e86831644527794099218e"
+  sha256 "26fe5993a6de832f58a8173dfb1dc5b4fcc6b7ce9e7d739774a04b90027ef3c7"
 
 
 
