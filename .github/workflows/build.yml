@@ -15,7 +15,7 @@ on:
 
   # Run automatically every 8 hours
   schedule:
-    - cron: '13 3,9,15,21 * * *'
+    - cron: '13 4,10,16,22 * * *'
 
   # Run when packages.txt, scripts, or this workflow file are changed
   push:
