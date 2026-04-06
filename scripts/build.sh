@@ -30,7 +30,7 @@ RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
-MAX_BUILD_TIME=$((2 * 3600 + 0 * 60)) # 5.5 hours in seconds
+MAX_BUILD_TIME=$((1 * 3600 + 0.5 * 60)) # 5.5 hours in seconds
 
 mkdir -p "$OUTPUT_DIR"
 
