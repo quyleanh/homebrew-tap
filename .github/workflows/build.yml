@@ -90,7 +90,7 @@ jobs:
           prerelease: false
           make_latest: true
           fail_on_unmatched_files: false
-          files: bottles/*.bottle.tar.gz
+          files: bottles/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -133,7 +133,7 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
             echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-            for f in bottles/*.bottle.tar.gz; do
+            for f in bottles/*.tar.gz; do
               [ -f "$f" ] || continue
               size=$(du -h "$f" | cut -f1)
               echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY

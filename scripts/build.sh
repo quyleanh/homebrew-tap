@@ -336,7 +336,7 @@ echo ""
 [ ${#BUILT[@]} -eq 0 ] && [ ${#FAILED[@]} -eq 0 ] &&   
 echo "Nothing new to build — all packages are up to date."
 
-ls -lh "$OUTPUT_DIR/"*.bottle.tar.gz 2>/dev/null || echo "No bottles in output dir."
+ls -lh "$OUTPUT_DIR/"*.tar.gz 2>/dev/null || echo "No bottles in output dir."
 
 echo "BUILT_COUNT=${#BUILT[@]}"   >> "${GITHUB_OUTPUT:-/dev/null}"
 echo "FAILED_COUNT=${#FAILED[@]}" >> "${GITHUB_OUTPUT:-/dev/null}"
