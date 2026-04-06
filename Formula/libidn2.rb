@@ -6,7 +6,7 @@ class Libidn2 < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libidn2--2.3.8.sequoia.bottle.1.tar.gz"
-  sha256 "97db1223525ea154e6e5131261dec20375b4d3e583800bb9587dd324c5395a5e"
+  sha256 "68250cb4ac38144319e7099ad53c4279fad76d426a3066baf0b8f6a30a4ec3ee"
 
 
 

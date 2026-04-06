@@ -6,7 +6,7 @@ class Cmake < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake--4.3.1.sequoia.bottle.1.tar.gz"
-  sha256 "be539022e911ed97b03b9a003c7cbbc52d026aa3c8c49868c3e9d9445de00e38"
+  sha256 "8e26c46f41022a763577764427e9c84f3f8a841262d75d5717ddd80c474bbad6"
 
 
 

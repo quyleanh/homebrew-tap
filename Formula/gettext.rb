@@ -6,7 +6,7 @@ class Gettext < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gettext--1.0.sequoia.bottle.1.tar.gz"
-  sha256 "6191e60ee0f3a10210c89dd0ba5f3a9a4aa32338a0e53e239efbd0adfb1f5d50"
+  sha256 "6cd79a61fc0919507d67c1c4e92400e4e6572a3c343c1dfa7135f917e0ff1739"
 
 
 

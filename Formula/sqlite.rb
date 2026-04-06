@@ -6,7 +6,7 @@ class Sqlite < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.51.3.sequoia.bottle.1.tar.gz"
-  sha256 "5c1e3eb9b072492e486f77b4f49333e1bdc6fc77718e4b163c654680b6ca051a"
+  sha256 "c5b3f41c3baa8f50e5b794da76ae996c63e342ca822ddc95f23b8bae20015901"
 
 
 

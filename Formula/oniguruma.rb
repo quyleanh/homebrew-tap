@@ -6,7 +6,7 @@ class Oniguruma < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/oniguruma--6.9.10.sequoia.bottle.1.tar.gz"
-  sha256 "a503ae3a9abe5821d90f4f219ce5badc88bcfcc6abd181f0cd62aca073d2ae90"
+  sha256 "07b5f688a1347ed53390eba42372d85e25801a21c8649cf79d0c237c5fa54414"
 
 
 

@@ -6,7 +6,7 @@ class Pkgconf < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf--2.5.1.sequoia.bottle.1.tar.gz"
-  sha256 "ac8f56675b2a44bc1d153ee1ef537e1718fd2857e5ad8f56be3d5835d79a712c"
+  sha256 "01da8a54c213114d843dac24889fb9b1482ac8fda1da34a55da6d23654bc157b"
 
 
 

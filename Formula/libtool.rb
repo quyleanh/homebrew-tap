@@ -6,7 +6,7 @@ class Libtool < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtool--2.5.4.sequoia.bottle.1.tar.gz"
-  sha256 "0d51af796affae0e167d71a72534e251281ddc2f5d7e7480ae4df736ac430649"
+  sha256 "2b3141f310b08bf44570b17444b56a7cc51435af3c6af714c57102a81193904d"
 
 
 

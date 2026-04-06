@@ -6,7 +6,7 @@ class Lz4 < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lz4--1.10.0.sequoia.bottle.2.tar.gz"
-  sha256 "8fa69ea12c0c5e80a7fff56d572713bc5ef718d286a83fe6f3888ba87e7ea012"
+  sha256 "ab4e63727f89106aa2a9271c16acc56ca1d55ee31797477452e07d55a27f6d1c"
 
 
 

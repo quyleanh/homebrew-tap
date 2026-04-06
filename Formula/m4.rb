@@ -6,7 +6,7 @@ class M4 < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/m4--1.4.21.sequoia.bottle.1.tar.gz"
-  sha256 "671ac9e1154f14cdcbc82539e92d501796b8fe706a2bcddcda01d87a03144e8b"
+  sha256 "71523f29a6da62788720dea673c2b579cf72e9d0c46adffb597b9500f2cda62a"
 
 
 

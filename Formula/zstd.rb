@@ -6,7 +6,7 @@ class Zstd < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/zstd--1.5.7_1.sequoia.bottle.1.tar.gz"
-  sha256 "bcbb1df448b16eaf888a5127ca016d72c2c6139c8391f0cd4fabe5b432dffc88"
+  sha256 "9129045b94c5b1c6da9938cced8a6ffcf35c4913498848aeca15505ca23161fc"
 
 
 

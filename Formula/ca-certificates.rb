@@ -6,7 +6,7 @@ class CaCertificates < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-03-19.sequoia.bottle.1.tar.gz"
-  sha256 "dfc5d61b01dc7baf7e619ea2573685fe3b1cfe66d01952a1ec7f3df824f5640a"
+  sha256 "6328d877f24abaf102a00244cad2846c1e8c5aba8c30be10029c3330c7110513"
 
 
 

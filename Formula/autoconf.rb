@@ -6,7 +6,7 @@ class Autoconf < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/autoconf--2.73.sequoia.bottle.1.tar.gz"
-  sha256 "b9e715003601145a32839d036d39497d0857f4350dfeda41cafb5d47390409c6"
+  sha256 "2ead5b3f1256a1a7bdced974c577d066b017470309fde0e5d4422268f33f7f92"
 
 
 

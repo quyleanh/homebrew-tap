@@ -6,7 +6,7 @@ class Automake < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/automake--1.18.1.sequoia.bottle.1.tar.gz"
-  sha256 "f206fe05a8ed57ef84bf545c012233e4d0ced32f1c8dafeb0ab6bc5d801d100a"
+  sha256 "d4e2b8bddc2ff75b0551f2b06f77373f808201052882eda0c3b21d5b03188893"
 
 
 

@@ -6,7 +6,7 @@ class Readline < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/readline--8.3.3.sequoia.bottle.1.tar.gz"
-  sha256 "2b76dba1dacca6a1e69c418a1589e075168755ff728042134f969e44f269d04d"
+  sha256 "051e926f8b5187f5f0f407f41263fa1ef25c9aa5e6c5adf161ad6afa61c036d4"
 
 
 

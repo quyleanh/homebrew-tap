@@ -6,7 +6,7 @@ class Certifi < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.2.25.sequoia.bottle.1.tar.gz"
-  sha256 "6be07b5afb203ab89819f68f3deb9434e1b4c8b03720b498de6543bf1bf90095"
+  sha256 "62b22257059413639604e379c5cabec1a3bef9155bb60e2ce951b9151383f51e"
 
 
 

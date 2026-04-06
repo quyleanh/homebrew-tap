@@ -6,7 +6,7 @@ class Mpdecimal < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpdecimal--4.0.1.sequoia.bottle.1.tar.gz"
-  sha256 "5662840562b07d26735ae1e901861711ad66d9f5b9a4e6668c4cdf6e9db27b5d"
+  sha256 "93010c305ab5b454ff629094610e0e012d3ef1cbf18ed80851319e62f94e1eaf"
 
 
 

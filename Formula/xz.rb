@@ -6,7 +6,7 @@ class Xz < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz--5.8.3.sequoia.bottle.1.tar.gz"
-  sha256 "df9cb8d852cefdbac5499d32296d5624144106a717c54941ebb0082ceea0503e"
+  sha256 "8c6c8e0ba75780badeaf59727cdc1503b1e0969c5084ca04506fe03f348c0d68"
 
 
 

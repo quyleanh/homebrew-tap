@@ -6,7 +6,7 @@ class Libunistring < Formula
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libunistring--1.4.2.sequoia.bottle.1.tar.gz"
-  sha256 "427e51af7f377c9a24f163bb3edd945c276142f127f0d77fa496dead5a16cc18"
+  sha256 "341aad1fd8bf6ac3bab9815ef6d82cbd1cf57dfa74a704710bcd67999a1c8169"
 
 
 
