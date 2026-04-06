@@ -179,9 +179,17 @@ echo "  → Force build enabled"
 return 0
 fi
 
-local latest
-latest=$(brew info --json=v1 "$pkg" 2>/dev/null |   
-jq -r '.[0].versions.stable // empty')
+  local info
+  info=$(brew info --json=v1 "$pkg" 2>/dev/null)
+  
+  local latest
+  latest=$(echo "$info" | jq -r '.[0].versions.stable // empty')
+
+  local revision
+  revision=$(echo "$info" | jq -r '.[0].revision // 0' || echo "0")
+  if [ "${revision:-0}" -gt 0 ]; then
+    latest="${latest}_${revision}"
+  fi
 
 if [ -z "$latest" ]; then
 echo "  → Could not determine version, building to be safe"

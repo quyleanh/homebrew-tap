@@ -90,7 +90,9 @@ jobs:
           prerelease: false
           make_latest: true
           fail_on_unmatched_files: false
-          files: bottles/*.tar.gz
+          files: |
+            bottles/*.tar.gz
+            bottles/*.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
