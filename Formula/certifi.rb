@@ -4,16 +4,19 @@ class Certifi < Formula
   homepage "https://github.com/certifi/python-certifi"
   version "2026.2.25"
   
-  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
-  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.2.25.sequoia.bottle.tar.gz"
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.2.25.sequoia.bottle.1.tar.gz"
+  sha256 "6be07b5afb203ab89819f68f3deb9434e1b4c8b03720b498de6543bf1bf90095"
+
+
 
   def install
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
     prefix.install Dir["*"]
   end
 
   test do
-    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
+    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
     assert_true true
   end
 end
