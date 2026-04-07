@@ -53,7 +53,7 @@ for json_file in "${JSON_FILES[@]}"; do
   if [[ "$version" == *"_"* ]]; then
     base_ver="${version%%_*}"
     rev="${version##*_}"
-    version_ruby="version \"$base_ver\"\n  revision $rev"
+    version_ruby=$(printf 'version "%s"\n  revision %s' "$base_ver" "$rev")
   else
     version_ruby="version \"$version\""
   fi

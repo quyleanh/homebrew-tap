@@ -2,7 +2,8 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.3"\n  revision 1
+  version "3.14.3"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.3_1.sequoia.bottle.1.tar.gz"

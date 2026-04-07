@@ -2,7 +2,8 @@
 class Zstd < Formula
   desc "Zstandard is a real-time compression algorithm"
   homepage "https://facebook.github.io/zstd/"
-  version "1.5.7"\n  revision 1
+  version "1.5.7"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/zstd--1.5.7_1.sequoia.bottle.1.tar.gz"

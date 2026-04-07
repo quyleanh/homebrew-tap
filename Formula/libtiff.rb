@@ -2,7 +2,8 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  version "4.7.1"\n  revision 1
+  version "4.7.1"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.1_1.sequoia.bottle.1.tar.gz"

@@ -2,7 +2,8 @@
 class Libevent < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
-  version "2.1.12"\n  revision 1
+  version "2.1.12"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent--2.1.12_1.sequoia.bottle.1.tar.gz"

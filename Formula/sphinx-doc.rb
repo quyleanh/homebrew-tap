@@ -2,7 +2,8 @@
 class SphinxDoc < Formula
   desc "Tool to create intelligent and beautiful documentation"
   homepage "https://www.sphinx-doc.org/"
-  version "9.1.0"\n  revision 3
+  version "9.1.0"
+  revision 3
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sphinx-doc--9.1.0_3.sequoia.bottle.1.tar.gz"

@@ -2,7 +2,8 @@
 class Libssh2 < Formula
   desc "C library implementing the SSH2 protocol"
   homepage "https://libssh2.org/"
-  version "1.11.1"\n  revision 1
+  version "1.11.1"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_1.sequoia.bottle.1.tar.gz"

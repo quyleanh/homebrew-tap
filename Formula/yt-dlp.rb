@@ -2,7 +2,8 @@
 class YtDlp < Formula
   desc "Feature-rich command-line audio/video downloader"
   homepage "https://github.com/yt-dlp/yt-dlp"
-  version "2026.3.17"\n  revision 1
+  version "2026.3.17"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.3.17_1.sequoia.bottle.1.tar.gz"

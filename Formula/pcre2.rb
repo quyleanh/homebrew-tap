@@ -2,7 +2,8 @@
 class Pcre2 < Formula
   desc "Perl compatible regular expressions library with a new API"
   homepage "https://www.pcre.org/"
-  version "10.47"\n  revision 1
+  version "10.47"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pcre2--10.47_1.sequoia.bottle.1.tar.gz"

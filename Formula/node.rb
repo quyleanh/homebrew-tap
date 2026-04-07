@@ -2,7 +2,8 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "25.9.0"\n  revision 1
+  version "25.9.0"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--25.9.0_1.sequoia.bottle.1.tar.gz"

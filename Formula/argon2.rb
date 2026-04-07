@@ -2,7 +2,8 @@
 class Argon2 < Formula
   desc "Password hashing library and CLI utility"
   homepage "https://github.com/P-H-C/phc-winner-argon2"
-  version "20190702"\n  revision 1
+  version "20190702"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/argon2--20190702_1.sequoia.bottle.1.tar.gz"

@@ -2,7 +2,8 @@
 class Aria2 < Formula
   desc "Download with resuming and segmented downloading"
   homepage "https://aria2.github.io/"
-  version "1.37.0"\n  revision 1
+  version "1.37.0"
+  revision 1
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_1.sequoia.bottle.2.tar.gz"
