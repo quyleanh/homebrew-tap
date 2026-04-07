@@ -2,18 +2,21 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "25.9.0_1"
+  version "25.9.0"\n  revision 1
   
-  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
-  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--25.9.0_1.sequoia.bottle.tar.gz"
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--25.9.0_1.sequoia.bottle.1.tar.gz"
+  sha256 "b983a345e1da684d7cf03726c756754fcd0226b12797d17b714227697cfa7d7a"
+
+
 
   def install
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
     prefix.install Dir["*"]
   end
 
   test do
-    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
+    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
     assert_true true
   end
 end

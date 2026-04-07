@@ -4,16 +4,19 @@ class Libngtcp2 < Formula
   homepage "https://nghttp2.org/ngtcp2/"
   version "1.22.0"
   
-  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
-  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2--1.22.0.sequoia.bottle.tar.gz"
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2--1.22.0.sequoia.bottle.1.tar.gz"
+  sha256 "60e97b86984fd764afce1f0e407cbc7fe8f1eb8192b728f3586460aafd5cb8c5"
+
+
 
   def install
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
     prefix.install Dir["*"]
   end
 
   test do
-    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
+    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
     assert_true true
   end
 end
