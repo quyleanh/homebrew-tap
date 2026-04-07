@@ -4,6 +4,12 @@ set -euo pipefail
 
 TAP_NAME="quyleanh/tap"
 
+LOG_DIR="$HOME/Library/Logs/homebrew-tap-replace"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/replace_$(date '+%Y%m%d_%H%M%S').log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "Log file: $LOG_FILE"
+
 echo "=== Homebrew Tap Batch Replacer ==="
 echo "This script will reinstall/install all formula available in $TAP_NAME"
 echo "so that your machine uses your newly built bottles."
@@ -47,10 +53,15 @@ for pkg in $FORMULAS; do
   echo ">> Processing $pkg..."
   echo "--------------------------------------------------------"
 
-  # Check if package is already installed
+  # Check if the package is already installed from the custom tap
+  if brew list --full-name 2>/dev/null | grep -q "^${TAP_NAME}/${pkg}$"; then
+    echo "[skip] $pkg is already installed from $TAP_NAME — skipping."
+    continue
+  fi
+
+  # Check if package is installed from elsewhere (e.g. homebrew-core)
   if brew list "$pkg" &>/dev/null; then
-    echo ">> $pkg is currently installed. Forcing reinstall from $TAP_NAME/$pkg..."
-    # Reinstall explicitely points to your tap's formula
+    echo ">> $pkg is installed from a different source. Reinstalling from $TAP_NAME/$pkg..."
     brew reinstall "$TAP_NAME/$pkg" || echo "[-] Warning: Failed to reinstall $pkg"
   else
     echo ">> $pkg is not installed locally. Installing $TAP_NAME/$pkg..."
