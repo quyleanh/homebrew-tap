@@ -2,18 +2,21 @@
 class Aria2 < Formula
   desc "Download with resuming and segmented downloading"
   homepage "https://aria2.github.io/"
-  version "1.37.0_1"
+  version "1.37.0"\n  revision 1
   
-  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
-  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_1.sequoia.bottle.tar.gz"
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_1.sequoia.bottle.2.tar.gz"
+  sha256 "34e26caf2c5746fbc17b45b60b98b8c3670b5b00730108d6e3898491b4be9207"
+
+
 
   def install
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
     prefix.install Dir["*"]
   end
 
   test do
-    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
+    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
     assert_true true
   end
 end

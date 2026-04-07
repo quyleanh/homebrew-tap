@@ -4,16 +4,19 @@ class Wget < Formula
   homepage "https://www.gnu.org/software/wget/"
   version "1.25.0"
   
-  # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
-  # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/wget--1.25.0.sequoia.bottle.tar.gz"
+  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/wget--1.25.0.sequoia.bottle.2.tar.gz"
+  sha256 "a9c837e3b0b9d58ba73cf2e1d03310036447f74fc9f0221967e047ecc8bd9386"
+
+
 
   def install
+    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
     prefix.install Dir["*"]
   end
 
   test do
-    # Ãƒâ€žÃ‚ÂÃƒâ€ Ã‚Â¡n giÃƒÂ¡Ã‚ÂºÃ‚Â£n hÃƒÆ’Ã‚Â³a test Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ trÃƒÆ’Ã‚Â¡nh lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i mÃƒÆ’Ã‚Â´i trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âng trÃƒÆ’Ã‚Âªn GitHub Runner
+    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
     assert_true true
   end
 end
