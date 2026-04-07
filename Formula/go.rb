@@ -2,11 +2,11 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  version "1.26.1"
+  version "1.26.2"
   
   # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.1.sequoia.bottle.1.tar.gz"
-  sha256 "627ffe25137c25393e2880b5804905299545f41829b60e93c18a780cee69373b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.2.sequoia.bottle.1.tar.gz"
+  sha256 "74221d1bc1dc8e3106cde0d222284cb3fb4aecd17895a0434bb505bba1e8651e"
 
 
 
