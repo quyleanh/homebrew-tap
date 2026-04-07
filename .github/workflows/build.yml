@@ -119,6 +119,7 @@ jobs:
 
           Built by GitHub Actions run #${{ github.run_number }}
           Runner: macos-15-intel (Sequoia, Intel x86_64)"
+            git pull --rebase
             git push
           fi
 
