@@ -20,6 +20,5 @@ tmux
 ffmpeg
 
 # Dev / runtimes
-go
 node
 hugo
