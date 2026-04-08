@@ -7,6 +7,7 @@ class Yasm < Formula
   # SÃƒÂ¡Ã‚Â»Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥ng dummy URL Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ Homebrew khÃƒÆ’Ã‚Â´ng phÃƒÆ’Ã‚Â n nÃƒÆ’Ã‚Â n, 
   # nhÃƒâ€ Ã‚Â°ng thÃƒÂ¡Ã‚Â»Ã‚Â±c tÃƒÂ¡Ã‚ÂºÃ‚Â¿ sÃƒÂ¡Ã‚ÂºÃ‚Â½ cÃƒÆ’Ã‚Â i qua block bottle bÃƒÆ’Ã‚Âªn dÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºi.
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yasm--1.3.0_2.sequoia.bottle.tar.gz"
+  sha256 "a32de9662d5a0cef88a68fc193c355991c47d735d2bca140b71e5b4701f8f2a3"
 
   def install
     prefix.install Dir["*"]
