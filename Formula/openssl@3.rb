@@ -2,21 +2,28 @@
 class OpensslAT3 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  version "3.6.1"
+  version "3.6.2"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.1.sequoia.bottle.1.tar.gz"
-  sha256 "ec9b4f6c9999906b64ae7f79a7d6e39c770a303b35b802994cab8ea465905502"
+  # Use a dummy URL to download the pre-built .tar.gz file directly
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.2.sequoia.bottle.1.tar.gz"
+  sha256 "f4e78af51b04c218ae16b3297ef75de5d926d8f47eac0ac782575017f04d80ce"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end
