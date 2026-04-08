@@ -53,15 +53,6 @@ jobs:
         run: |
           brew install bash jq  # bash 5+ and jq required by build scripts
 
-      - name: Make scripts executable
-        run: |
-          # Fix line endings in case of CRLF corruption on checkout
-          sed -i.bak 's/\r$//' scripts/build.sh
-          sed -i.bak 's/\r$//' scripts/update_formula.sh
-          rm -f scripts/*.bak
-          chmod +x scripts/build.sh
-          chmod +x scripts/update_formula.sh
-
       - name: Build bottles
         id: build
         env:
@@ -69,8 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ inputs.force_build || 'false' }}
-        run: |
-          /usr/local/bin/bash scripts/build.sh
+        run: /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles
         run: |
