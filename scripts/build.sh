@@ -30,7 +30,7 @@ RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
-MAX_BUILD_TIME=$((1 * 3600 + 30 * 60)) # 5.5 hours in seconds
+MAX_BUILD_TIME=$((5 * 3600)) # 5 hours in seconds
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -70,7 +70,7 @@ local leaves=("$@")
 
 # brew deps --topological on multiple packages gives the right order
 
-all_deps=$(brew deps --topological --union --include-build "${leaves[@]}" 2>/dev/null |
+all_deps=$(brew deps --topological --union "${leaves[@]}" 2>/dev/null |
 awk '!/^[ \t]*$/' |
 awk '!seen[$0]++')
 
