@@ -79,22 +79,13 @@ jobs:
 
       - name: Upload bottles to release
         if: steps.build.outputs.BUILT_COUNT != '0'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: stable
-          name: "Stable Bottles"
-          body: |
-            Auto-built Homebrew bottles for macOS Ventura (13) on Intel x86_64.
-            Built on `macos-15-intel` runner.
-            Last updated: run #${{ github.run_number }}
-          prerelease: false
-          make_latest: true
-          fail_on_unmatched_files: false
-          files: |
-            bottles/*.tar.gz
-            bottles/*.json
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit stable \
+            --title "Stable Bottles" \
+            --notes "Auto-built Homebrew bottles for macOS Ventura (13) on Intel x86_64. Built on macos-15-intel runner. Last updated: run #${{ github.run_number }}"
+          gh release upload stable bottles/*.tar.gz bottles/*.json --clobber
 
       - name: Update formula files
         if: steps.build.outputs.BUILT_COUNT != '0'
