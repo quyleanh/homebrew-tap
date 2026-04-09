@@ -104,6 +104,11 @@ jobs:
             git push
           fi
 
+      - name: Cleanup orphaned assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: /usr/local/bin/bash scripts/cleanup_release.sh
+
       - name: Summary
         run: |
           built=${{ steps.build.outputs.BUILT_COUNT || '0' }}
