@@ -24,10 +24,16 @@ fi
 VALID_ASSETS=()
 for f in "${CURRENT_FILES[@]}"; do
     VALID_ASSETS+=("$f")
-    # Each bottle .tar.gz should have a corresponding .json file
     if [[ "$f" == *.tar.gz ]]; then
-        json_file="${f//.tar.gz/.json}"
-        VALID_ASSETS+=("$json_file")
+        # 1. Direct replacement (matches if names match exactly, e.g. pkg--1.2.3.bottle.1.json)
+        VALID_ASSETS+=("${f%.tar.gz}.json")
+        
+        # 2. Base JSON name (Homebrew often omits revision in JSON filename even if in tarball)
+        # Converts pkg--1.2.3.sequoia.bottle.1.tar.gz -> pkg--1.2.3.sequoia.bottle.json
+        base_json=$(echo "$f" | sed -E 's/\.bottle(\.[0-9]+)?\.tar\.gz$/.bottle.json/')
+        if [[ "$base_json" == *.json ]]; then
+            VALID_ASSETS+=("$base_json")
+        fi
     fi
 done
 
