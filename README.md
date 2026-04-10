@@ -1,86 +1,87 @@
-# homebrew-tap
+# 🍺 homebrew-tap
 
-Private Homebrew Tap with pre-built bottles for macOS Ventura (13) on Intel x86_64.
+A high-performance, private Homebrew Tap providing pre-built binary bottles for Intel-based Macs.
 
-Solves the problem of Homebrew dropping full binary support for 2017 Intel Macs.
+This repository solves the "end-of-life" problem for older Intel Macs (like the MacBook Pro 2017) by providing a continuous build pipeline that hosts binaries on GitHub Releases, bypassing the need for long local compilations.
 
-## Supported machine
+---
 
-| Machine | macOS | Chip |
-|---------|-------|------|
-| MacBook Pro 2017 | Ventura 13 | Intel Core i5/i7 |
+## 🚀 Quick Start
 
-## Initial setup
-
-```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/homebrew-tap/main/install.sh)"
-```
-
-Or manually:
+### 1. Automatic Installation
+Run this command to automatically install Homebrew (if missing), tap this repository, and replace existing packages with versions from this tap:
 
 ```bash
-brew tap YOUR_USERNAME/tap https://github.com/YOUR_USERNAME/homebrew-tap
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/quyleanh/homebrew-tap/main/install.sh)"
 ```
 
-## Usage
+### 2. Manual Setup
+If you prefer to do it manually:
 
 ```bash
-# Install a package
-brew install YOUR_USERNAME/tap/ffmpeg
+# Add the tap
+brew tap quyleanh/tap
 
-# Update all
-brew update && brew upgrade
+# Install a specific package from this tap
+brew install quyleanh/tap/ffmpeg
 
-# List available packages
-brew tap-info YOUR_USERNAME/tap
+# Force replace all installed packages with our versions
+./scripts/batch_replace_on_mac.sh
 ```
 
-## Default packages
+---
 
-See and edit the list at [`packages.txt`](./packages.txt).
+## 💻 Supported Environment
 
-| Package | Description |
-|---------|-------------|
-| ffmpeg | Audio/video processing |
-| aria2 | Download manager |
-| bash | Latest bash shell |
-| fzf | Fuzzy finder |
-| go | Go runtime |
-| hugo | Static site generator |
-| jq | JSON processor |
-| node | Node.js runtime |
-| rclone | Cloud storage sync |
-| tmux | Terminal multiplexer |
-| tree | Directory tree |
-| wget | File downloader |
-| yt-dlp | Video downloader |
-| argon2 | Password hashing |
+| Component | specification |
+|-----------|---------------|
+| **Hardware** | Intel-based Macs (e.g., MacBook Pro 2017) |
+| **OS** | macOS Ventura (13) or newer |
+| **Architecture** | x86_64 |
 
-## Adding or removing packages
+---
 
-1. Edit [`packages.txt`](./packages.txt)
-2. Push to GitHub
-3. GitHub Actions automatically builds new bottles
-4. Run `brew update && brew upgrade` on your machine
+## 🛠️ How It Works
 
-## Manual build
+This tap uses a custom **"Dependency Hijacking"** architecture to ensure your system stays within the private ecosystem:
 
-Go to the **Actions** tab on GitHub → select **Build Bottles** → **Run workflow**.
+1.  **Build Pipeline**: GitHub Actions runs on a `macos-15-intel` runner.
+2.  **Bottle Generation**: Packages are built using `brew install --build-bottle`.
+3.  **Binary Hosting**: The resulting `.tar.gz` bottles are uploaded to the `stable` Release.
+4.  **Formula Modification**: The `scripts/update_formula.sh` script rewrites formulae to:
+    *   Point the `url` directly to the GitHub Release asset.
+    *   Rewrite all dependencies to point to `quyleanh/tap/dependency` instead of the default `homebrew/core`.
+5.  **Clean Installation**: When you `brew install`, it downloads the pre-built binary and extracts it directly into your Cellar—no local compiling required.
 
-Use the `force_build = true` option to rebuild all packages regardless of version.
+---
 
-## How it works
+## 📝 Managing Packages
 
-```
-packages.txt  (you edit this)
-      ↓
-GitHub Actions (macos-15-intel, Intel x86_64)
-builds each package with --build-bottle
-      ↓
-Bottles packed from Cellar and uploaded to Release "stable"
-      ↓
-Formula/ auto-updated with new SHA256 and URLs
-      ↓
-brew update && brew upgrade on your machine
-→ downloads the bottle, no local compilation
-```
+### Adding New Packages
+1.  Open [`packages.txt`](./packages.txt).
+2.  Add the name of the Homebrew formula you want.
+3.  Commit and push to GitHub.
+4.  The **GitHub Action** will automatically trigger, resolve all dependencies, and build everything in the correct topological order.
+
+### Maintenance Scripts
+| Script | Purpose |
+|--------|---------|
+| `scripts/build.sh` | The main build engine. Handles dependency graphs and builds bottles. |
+| `scripts/update_formula.sh` | Post-build script that generates the `.rb` formula files. |
+| `scripts/cleanup_release.sh` | Automatically removes old/unused bottles from the GitHub Release to keep it lean. |
+| `scripts/batch_replace_on_mac.sh` | Locally migrates all your existing packages to use this tap. |
+
+---
+
+## 🔍 Troubleshooting
+
+**Q: Why is Homebrew still trying to build from source?**
+A: Ensure you have tapped the repo correctly. Try running `brew untap quyleanh/tap && brew tap quyleanh/tap`. Also, check that the package is listed in [`Formula/`](./Formula/).
+
+**Q: SHA256 Checksum Mismatch?**
+A: This happens if a build was interrupted or an asset was manually changed. The automated pipeline usually fixes this on the next run, but you can also trigger a **Manual Build** with `force_build: true` in the GitHub Actions tab.
+
+---
+
+## ⚖️ License
+MIT. Created and maintained for personal use on 2017-era Intel Macs.

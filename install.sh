@@ -3,26 +3,20 @@
 # Run once to configure, then use brew as normal.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/homebrew-tap/main/install.sh | bash
-#   or: bash install.sh YOUR_USERNAME
+#   curl -fsSL https://raw.githubusercontent.com/quyleanh/homebrew-tap/main/install.sh | bash
+#   or: bash install.sh quyleanh
 
 set -euo pipefail
 
-GITHUB_USERNAME="${1:-}"
-
-# If no argument was provided, prompt for it
-if [ -z "$GITHUB_USERNAME" ]; then
-  read -rp "Your GitHub username: " GITHUB_USERNAME
-fi
-
-TAP_NAME="${GITHUB_USERNAME}/tap"
-TAP_REPO="https://github.com/${GITHUB_USERNAME}/homebrew-tap"
+GITHUB_USERNAME="${1:-quyleanh}"
 
 echo ""
 echo "=== Private Homebrew Tap Installer ==="
-echo "Tap: $TAP_NAME"
-echo "Repo: $TAP_REPO"
+echo "Tap: ${GITHUB_USERNAME}/tap"
 echo ""
+
+TAP_NAME="${GITHUB_USERNAME}/tap"
+TAP_REPO="https://github.com/${GITHUB_USERNAME}/homebrew-tap"
 
 # Check Homebrew is installed
 if ! command -v brew &>/dev/null; then
@@ -57,6 +51,16 @@ fi
 echo ""
 echo "🔄 Updating Homebrew..."
 brew update --quiet
+
+# Automatic replacement
+echo ""
+echo "📦 Running batch replacement to ensure you use $TAP_NAME packages..."
+TAP_DIR=$(brew --repo "$TAP_NAME")
+if [ -f "$TAP_DIR/scripts/batch_replace_on_mac.sh" ]; then
+  /usr/bin/env bash "$TAP_DIR/scripts/batch_replace_on_mac.sh"
+else
+  echo "⚠️  Could not find batch_replace_on_mac.sh in $TAP_DIR/scripts/"
+fi
 
 echo ""
 echo "══════════════════════════════════════"
