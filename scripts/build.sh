@@ -31,6 +31,7 @@ OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 MAX_BUILD_TIME=$((5 * 3600)) # 5 hours in seconds
+export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-12.0}"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -147,9 +148,10 @@ return
 }
 
 while IFS= read -r asset_name; do
-# Bottle filename format: aria2--1.37.0_1.sequoia.bottle.tar.gz
-# Capture everything between -- and the first OS tag (.sequoia. / .ventura. etc.)
-if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^/]+).(sequoia|ventura|sonoma|monterey). ]]; then
+# Bottle filename format examples: 
+# aria2--1.37.0_1.sequoia.bottle.tar.gz
+# aria2--1.37.0.intel_12.bottle.tar.gz
+if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^/]+)\.(sequoia|ventura|sonoma|monterey|big_sur|intel[0-9_]*)\. ]]; then
 local pkg="${BASH_REMATCH[1]}"
 local ver="${BASH_REMATCH[2]}"
 echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
@@ -283,8 +285,6 @@ if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
   continue
 fi
 
-bottle_name="${pkg}--${pkg_version}.sequoia.bottle.tar.gz"
-
 echo "  📦 Packing bottle via Homebrew..."
 
 # Let brew bottle generate BOTH the JSON and the deterministic tar.gz archive
@@ -295,21 +295,18 @@ brew bottle \
   "$pkg" 2>/dev/null || true
 
 # Move BOTH the natively generated tar.gz bottle and the JSON file to OUTPUT_DIR
+# We find exactly what Homebrew generated to avoid hardcoding the OS tag (sequoia/ventura/etc)
 find . -maxdepth 1 -name "${pkg}--*.json" -exec mv {} "$OUTPUT_DIR/" \;
 find . -maxdepth 1 -name "${pkg}--*.tar.gz" -exec mv {} "$OUTPUT_DIR/" \;
 
-bottle_path="$OUTPUT_DIR/$bottle_name"
-if [ ! -f "$bottle_path" ]; then
-  # Fallback: Find any generated bottle tar.gz just in case naming was slightly different
-  generated_tar=$(find "$OUTPUT_DIR" -maxdepth 1 -name "${pkg}--*.tar.gz" | head -n 1)
-  if [ -n "$generated_tar" ]; then
-    bottle_path="$generated_tar"
-  else
-    echo "  ⚠️  brew bottle failed to generate the archive for $pkg"
-    FAILED+=("$pkg")
-    echo ""
-    continue
-  fi
+# Find the tarball we just moved to verify it exists
+bottle_path=$(find "$OUTPUT_DIR" -maxdepth 1 -name "${pkg}--*${pkg_version}*.tar.gz" | head -n 1)
+
+if [ -z "$bottle_path" ] || [ ! -f "$bottle_path" ]; then
+  echo "  ⚠️  brew bottle failed to generate the archive for $pkg"
+  FAILED+=("$pkg")
+  echo ""
+  continue
 fi
 
 echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"

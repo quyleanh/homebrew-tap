@@ -26,13 +26,14 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  MACOSX_DEPLOYMENT_TARGET: "12.0"  # Target Monterey (12.0) and above
 
 permissions:
   contents: write  # Required to commit formula updates and manage releases
 
 jobs:
   build:
-    name: Build Bottles (macOS 15 / Intel x86_64)
+    name: Build Bottles (macOS Intel / Multi-OS 12+)
     runs-on: macos-15-intel
 
     steps:
@@ -74,7 +75,7 @@ jobs:
         run: |
           gh release edit stable \
             --title "Stable Bottles" \
-            --notes "Auto-built Homebrew bottles for macOS Ventura (13) on Intel x86_64. Built on macos-15-intel runner. Last updated: run #${{ github.run_number }}"
+            --notes "Auto-built Homebrew bottles for Intel x86_64. Native support for Monterey (12), Ventura (13), Sonoma (14), and Sequoia (15). Built on macos-15-intel runner with deployment target 12.0. Last updated: run #${{ github.run_number }}"
           gh release upload stable bottles/*.tar.gz bottles/*.json --clobber
 
       - name: Update formula files
