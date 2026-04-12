@@ -271,7 +271,7 @@ fi
 
 brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 
-if brew install --build-bottle "$pkg"; then
+if brew install --build-bottle --overwrite "$pkg"; then
 echo "  ✅ Installed, packing bottle…"
 
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
