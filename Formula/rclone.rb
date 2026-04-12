@@ -4,19 +4,26 @@ class Rclone < Formula
   homepage "https://rclone.org/"
   version "1.73.4"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.73.4.sequoia.bottle.1.tar.gz"
-  sha256 "035c829dd103224b2dbffdd2f113738992e13ea7f10fe31f1eafcfb99d4c541f"
+  sha256 "0be53e1c4ef7d2091656b18757ff9414cbb2afc23473e2a40bccd2549bbc4704"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

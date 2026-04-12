@@ -4,19 +4,26 @@ class Certifi < Formula
   homepage "https://github.com/certifi/python-certifi"
   version "2026.2.25"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.2.25.sequoia.bottle.1.tar.gz"
-  sha256 "62b22257059413639604e379c5cabec1a3bef9155bb60e2ce951b9151383f51e"
+  sha256 "0846e8615aa6e8fd050cf6d8fc9eb9efb70c5344e851e4450a13aa56383cc4ef"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

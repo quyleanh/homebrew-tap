@@ -4,19 +4,26 @@ class AdaUrl < Formula
   homepage "https://github.com/ada-url/ada"
   version "3.4.4"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url--3.4.4.sequoia.bottle.1.tar.gz"
-  sha256 "8f7d1c47f1aa21e5e934f6bab2b862aaefc4925cf2cd03fec18d444b0b9034b0"
+  sha256 "8b19acb7ee435a4ace59f6eed611a167a4184844254cb628baba5b7ffb5f0d2f"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

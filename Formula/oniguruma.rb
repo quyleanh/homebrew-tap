@@ -4,19 +4,26 @@ class Oniguruma < Formula
   homepage "https://github.com/kkos/oniguruma/"
   version "6.9.10"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/oniguruma--6.9.10.sequoia.bottle.1.tar.gz"
-  sha256 "07b5f688a1347ed53390eba42372d85e25801a21c8649cf79d0c237c5fa54414"
+  sha256 "2e72f71d415a678a95d45c3ebf476358d02a3c74e9b53ea2ce8cade52e9174c1"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

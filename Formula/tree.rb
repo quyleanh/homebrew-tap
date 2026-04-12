@@ -4,19 +4,26 @@ class Tree < Formula
   homepage "https://oldmanprogrammer.net/source.php?dir=projects/tree"
   version "2.3.2"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tree--2.3.2.sequoia.bottle.1.tar.gz"
-  sha256 "d189fd0e9fb61f5cb21f017d146a046fbd2ee9f3777ae2b3853c21eea1284925"
+  sha256 "3c9b1127e3b9156c5a8a4b62fcc6943ba7f6602d0c6b109cf043d0682ba8db94"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

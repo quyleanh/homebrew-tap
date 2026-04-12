@@ -4,19 +4,26 @@ class Uvwasi < Formula
   homepage "https://github.com/nodejs/uvwasi"
   version "0.0.23"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/uvwasi--0.0.23.sequoia.bottle.2.tar.gz"
-  sha256 "5e87054f3fc6647c0f3be8c121a34904a11f549365bc7a2c74d63dd8176e7395"
+  sha256 "44f6191c08c62afcea00acc06ebc900212dabb1ce4861fa4c2df635ae630603e"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

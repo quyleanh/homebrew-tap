@@ -6,7 +6,7 @@ class Deno < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.7.12.sequoia.bottle.1.tar.gz"
-  sha256 "6162bbf562014310597a073b639cec49c8c0ed99c220b1ee53bce14b89f5f272"
+  sha256 "35b7b026964eecbb439aeb4422464b9ca051f749f243a57527d8ef48edc753ff"
 
 
 

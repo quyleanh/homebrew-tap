@@ -4,19 +4,26 @@ class Libvpx < Formula
   homepage "https://www.webmproject.org/code/"
   version "1.16.0"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvpx--1.16.0.sequoia.bottle.1.tar.gz"
-  sha256 "f1fc9e7ee19ae8fe93c5ddd80340ed7707de966de22b60526bc7b19db90af9dd"
+  sha256 "a51fe02a3778545c8b8ec6ec6250d73f3e3de3a1f5d35663c37b54adf4d717a8"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

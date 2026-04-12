@@ -4,19 +4,26 @@ class Libnghttp2 < Formula
   homepage "https://nghttp2.org/"
   version "1.68.1"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp2--1.68.1.sequoia.bottle.1.tar.gz"
-  sha256 "a544cc38c3f4e085a20ee39eef68f42c02a9f0f350c1e96814f4e7445ac33ae8"
+  sha256 "893b9068708e59a53a3cfcff354218ec515022173756a64b6bc6581f77d284f1"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

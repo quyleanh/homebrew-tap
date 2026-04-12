@@ -4,19 +4,26 @@ class Libunistring < Formula
   homepage "https://www.gnu.org/software/libunistring/"
   version "1.4.2"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libunistring--1.4.2.sequoia.bottle.1.tar.gz"
-  sha256 "341aad1fd8bf6ac3bab9815ef6d82cbd1cf57dfa74a704710bcd67999a1c8169"
+  sha256 "99d627b1e06f6c8f14b2830eb940d2807d5f329b8fe0d04e9a3b9ca20dec3135"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

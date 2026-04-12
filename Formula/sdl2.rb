@@ -4,19 +4,26 @@ class Sdl2 < Formula
   homepage "https://www.libsdl.org/"
   version "2.32.10"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2--2.32.10.sequoia.bottle.1.tar.gz"
-  sha256 "ad05a9862dfe7ad4a7d6b2d276f666ef758021a299373463f98ac58585fdfa7c"
+  sha256 "c93324ecef8a0d7adc98d444dc77b342fd48a68ebc528339fd74ad64173e6f38"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

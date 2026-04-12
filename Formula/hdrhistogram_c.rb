@@ -4,19 +4,26 @@ class HdrhistogramC < Formula
   homepage "https://github.com/HdrHistogram/HdrHistogram_c"
   version "0.11.9"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hdrhistogram_c--0.11.9.sequoia.bottle.2.tar.gz"
-  sha256 "f9d76c3baae9814b5fe48986502685af7164a405bedb865b688de879409fa6ff"
+  sha256 "295f1383de2223a3aa0c084bf4aaebc0ed5b289e24dafe8804eabda20f43e0c2"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

@@ -4,19 +4,26 @@ class SvtAv1 < Formula
   homepage "https://gitlab.com/AOMediaCodec/SVT-AV1"
   version "4.1.0"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/svt-av1--4.1.0.sequoia.bottle.1.tar.gz"
-  sha256 "3ea17d13f556f49bff956ba8ae7687a67b1d3c405be5e1401269f602570ec6b4"
+  sha256 "6c14637ca679957edc87e9276f13906ad0d925a5bc953bf0e7224bd8fb4b6f49"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

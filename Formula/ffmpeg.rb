@@ -4,19 +4,26 @@ class Ffmpeg < Formula
   homepage "https://ffmpeg.org/"
   version "8.1"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.sequoia.bottle.3.tar.gz"
-  sha256 "bb9f840b0e3d08f13b7c9eb8fcc7dfa109ad007a0949a5f6a23b06883c189a4f"
+  sha256 "a4af2f26cfc788c988eced28ad23873f65c8a79e5f9ebe5b375d678137e40f2f"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

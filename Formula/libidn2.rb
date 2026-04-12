@@ -4,19 +4,26 @@ class Libidn2 < Formula
   homepage "https://www.gnu.org/software/libidn/#libidn2"
   version "2.3.8"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libidn2--2.3.8.sequoia.bottle.1.tar.gz"
-  sha256 "68250cb4ac38144319e7099ad53c4279fad76d426a3066baf0b8f6a30a4ec3ee"
+  sha256 "5ae1fdf9d34714c8ddd3efe719d85b616287ead48780f0c2f716c62cea368927"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

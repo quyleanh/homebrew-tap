@@ -2,21 +2,28 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  version "3.51.3"
+  version "3.53.0"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.51.3.sequoia.bottle.1.tar.gz"
-  sha256 "c5b3f41c3baa8f50e5b794da76ae996c63e342ca822ddc95f23b8bae20015901"
+  # Use a dummy URL to download the pre-built .tar.gz file directly
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.0.sequoia.bottle.1.tar.gz"
+  sha256 "aa1a505d566c7073f5d6a8d76119856272161093a886fee4a1a1030fb8fca987"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

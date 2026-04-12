@@ -6,7 +6,7 @@ class PythonAT314 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.4.sequoia.bottle.1.tar.gz"
-  sha256 "751554e34fe401ca24cb8b3179fe4092ff838d00f28cce5a7ff8820316044a15"
+  sha256 "2ec2895c33e918ea389cd37b68a266a90c6ed4b23391b2044a2ad65593a5bde3"
 
 
 

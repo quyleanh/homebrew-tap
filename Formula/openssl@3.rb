@@ -6,7 +6,7 @@ class OpensslAT3 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.2.sequoia.bottle.1.tar.gz"
-  sha256 "f4e78af51b04c218ae16b3297ef75de5d926d8f47eac0ac782575017f04d80ce"
+  sha256 "26c1befbba4d0f34f9eb9af2a0c5cc26e3865abffbf9276a2b3083afc594accf"
 
 
 

@@ -6,7 +6,7 @@ class Llhttp < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.3.1.sequoia.bottle.1.tar.gz"
-  sha256 "219c3837fd250da34d98d6e1c788db2708cb477847e2faa59841ff931745de6e"
+  sha256 "5fb5e446a11cdb457ead9070ee6a533d8c6984567118f4f3aafd73fe9e52d937"
 
 
 

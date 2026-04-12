@@ -4,19 +4,26 @@ class Mpdecimal < Formula
   homepage "https://www.bytereef.org/mpdecimal/"
   version "4.0.1"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpdecimal--4.0.1.sequoia.bottle.1.tar.gz"
-  sha256 "93010c305ab5b454ff629094610e0e012d3ef1cbf18ed80851319e62f94e1eaf"
+  sha256 "c61a9be34f01a4f002f92f799f75d4e5d1114b4153eedec6d3868bf09057c052"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

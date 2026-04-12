@@ -4,19 +4,26 @@ class Gettext < Formula
   homepage "https://www.gnu.org/software/gettext/"
   version "1.0"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gettext--1.0.sequoia.bottle.1.tar.gz"
-  sha256 "6cd79a61fc0919507d67c1c4e92400e4e6572a3c343c1dfa7135f917e0ff1739"
+  sha256 "a6bce66e89a98daec90bdeb454d0e4b0be819cd7777b3d3c33172250505a9698"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end
