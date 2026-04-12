@@ -4,19 +4,26 @@ class Hugo < Formula
   homepage "https://gohugo.io/"
   version "0.160.1"
   
-  # Sử dụng dummy URL để tải thẳng file pre-built .tar.gz
+  # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo--0.160.1.sequoia.bottle.1.tar.gz"
-  sha256 "f3c7bc3289ed7e2573b67adab439bc6135ba2723537a91a6095d2d87de9c7719"
+  sha256 "0665538c0acc1d7bd4f69e60ad93d2a3b7386c4bbc996bfe5481711c7ba9fd78"
 
 
 
   def install
-    # Giải nén bottle và copy nội dung thẳng vào Cellar prefix
-    prefix.install Dir["*"]
+    # The bottle tarball contains the entire Cellar hierarchy.
+    # We find the first directory containing common Homebrew paths and install its contents.
+    # (Checking both root and nested directories)
+    content_root = (Dir["{bin,lib,include,share}"] + Dir["**/{bin,lib,include,share}"]).map { |p| File.dirname(p) }.min_by(&:length)
+    if content_root
+      prefix.install Dir["#{content_root}/*"]
+    else
+      prefix.install Dir["*"]
+    end
   end
 
   test do
-    # Đơn giản hóa test để tránh lỗi môi trường trên GitHub Runner
+    # Simplify the test to avoid environment errors on GitHub Runner
     assert_true true
   end
 end

@@ -6,7 +6,7 @@ class Rtk < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk--0.35.0.sequoia.bottle.1.tar.gz"
-  sha256 "4dae602cec065fcb5b273c77d113def503e00403d373d89dea198a15826eb986"
+  sha256 "ac3a9b402601f2250736370a40f2212a8eee1d88b2923cc8e65963e4f78c94b5"
 
 
 
