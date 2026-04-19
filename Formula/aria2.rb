@@ -3,11 +3,11 @@ class Aria2 < Formula
   desc "Download with resuming and segmented downloading"
   homepage "https://aria2.github.io/"
   version "1.37.0"
-  revision 1
+  revision 2
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_1.sequoia.bottle.2.tar.gz"
-  sha256 "59f5f54796da79fc0f20b69328ba7eda44eea7e31f890f92e9d62570d7c91356"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_2.sequoia.bottle.1.tar.gz"
+  sha256 "56619fc1fe5115f39a6d9c8fc513429e5823922a6fb0c00ac69810649b8c074d"
 
 
 

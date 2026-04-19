@@ -2,11 +2,11 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  version "1.73.4"
+  version "1.73.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.73.4.sequoia.bottle.1.tar.gz"
-  sha256 "0be53e1c4ef7d2091656b18757ff9414cbb2afc23473e2a40bccd2549bbc4704"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.73.5.sequoia.bottle.1.tar.gz"
+  sha256 "abcba6d8f9c785882858dd34f2674e30167d757a3e018242142b607692b4fb65"
 
 
 
