@@ -2,11 +2,11 @@
 class X265 < Formula
   desc "H.265/HEVC encoder"
   homepage "https://bitbucket.org/multicoreware/x265_git"
-  version "4.1"
+  version "4.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/x265--4.1.sequoia.bottle.2.tar.gz"
-  sha256 "d975d9b7cffb4a84826d85fd9464959792547aab651575df20c883076ef07fe5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/x265--4.2.sequoia.bottle.1.tar.gz"
+  sha256 "dfa5ec3425dc9cb66e1e3cb1c6d0a012f80b54c72006c2749dbe3d29bfbc3fa8"
 
 
 
