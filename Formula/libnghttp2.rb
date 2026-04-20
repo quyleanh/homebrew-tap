@@ -2,11 +2,11 @@
 class Libnghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  version "1.68.1"
+  version "1.69.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp2--1.68.1.sequoia.bottle.1.tar.gz"
-  sha256 "893b9068708e59a53a3cfcff354218ec515022173756a64b6bc6581f77d284f1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp2--1.69.0.sequoia.bottle.1.tar.gz"
+  sha256 "f637c2bd3531e7ffdbac7856db004d9b39d8ae0e099db21153c72cd841684b70"
 
 
 
