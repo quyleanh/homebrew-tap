@@ -2,11 +2,11 @@
 class Simdutf < Formula
   desc "Unicode conversion routines, fast"
   homepage "https://simdutf.github.io/simdutf/"
-  version "8.2.0"
+  version "9.0.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf--8.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "6de7c920a3d2f596d36147cb4a859b4cabf889781d38dc7a774dd3e515381f6a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf--9.0.0.sequoia.bottle.1.tar.gz"
+  sha256 "f837aae965526286bfd80a46cc0ddad43058b4ddd2ca063402ca09942b7684b7"
 
 
 

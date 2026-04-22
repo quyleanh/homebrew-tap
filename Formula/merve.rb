@@ -3,10 +3,11 @@ class Merve < Formula
   desc "C++ lexer for extracting named exports from CommonJS modules"
   homepage "https://github.com/nodejs/merve"
   version "1.2.2"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/merve--1.2.2.sequoia.bottle.1.tar.gz"
-  sha256 "8519c5129325e858e71a0b378276e1a25d398f3f7799003b9ae8f551753258d7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/merve--1.2.2_1.sequoia.bottle.1.tar.gz"
+  sha256 "93f34bc31ebbbe1c66a9d89115d3222dd1fedbc150f9648c164882104ba8ef8d"
 
 
 
