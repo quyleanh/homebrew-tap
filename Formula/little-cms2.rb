@@ -2,11 +2,11 @@
 class LittleCms2 < Formula
   desc "Color management engine supporting ICC profiles"
   homepage "https://www.littlecms.com/"
-  version "2.18"
+  version "2.19"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2--2.18.sequoia.bottle.1.tar.gz"
-  sha256 "c05849524896337c396bf02910e9b940a89a936c1d07c9dcd37f97e0995f81b8"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2--2.19.sequoia.bottle.1.tar.gz"
+  sha256 "e604113a121d9b63f2ce8e7f5a28ec967d687754d364902cfce8642517fd5fe6"
 
 
 
