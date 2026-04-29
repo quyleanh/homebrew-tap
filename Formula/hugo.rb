@@ -2,11 +2,11 @@
 class Hugo < Formula
   desc "Configurable static site generator"
   homepage "https://gohugo.io/"
-  version "0.161.0"
+  version "0.161.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo--0.161.0.sequoia.bottle.1.tar.gz"
-  sha256 "98bb443687022f5c55044ad00d523788bd12b5462cdae2e69d9ccf44f7c920a4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo--0.161.1.sequoia.bottle.1.tar.gz"
+  sha256 "a53228697f0f10002684015c4b13afcdbd6cc92f1e70355bb3196859e32e87ec"
 
 
 
