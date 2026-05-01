@@ -2,11 +2,11 @@
 class Llhttp < Formula
   desc "Port of http_parser to llparse"
   homepage "https://llhttp.org/"
-  version "9.3.1"
+  version "9.4.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.3.1.sequoia.bottle.1.tar.gz"
-  sha256 "5fb5e446a11cdb457ead9070ee6a533d8c6984567118f4f3aafd73fe9e52d937"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.4.1.sequoia.bottle.1.tar.gz"
+  sha256 "a182595fe862bc210af58e91febc319c4e43a018425c3d11f6e233e872e3f7ae"
 
 
 
