@@ -2,11 +2,11 @@
 class Simdjson < Formula
   desc "SIMD-accelerated C++ JSON parser"
   homepage "https://simdjson.org"
-  version "4.6.3"
+  version "4.6.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson--4.6.3.sequoia.bottle.1.tar.gz"
-  sha256 "2ccc48346136284860bbfddd0fcc779e754db01a1ab1ebdadbf47d83e9085f3a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson--4.6.4.sequoia.bottle.1.tar.gz"
+  sha256 "19919557c8477ae3198e19a6d442913d7b409aa306862345a3be53e257345619"
 
 
 
