@@ -2,11 +2,11 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  version "3.53.0"
+  version "3.53.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.0.sequoia.bottle.1.tar.gz"
-  sha256 "aa1a505d566c7073f5d6a8d76119856272161093a886fee4a1a1030fb8fca987"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.1.sequoia.bottle.1.tar.gz"
+  sha256 "d7dbf5ee9d585c548fbec10092539b118fbda18f61b8d18bc94818f21644013a"
 
 
 

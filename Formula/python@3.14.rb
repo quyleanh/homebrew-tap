@@ -2,12 +2,11 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.4"
-  revision 1
+  version "3.14.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.4_1.sequoia.bottle.1.tar.gz"
-  sha256 "06a63a14f94f50a4c7540b9cedd7d0058b33e031b17eb9865ef3a5e1cc90aa07"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.5.sequoia.bottle.1.tar.gz"
+  sha256 "c7314acb360e8412de8cce20fed523e83d8acdf499ae3f545b4693fdb76b05a3"
 
 
 
