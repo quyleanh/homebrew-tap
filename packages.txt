@@ -14,7 +14,7 @@ rclone
 
 # Shell
 bash
-tmux
+#tmux
 
 # Media
 ffmpeg
