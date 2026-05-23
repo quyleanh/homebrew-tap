@@ -2,11 +2,11 @@
 class Certifi < Formula
   desc "Mozilla CA bundle for Python"
   homepage "https://github.com/certifi/python-certifi"
-  version "2026.4.22"
+  version "2026.5.20"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.4.22.sequoia.bottle.1.tar.gz"
-  sha256 "c88a7b16ec99323fb40e3907da1f2f07406181cb8b5a4df26fe61c2364fd1cfb"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.5.20.sequoia.bottle.1.tar.gz"
+  sha256 "f93d4d9641e97a453a85e9cb6d309c6dfdc7b64b599317b653969a18d76fdfc3"
 
 
 
