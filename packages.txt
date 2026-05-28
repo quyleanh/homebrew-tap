@@ -11,6 +11,7 @@ jq
 tree
 yt-dlp
 rclone
+mole
 
 # Shell
 bash
