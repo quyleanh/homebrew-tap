@@ -54,7 +54,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install bash jq  # bash 5+ and jq required by build scripts
+          if ! brew list bash >/dev/null 2>&1; then
+            brew install bash
+          fi
+      
+          if ! brew list jq >/dev/null 2>&1; then
+            brew install jq
+          fi
+      
+          brew link --overwrite bash || true
+          brew link --overwrite jq || true
 
       - name: Build bottles
         id: build
