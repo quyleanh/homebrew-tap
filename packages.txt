@@ -19,6 +19,7 @@ tmux
 
 # Media
 ffmpeg
+libx11
 
 # Dev / runtimes
 node
