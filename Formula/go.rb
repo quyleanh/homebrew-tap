@@ -2,11 +2,11 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  version "1.26.3"
+  version "1.26.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.3.sequoia.bottle.1.tar.gz"
-  sha256 "771822cc7647d3ea2a318fc84d7aa2726b13cd1b7ccb090da7f2c0bf6793136a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.4.sequoia.bottle.1.tar.gz"
+  sha256 "26f2a6a4cdac09f1431923ab9b3fd37ff7ab20a3fc16d8f1cbdce15b25e8ce04"
 
 
 
