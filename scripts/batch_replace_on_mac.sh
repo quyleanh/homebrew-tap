@@ -55,18 +55,21 @@ for pkg in $FORMULAS; do
 
   # Check if the package is already installed from the custom tap
   if brew list --full-name 2>/dev/null | grep -q "^${TAP_NAME}/${pkg}$"; then
-    echo "[skip] $pkg is already installed from $TAP_NAME — skipping."
-    continue
+    echo "[skip] $pkg is already installed from $TAP_NAME — ensuring it is linked."
+  else
+    # Check if package is installed from elsewhere (e.g. homebrew-core)
+    if brew list "$pkg" &>/dev/null; then
+      echo ">> $pkg is installed from a different source. Reinstalling from $TAP_NAME/$pkg..."
+      brew reinstall "$TAP_NAME/$pkg" || echo "[-] Warning: Failed to reinstall $pkg"
+    else
+      echo ">> $pkg is not installed locally. Installing $TAP_NAME/$pkg..."
+      brew install "$TAP_NAME/$pkg" || echo "[-] Warning: Failed to install $pkg"
+    fi
   fi
 
-  # Check if package is installed from elsewhere (e.g. homebrew-core)
-  if brew list "$pkg" &>/dev/null; then
-    echo ">> $pkg is installed from a different source. Reinstalling from $TAP_NAME/$pkg..."
-    brew reinstall "$TAP_NAME/$pkg" || echo "[-] Warning: Failed to reinstall $pkg"
-  else
-    echo ">> $pkg is not installed locally. Installing $TAP_NAME/$pkg..."
-    brew install "$TAP_NAME/$pkg" || echo "[-] Warning: Failed to install $pkg"
-  fi
+  echo ">> Linking $pkg..."
+  brew unlink "$pkg" 2>/dev/null || true
+  brew link --overwrite "$pkg" || echo "[-] Warning: Failed to link $pkg"
 done
 
 echo ""
