@@ -2,11 +2,11 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.8.1"
+  version "2.8.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.8.1.sequoia.bottle.1.tar.gz"
-  sha256 "8537455b4769db63cdd8ed0bc9d732743bbb75a4099755cf01a8a438012cb88f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.8.2.sequoia.bottle.1.tar.gz"
+  sha256 "2eb5515e1720d288674bf74670ea5d068c3c103a47dbac52d391cdee41458ee2"
 
 
 
@@ -19,6 +19,24 @@ class Deno < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

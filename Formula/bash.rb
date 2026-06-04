@@ -2,11 +2,11 @@
 class Bash < Formula
   desc "Bourne-Again SHell, a UNIX command interpreter"
   homepage "https://www.gnu.org/software/bash/"
-  version "5.3.9"
+  version "5.3.12"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash--5.3.9.sequoia.bottle.1.tar.gz"
-  sha256 "cf7494920fb9de6c585ba5ecaca59c25e63311058899771075c41b2fd726fb54"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash--5.3.12.sequoia.bottle.1.tar.gz"
+  sha256 "8469ff32c34d490d0e56d67dee59140e36203bf37f8a9d899ea4342dcca13b44"
 
 
 
@@ -19,6 +19,24 @@ class Bash < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
