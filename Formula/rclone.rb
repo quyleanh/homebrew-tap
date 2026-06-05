@@ -2,11 +2,11 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  version "1.74.2"
+  version "1.74.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.74.2.sequoia.bottle.1.tar.gz"
-  sha256 "4cdbdc6ebbc620138c53fcc61a695ea124687e999f8212a375a573902193250b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.74.3.sequoia.bottle.1.tar.gz"
+  sha256 "e886665def043737bd53cbf3c506ad4d2c6099ed31daed506c4a65c62ce063a0"
 
 
 
@@ -19,6 +19,24 @@ class Rclone < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
