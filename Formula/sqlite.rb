@@ -2,11 +2,11 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  version "3.53.1"
+  version "3.53.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.1.sequoia.bottle.1.tar.gz"
-  sha256 "d7dbf5ee9d585c548fbec10092539b118fbda18f61b8d18bc94818f21644013a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.2.sequoia.bottle.1.tar.gz"
+  sha256 "348a1cac592a3b13437ece864b700a9083f4d321a292fa25a818b25575d5a90d"
 
 
 
@@ -19,6 +19,24 @@ class Sqlite < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
