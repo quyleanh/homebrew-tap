@@ -2,11 +2,11 @@
 class Rtk < Formula
   desc "CLI proxy to minimize LLM token consumption"
   homepage "https://www.rtk-ai.app/"
-  version "0.42.2"
+  version "0.42.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk--0.42.2.sequoia.bottle.1.tar.gz"
-  sha256 "5df2308b44315619937f2e22fef73310b90c8fdf1e5d16048ddb42fd758001ae"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk--0.42.3.sequoia.bottle.1.tar.gz"
+  sha256 "804a357dbf4ee5f2255e2da5c5c12105df4c737ee2219768eb425badf65e0930"
 
 
 
