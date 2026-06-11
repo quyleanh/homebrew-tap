@@ -2,12 +2,11 @@
 class YtDlp < Formula
   desc "Feature-rich command-line audio/video downloader"
   homepage "https://github.com/yt-dlp/yt-dlp"
-  version "2026.3.17"
-  revision 2
+  version "2026.6.9"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.3.17_2.sequoia.bottle.1.tar.gz"
-  sha256 "2be0cef7a96f1a668c2744301f94d80fa4884b01256adbbf5f4f3131add4b683"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.6.9.sequoia.bottle.1.tar.gz"
+  sha256 "3cb823cdebce62d02ff25ce0a080200bccc733d4811d2313ac79817f408a0bff"
 
 
 
@@ -20,6 +19,24 @@ class YtDlp < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

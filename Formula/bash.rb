@@ -2,11 +2,11 @@
 class Bash < Formula
   desc "Bourne-Again SHell, a UNIX command interpreter"
   homepage "https://www.gnu.org/software/bash/"
-  version "5.3.12"
+  version "5.3.15"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash--5.3.12.sequoia.bottle.1.tar.gz"
-  sha256 "8469ff32c34d490d0e56d67dee59140e36203bf37f8a9d899ea4342dcca13b44"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash--5.3.15.sequoia.bottle.1.tar.gz"
+  sha256 "7870e7f3e1aabfea587eac5e74d6acf1952bc48d6064f23ca993b627533dea8f"
 
 
 
