@@ -2,11 +2,11 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.5"
+  version "3.14.6"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.5.sequoia.bottle.1.tar.gz"
-  sha256 "c7314acb360e8412de8cce20fed523e83d8acdf499ae3f545b4693fdb76b05a3"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.6.sequoia.bottle.1.tar.gz"
+  sha256 "e88b41833ee76008f34578c041dc3a834ddcd42d1ada4b92942fefd243feb68e"
 
 
 
@@ -19,6 +19,24 @@ class PythonAT314 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
