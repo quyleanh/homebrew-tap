@@ -2,11 +2,11 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream select audio and video codecs"
   homepage "https://ffmpeg.org/"
-  version "8.1.1"
+  version "8.1.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.1.sequoia.bottle.1.tar.gz"
-  sha256 "c10bb3a3454c185e00c69f3cba95e285e5a05722ab3ed40f0f2e21b362d6a6d4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.2.sequoia.bottle.1.tar.gz"
+  sha256 "ee664fc0b4dd336f8bd1b1ebebb7d33bce09a841e3bda90e2c46f2639bc3e2af"
 
 
 
@@ -19,6 +19,24 @@ class Ffmpeg < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
