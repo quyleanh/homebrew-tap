@@ -2,11 +2,11 @@
 class Llhttp < Formula
   desc "Port of http_parser to llparse"
   homepage "https://llhttp.org/"
-  version "9.4.1"
+  version "9.4.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.4.1.sequoia.bottle.1.tar.gz"
-  sha256 "a182595fe862bc210af58e91febc319c4e43a018425c3d11f6e233e872e3f7ae"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.4.2.sequoia.bottle.1.tar.gz"
+  sha256 "437a630b68cf5f7d7f84fae121fa149e0404efd9d57378a9089932d8fcf83b78"
 
 
 
@@ -19,6 +19,24 @@ class Llhttp < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
