@@ -2,11 +2,11 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://jqlang.github.io/jq/"
-  version "1.8.1"
+  version "1.8.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jq--1.8.1.sequoia.bottle.1.tar.gz"
-  sha256 "c485aded0a3514e8142d331594f46c152a53ce15ac93bbc52b9c8f52d6ba0566"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jq--1.8.2.sequoia.bottle.1.tar.gz"
+  sha256 "574071a303e5e01bb6399d93f57efde7c0459e98d1de0af4b0469fced1c61219"
 
 
 
@@ -19,6 +19,24 @@ class Jq < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
