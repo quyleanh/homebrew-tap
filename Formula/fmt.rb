@@ -2,11 +2,11 @@
 class Fmt < Formula
   desc "Open-source formatting library for C++"
   homepage "https://fmt.dev/"
-  version "12.1.0"
+  version "12.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fmt--12.1.0.sequoia.bottle.1.tar.gz"
-  sha256 "7e3e7ebe1c9cf21b6c31b1361824674715febdf0387bb1e288c9ddbe5b04d9c0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fmt--12.2.0.sequoia.bottle.1.tar.gz"
+  sha256 "c422289064c617faeebf29bc3c0a218509ccd5fac0904c76ada0e74f3b15962b"
 
 
 
@@ -19,6 +19,24 @@ class Fmt < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
