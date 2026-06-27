@@ -2,11 +2,11 @@
 class Tmux < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  version "3.6b"
+  version "3.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux--3.6b.sequoia.bottle.2.tar.gz"
-  sha256 "c12a78102fdaa8d2cba02590ef91beaf56a51858d73ea60265a843a36ad2a1b1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux--3.7.sequoia.bottle.1.tar.gz"
+  sha256 "c5ec2be65e60e17f7df9ed6557d7ed53b4eff861c64440befbe77597cefe6acd"
 
 
 
@@ -19,6 +19,24 @@ class Tmux < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
