@@ -2,11 +2,11 @@
 class Mole < Formula
   desc "Deep clean and optimize your Mac"
   homepage "https://mole.fit"
-  version "1.44.0"
+  version "1.44.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mole--1.44.0.sequoia.bottle.1.tar.gz"
-  sha256 "0a20a7d1cd58cd422b0ffb34d0936a70082cdd01c8c32a96c8eeb91f9edf5af1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mole--1.44.1.sequoia.bottle.1.tar.gz"
+  sha256 "e326977f877796688b4d352ce4e44ed034007a37fd9634281ebead0caf0ab259"
 
 
 
