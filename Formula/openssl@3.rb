@@ -2,11 +2,11 @@
 class OpensslAT3 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  version "3.6.2"
+  version "3.6.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.2.sequoia.bottle.1.tar.gz"
-  sha256 "26c1befbba4d0f34f9eb9af2a0c5cc26e3865abffbf9276a2b3083afc594accf"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.3.sequoia.bottle.1.tar.gz"
+  sha256 "622f2c657c2d0b08db8c1c69a9cc1532d5929ce71b006caeb2393f54b081ca67"
 
 
 
@@ -19,6 +19,24 @@ class OpensslAT3 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
