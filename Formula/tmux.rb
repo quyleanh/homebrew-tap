@@ -2,11 +2,11 @@
 class Tmux < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  version "3.7"
+  version "3.7a"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux--3.7.sequoia.bottle.1.tar.gz"
-  sha256 "c5ec2be65e60e17f7df9ed6557d7ed53b4eff861c64440befbe77597cefe6acd"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux--3.7a.sequoia.bottle.1.tar.gz"
+  sha256 "12568cef336d1c01bf121f692edf5f2c93913ca3a002ee401c634ebed3a64edd"
 
 
 

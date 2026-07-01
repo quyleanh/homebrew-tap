@@ -2,11 +2,11 @@
 class JpegTurbo < Formula
   desc "JPEG image codec that aids compression and decompression"
   homepage "https://www.libjpeg-turbo.org/"
-  version "3.1.4.1"
+  version "3.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jpeg-turbo--3.1.4.1.sequoia.bottle.1.tar.gz"
-  sha256 "46a0ed6e3ef252f4b7c469cde6d598963a11d61831f2786bd8c6a13bcdd96b77"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jpeg-turbo--3.2.0.sequoia.bottle.1.tar.gz"
+  sha256 "f2070ab846d38fbe76115b66654570efb258c2826a5b2b5c4972ecc89df9cc25"
 
 
 
@@ -19,6 +19,24 @@ class JpegTurbo < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
