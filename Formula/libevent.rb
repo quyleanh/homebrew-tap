@@ -2,12 +2,11 @@
 class Libevent < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
-  version "2.1.12"
-  revision 1
+  version "2.1.13"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent--2.1.12_1.sequoia.bottle.1.tar.gz"
-  sha256 "28f822f09e17045bb8479714c83792cdbc067050b6e71b68a81ab9222f5b3264"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent--2.1.13.sequoia.bottle.1.tar.gz"
+  sha256 "7b42a140a72c4882a241792e7c13034c3efef96b57329d5964bbbd66a378353b"
 
 
 
@@ -20,6 +19,24 @@ class Libevent < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

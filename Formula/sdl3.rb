@@ -2,11 +2,11 @@
 class Sdl3 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://libsdl.org/"
-  version "3.4.10"
+  version "3.4.12"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3--3.4.10.sequoia.bottle.1.tar.gz"
-  sha256 "f65e3a02e19f329307efab71eed356d3fd3e44b17d79be360b76e4d24bdfdf49"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3--3.4.12.sequoia.bottle.1.tar.gz"
+  sha256 "7e43a33f0268644a3d6f96d00fe01b4919d7c10cb3769b6269c32084bfa1344e"
 
 
 
