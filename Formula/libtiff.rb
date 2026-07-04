@@ -2,12 +2,11 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  version "4.7.1"
-  revision 1
+  version "4.7.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.1_1.sequoia.bottle.1.tar.gz"
-  sha256 "e2871f9744e6fff8260f72553b1f43f8cc7da7997c96ea532ff2df4f30bdaf74"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.2.sequoia.bottle.1.tar.gz"
+  sha256 "cb75800ac61342cff7527ffa22e695215a4d28fb0faded77884d8a8bfc1575d1"
 
 
 
@@ -20,6 +19,24 @@ class Libtiff < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
