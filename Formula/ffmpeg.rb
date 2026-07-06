@@ -3,10 +3,11 @@ class Ffmpeg < Formula
   desc "Play, record, convert, and stream select audio and video codecs"
   homepage "https://ffmpeg.org/"
   version "8.1.2"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.2.sequoia.bottle.1.tar.gz"
-  sha256 "ee664fc0b4dd336f8bd1b1ebebb7d33bce09a841e3bda90e2c46f2639bc3e2af"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.2_1.sequoia.bottle.1.tar.gz"
+  sha256 "e715ed6bd4b5820adeaf5318e421a2e5a16df795e84f380e9597247a87ea7f8f"
 
 
 

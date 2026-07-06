@@ -2,11 +2,11 @@
 class YtDlp < Formula
   desc "Feature-rich command-line audio/video downloader"
   homepage "https://github.com/yt-dlp/yt-dlp"
-  version "2026.6.9"
+  version "2026.7.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.6.9.sequoia.bottle.1.tar.gz"
-  sha256 "3cb823cdebce62d02ff25ce0a080200bccc733d4811d2313ac79817f408a0bff"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.7.4.sequoia.bottle.1.tar.gz"
+  sha256 "5b0244fe80c89223c8cdef70b4d2b14476ed55e001156d83a7d15812544a47f0"
 
 
 
