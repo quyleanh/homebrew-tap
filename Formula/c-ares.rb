@@ -2,11 +2,11 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  version "1.34.6"
+  version "1.34.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares--1.34.6.sequoia.bottle.1.tar.gz"
-  sha256 "6ec1fd8f8449a4f2906cb85837cc6674b1c64257ccffe30bc7395172880d89e7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares--1.34.7.sequoia.bottle.1.tar.gz"
+  sha256 "5280b88d65762c2643bf5b75999ab1ea5bc65c5f65d6a90c4e325fff87fc513d"
 
 
 
@@ -19,6 +19,24 @@ class CAres < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
