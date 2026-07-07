@@ -28,3 +28,4 @@ rtk
 go
 docker
 docker-compose
+colima
