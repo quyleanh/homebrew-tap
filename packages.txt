@@ -11,7 +11,7 @@ jq
 tree
 yt-dlp
 rclone
-mole
+#mole
 
 # Shell
 bash
@@ -26,3 +26,4 @@ node
 hugo
 rtk
 go
+docker
