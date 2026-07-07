@@ -27,3 +27,4 @@ hugo
 rtk
 go
 docker
+docker-compose
