@@ -2,11 +2,11 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  version "1.26.4"
+  version "1.26.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.4.sequoia.bottle.1.tar.gz"
-  sha256 "26f2a6a4cdac09f1431923ab9b3fd37ff7ab20a3fc16d8f1cbdce15b25e8ce04"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go--1.26.5.sequoia.bottle.1.tar.gz"
+  sha256 "de94a6b7fefa563672203533c935f8b317bdb0582c4fe4804d98c9acbc6f29e0"
 
 
 
@@ -19,6 +19,24 @@ class Go < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

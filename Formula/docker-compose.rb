@@ -2,11 +2,11 @@
 class DockerCompose < Formula
   desc "Isolated development environments using Docker"
   homepage "https://docs.docker.com/compose/"
-  version "5.3.0"
+  version "5.3.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-compose--5.3.0.sequoia.bottle.1.tar.gz"
-  sha256 "f7bac7df602efc97d68adb5524e0fa63e18295f954fc3439c345697893ea9911"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-compose--5.3.1.sequoia.bottle.1.tar.gz"
+  sha256 "b050d369c9cc8410725e3f72d6d48b29d5d20c51c37a7951835cd27ce6b352dc"
 
 
 

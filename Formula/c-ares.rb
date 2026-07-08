@@ -2,11 +2,11 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  version "1.34.7"
+  version "1.34.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares--1.34.7.sequoia.bottle.1.tar.gz"
-  sha256 "5280b88d65762c2643bf5b75999ab1ea5bc65c5f65d6a90c4e325fff87fc513d"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares--1.34.8.sequoia.bottle.1.tar.gz"
+  sha256 "e80ab5259b2285ef0049e2b91f9e2ab38c13025b399ad3582422226a30284e07"
 
 
 
