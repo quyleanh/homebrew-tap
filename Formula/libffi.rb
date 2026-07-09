@@ -2,11 +2,11 @@
 class Libffi < Formula
   desc "Portable Foreign Function Interface library"
   homepage "https://sourceware.org/libffi/"
-  version "3.6.0"
+  version "3.7.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libffi--3.6.0.sequoia.bottle.1.tar.gz"
-  sha256 "907463beb2cfe3f3ce6c3b75ff7c5888cb6d67913ad231f86341ba1b2320b09e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libffi--3.7.0.sequoia.bottle.1.tar.gz"
+  sha256 "62548a833fa79dd7b01afd29b41aa331f129fcecc93d43ccc5d5da7e5ff639bb"
 
 
 
