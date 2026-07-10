@@ -3,11 +3,11 @@ class Libssh2 < Formula
   desc "C library implementing the SSH2 protocol"
   homepage "https://libssh2.org/"
   version "1.11.1"
-  revision 1
+  revision 3
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_1.sequoia.bottle.1.tar.gz"
-  sha256 "881dde7853372ce9e1c9257dc4b8c1618f4c908812650337539fa58c5227c93c"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_3.sequoia.bottle.1.tar.gz"
+  sha256 "ebae5de349655f0fc3269585da1c1a3da6836dc5a105fd2d194346f0eb9597c1"
 
 
 
@@ -20,6 +20,24 @@ class Libssh2 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
