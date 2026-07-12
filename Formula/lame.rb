@@ -2,11 +2,11 @@
 class Lame < Formula
   desc "High quality MPEG Audio Layer III (MP3) encoder"
   homepage "https://lame.sourceforge.io/"
-  version "3.101"
+  version "4.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lame--3.101.sequoia.bottle.1.tar.gz"
-  sha256 "3f7ba9fe4e38cc391564892909a5f38d0b75b045426834d7458dc321b63e5e0b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lame--4.0.sequoia.bottle.1.tar.gz"
+  sha256 "4da2281b02a84d1656ab263470150ba4be74623800565c3344032c05456e2e19"
 
 
 
