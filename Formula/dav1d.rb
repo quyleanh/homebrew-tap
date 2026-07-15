@@ -2,11 +2,11 @@
 class Dav1d < Formula
   desc "AV1 decoder targeted to be small and fast"
   homepage "https://code.videolan.org/videolan/dav1d"
-  version "1.5.3"
+  version "1.5.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/dav1d--1.5.3.sequoia.bottle.1.tar.gz"
-  sha256 "50010b42b19e78343af304584c949131d667526d2eab317ab66b6dc954c8331e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/dav1d--1.5.4.sequoia.bottle.1.tar.gz"
+  sha256 "3bbbd8e8473fdea94c6f1d7dff39eb12bcb48e3f3cf0def8ad3f1e7e71885a5b"
 
 
 
@@ -19,6 +19,24 @@ class Dav1d < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
