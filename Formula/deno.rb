@@ -2,11 +2,11 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.9.2"
+  version "2.9.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.9.2.sequoia.bottle.1.tar.gz"
-  sha256 "da5462dd81c79ca1060b8dcf6392dff060361c6b74bef6ed86cdba04462fb4f7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.9.3.sequoia.bottle.1.tar.gz"
+  sha256 "6b5922570e7cae72a63ddfb6c21e260a30f3ffa2fd1f47f297e4170309b04058"
 
 
 
