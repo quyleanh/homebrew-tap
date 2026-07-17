@@ -2,11 +2,11 @@
 class CaCertificates < Formula
   desc "Mozilla CA certificate store"
   homepage "https://curl.se/docs/caextract.html"
-  version "2026-05-14"
+  version "2026-07-16"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-05-14.sequoia.bottle.1.tar.gz"
-  sha256 "ad6252c7763a3f77004b614348605ea072a8be96e774aa54522efa90123d205a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-07-16.sequoia.bottle.1.tar.gz"
+  sha256 "0dcb60d466bbdfcbd40539f419f8badb793afa5e92718e165c6ec07cfe233452"
 
 
 
@@ -19,6 +19,24 @@ class CaCertificates < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
