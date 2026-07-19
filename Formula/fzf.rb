@@ -2,11 +2,11 @@
 class Fzf < Formula
   desc "Command-line fuzzy finder written in Go"
   homepage "https://junegunn.github.io/fzf/"
-  version "0.74.0"
+  version "0.74.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fzf--0.74.0.sequoia.bottle.1.tar.gz"
-  sha256 "0e37c8ea164a6129baf0e8b61d2655ab7cc16a4bfffb50e79c0521eda2582393"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fzf--0.74.1.sequoia.bottle.1.tar.gz"
+  sha256 "4a70578e3c2c1aeb0482316f61d5b32ba9f935d44d93e6566b628bddfd7d2521"
 
 
 
