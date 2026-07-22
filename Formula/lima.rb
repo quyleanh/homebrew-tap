@@ -2,11 +2,11 @@
 class Lima < Formula
   desc "Linux virtual machines"
   homepage "https://lima-vm.io/"
-  version "2.1.4"
+  version "2.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lima--2.1.4.sequoia.bottle.1.tar.gz"
-  sha256 "9a07c48976ecba9aa7e5f1709b53ed8c301b87bb846c3807e05875fef8ebabb4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lima--2.2.0.sequoia.bottle.1.tar.gz"
+  sha256 "1c60507439a1d090ba6b86f050d46c48ce9b6e06476c5afedbc6b233f21dc187"
 
 
 
