@@ -2,11 +2,11 @@
 class Libngtcp2 < Formula
   desc "IETF QUIC protocol implementation"
   homepage "https://nghttp2.org/ngtcp2/"
-  version "1.24.0"
+  version "1.25.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2--1.24.0.sequoia.bottle.1.tar.gz"
-  sha256 "2f8ac8d2f32af0de351beb5bb64aa08660d008c9932a53fcc720dd7d224a1eb1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2--1.25.0.sequoia.bottle.1.tar.gz"
+  sha256 "9661eb2aab5e8954411818f620d311ce7447246aad5fe29dc723aa3626fdf172"
 
 
 

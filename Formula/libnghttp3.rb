@@ -2,11 +2,11 @@
 class Libnghttp3 < Formula
   desc "HTTP/3 library written in C"
   homepage "https://nghttp2.org/nghttp3/"
-  version "1.17.0"
+  version "1.18.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp3--1.17.0.sequoia.bottle.1.tar.gz"
-  sha256 "695ace7dc873a1a4d60846f76e006fa692bad785baa2c536c93fba94ab85270c"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp3--1.18.0.sequoia.bottle.1.tar.gz"
+  sha256 "f0f450fe29c2027340cbfc0dcf1073bf9834a9d83bb4a4ca70fb667b735f871e"
 
 
 
