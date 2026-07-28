@@ -3,11 +3,11 @@ class Libssh2 < Formula
   desc "C library implementing the SSH2 protocol"
   homepage "https://libssh2.org/"
   version "1.11.1"
-  revision 3
+  revision 4
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_3.sequoia.bottle.1.tar.gz"
-  sha256 "ebae5de349655f0fc3269585da1c1a3da6836dc5a105fd2d194346f0eb9597c1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_4.sequoia.bottle.1.tar.gz"
+  sha256 "41e82a563d2dff587b3da74d22ee62c135a2440485eb3cac086dbdb917879c97"
 
 
 
