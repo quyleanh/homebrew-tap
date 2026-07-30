@@ -2,11 +2,11 @@
 class Simdjson < Formula
   desc "SIMD-accelerated C++ JSON parser"
   homepage "https://simdjson.org"
-  version "4.6.4"
+  version "4.6.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson--4.6.4.sequoia.bottle.1.tar.gz"
-  sha256 "19919557c8477ae3198e19a6d442913d7b409aa306862345a3be53e257345619"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson--4.6.5.sequoia.bottle.1.tar.gz"
+  sha256 "a320e1002de27f204f5ddce6e3c3f6a69dce11c167e30bf1a31d865fc62f706d"
 
 
 
@@ -19,6 +19,24 @@ class Simdjson < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
