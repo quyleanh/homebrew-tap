@@ -2,11 +2,11 @@
 class Libnghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  version "1.69.0"
+  version "1.70.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp2--1.69.0.sequoia.bottle.1.tar.gz"
-  sha256 "f637c2bd3531e7ffdbac7856db004d9b39d8ae0e099db21153c72cd841684b70"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp2--1.70.0.sequoia.bottle.1.tar.gz"
+  sha256 "343baf292c0a40c196af4f84ba22ac246f2b7adf5a33b611a93c0c24f355262b"
 
 
 
@@ -19,6 +19,24 @@ class Libnghttp2 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
