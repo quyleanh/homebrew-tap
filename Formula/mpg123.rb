@@ -2,11 +2,11 @@
 class Mpg123 < Formula
   desc "MP3 player for Linux and UNIX"
   homepage "https://www.mpg123.de/"
-  version "1.33.6"
+  version "1.33.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpg123--1.33.6.sequoia.bottle.1.tar.gz"
-  sha256 "90e6a03994a45b231d7f216666893e08065d5e98cc670ca85a4a2fc42fb72c43"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpg123--1.33.7.sequoia.bottle.1.tar.gz"
+  sha256 "332fc30fe45ecce21a8f0becab07a9676775fa84d3c745b79823dfa99f06f467"
 
 
 
