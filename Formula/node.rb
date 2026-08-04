@@ -2,11 +2,11 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "26.5.1"
+  version "26.6.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.5.1.sequoia.bottle.1.tar.gz"
-  sha256 "2604892b6772172a6d4f683642582c5471abc93fe66e9db269e88b00acdb0931"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.6.0.sequoia.bottle.1.tar.gz"
+  sha256 "3fd57a3e40ece91ab6722d563d91a1208dee6ff57ab0c93b07dcfb0855bdb823"
 
 
 
