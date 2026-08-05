@@ -285,6 +285,21 @@ if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
   continue
 fi
 
+# FFmpeg must remain usable on the user's macOS 13 Intel machine. Do not
+# publish a bottle if Homebrew or the compiler silently raises its minimum OS.
+if [ "$pkg" = "ffmpeg" ]; then
+  ffmpeg_bin="$cellar_path/bin/ffmpeg"
+  min_os=$(otool -l "$ffmpeg_bin" 2>/dev/null |
+    awk '/LC_BUILD_VERSION/{seen=1; next} seen && /minos/{print $2; exit}')
+  echo "  → FFmpeg minimum macOS: ${min_os:-unknown}"
+  if [ -z "$min_os" ] || awk -v v="$min_os" 'BEGIN { exit !(v > 13.0) }'; then
+    echo "  ❌ FFmpeg bottle targets macOS ${min_os:-unknown}; refusing to publish for macOS 13"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
+fi
+
 echo "  📦 Packing bottle via Homebrew..."
 
 # Let brew bottle generate BOTH the JSON and the deterministic tar.gz archive
