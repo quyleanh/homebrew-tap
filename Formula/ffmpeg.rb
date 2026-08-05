@@ -6,7 +6,7 @@ class Ffmpeg < Formula
   url "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz"
   sha256 "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   depends_on "pkgconf" => :build
   depends_on "nasm" => :build if Hardware::CPU.intel?
