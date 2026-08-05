@@ -41,10 +41,25 @@ for json_file in "${JSON_FILES[@]}"; do
   # 3. HIJACK DEPENDENCIES: Point all dependencies to your own Tap
   # This is critical to ensure users stay within your custom ecosystem
   deps=$(jq -r --arg pkg "$pkg_name" --arg tap "$TAP_NAME" '
-    .[$pkg].formula.dependencies // [] | 
-    map("  depends_on \"" + $tap + "/" + . + "\"") | 
+    # Homebrew has used both dependencies and runtime_dependencies in bottle
+    # metadata. Keep this fallback explicit so a missing field cannot silently
+    # turn a dynamically-linked formula into a dependency-free formula.
+    (.[$pkg].formula.dependencies // .[$pkg].formula.runtime_dependencies // []) |
+    map(if type == "string" then . else .name end) |
+    map("  depends_on \"" + $tap + "/" + . + "\"") |
     join("\n")
   ' "$json_file")
+
+  # `brew bottle --json` does not consistently include formula dependency
+  # metadata across Homebrew versions. Fall back to the live formula metadata
+  # so generated tap formulae never lose their runtime dependency graph.
+  if [ -z "$deps" ]; then
+    deps=$(brew info --json=v2 "$pkg_name" 2>/dev/null | jq -r --arg tap "$TAP_NAME" '
+      (.formulae[0].dependencies // []) |
+      map("  depends_on \"" + $tap + "/" + . + "\"") |
+      join("\n")
+    ')
+  fi
 
   formula_file="$FORMULA_DIR/${pkg_name}.rb"
 

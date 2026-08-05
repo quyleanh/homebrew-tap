@@ -9,6 +9,19 @@ class Ffmpeg < Formula
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg--8.1.2_1.sequoia.bottle.1.tar.gz"
   sha256 "e715ed6bd4b5820adeaf5318e421a2e5a16df795e84f380e9597247a87ea7f8f"
 
+  # Keep the runtime graph inside this tap. These libraries are linked into
+  # the FFmpeg bottle and must be installed before the wrapper pours it.
+  depends_on "quyleanh/tap/dav1d"
+  depends_on "quyleanh/tap/lame"
+  depends_on "quyleanh/tap/libvmaf"
+  depends_on "quyleanh/tap/libvpx"
+  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/opus"
+  depends_on "quyleanh/tap/sdl2-compat"
+  depends_on "quyleanh/tap/svt-av1"
+  depends_on "quyleanh/tap/x264"
+  depends_on "quyleanh/tap/x265"
+
 
 
   def install

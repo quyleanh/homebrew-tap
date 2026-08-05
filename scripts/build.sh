@@ -71,7 +71,7 @@ local leaves=("$@")
 
 # brew deps --topological on multiple packages gives the right order
 
-all_deps=$(brew deps --topological --union "${leaves[@]}" 2>/dev/null |
+all_deps=$(brew deps --topological --union --include-build "${leaves[@]}" 2>/dev/null |
 awk '!/^[ \t]*$/' |
 awk '!seen[$0]++')
 
