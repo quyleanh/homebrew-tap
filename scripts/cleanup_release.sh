@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # cleanup_release.sh — Remove assets from GitHub Release that are no longer referenced by any Formula
 set -euo pipefail
+PROTECT_ASSETS_DIR="${PROTECT_ASSETS_DIR:-}"
 
 # Check for gh CLI
 if ! command -v gh &> /dev/null; then
@@ -64,6 +65,12 @@ for asset in "${REMOTE_ASSETS[@]}"; do
             break
         fi
     done
+
+    # Never delete assets produced by the current workflow run while formula
+    # commits and the release API are catching up with each other.
+    if [ -n "$PROTECT_ASSETS_DIR" ] && [ -f "$PROTECT_ASSETS_DIR/$asset" ]; then
+        found=true
+    fi
     
     if [ "$found" = false ]; then
         echo "🗑️  Deleting orphaned asset: $asset"

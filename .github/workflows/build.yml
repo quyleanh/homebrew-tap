@@ -95,6 +95,22 @@ jobs:
             --notes "Auto-built Homebrew bottles for Intel x86_64. Native support for Monterey (12), Ventura (13), Sonoma (14), and Sequoia (15). Built on macos-15-intel runner with deployment target 12.0. Last updated: run #${{ github.run_number }}"
           gh release upload stable bottles/*.tar.gz bottles/*.json --clobber
 
+      - name: Verify uploaded bottles
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote_assets=$(gh release view stable --json assets --jq '.assets[].name')
+          for bottle in bottles/*.tar.gz; do
+            [ -f "$bottle" ] || continue
+            asset=$(basename "$bottle")
+            if ! grep -Fxq "$asset" <<<"$remote_assets"; then
+              echo "Missing uploaded asset: $asset"
+              exit 1
+            fi
+          done
+
       - name: Update formula files
         if: always() && steps.build.outputs.BUILT_COUNT != '0'
         env:
@@ -126,6 +142,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROTECT_ASSETS_DIR: ${{ github.workspace }}/bottles
         run: /usr/local/bin/bash scripts/cleanup_release.sh
 
       - name: Summary
