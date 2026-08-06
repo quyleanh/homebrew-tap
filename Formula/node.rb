@@ -2,13 +2,30 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "26.6.0"
+  version "26.7.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.6.0.sequoia.bottle.1.tar.gz"
-  sha256 "3fd57a3e40ece91ab6722d563d91a1208dee6ff57ab0c93b07dcfb0855bdb823"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.7.0.sequoia.bottle.1.tar.gz"
+  sha256 "f555414270cb6b71300785d409f2266692a8866984b1ca9cd8449df07d85371a"
 
-
+  depends_on "quyleanh/tap/ada-url"
+  depends_on "quyleanh/tap/brotli"
+  depends_on "quyleanh/tap/c-ares"
+  depends_on "quyleanh/tap/hdrhistogram_c"
+  depends_on "quyleanh/tap/icu4c@78"
+  depends_on "quyleanh/tap/libffi"
+  depends_on "quyleanh/tap/libnghttp2"
+  depends_on "quyleanh/tap/libnghttp3"
+  depends_on "quyleanh/tap/libngtcp2"
+  depends_on "quyleanh/tap/libuv"
+  depends_on "quyleanh/tap/llhttp"
+  depends_on "quyleanh/tap/merve"
+  depends_on "quyleanh/tap/nbytes"
+  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/simdjson"
+  depends_on "quyleanh/tap/sqlite"
+  depends_on "quyleanh/tap/uvwasi"
+  depends_on "quyleanh/tap/zstd"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
