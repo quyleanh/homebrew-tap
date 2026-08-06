@@ -67,6 +67,7 @@ jobs:
 
       - name: Build bottles
         id: build
+        continue-on-error: true
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,7 +81,7 @@ jobs:
           ls -lh bottles/ 2>/dev/null || echo "No new bottles built"
 
       - name: Upload bottles to release
-        if: steps.build.outputs.BUILT_COUNT != '0'
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -90,14 +91,14 @@ jobs:
           gh release upload stable bottles/*.tar.gz bottles/*.json --clobber
 
       - name: Update formula files
-        if: steps.build.outputs.BUILT_COUNT != '0'
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           BOTTLES_DIR: ${{ github.workspace }}/bottles
         run: ./scripts/update_formula.sh
 
       - name: Commit updated formulas
-        if: steps.build.outputs.BUILT_COUNT != '0'
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -117,11 +118,13 @@ jobs:
           fi
 
       - name: Cleanup orphaned assets
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: /usr/local/bin/bash scripts/cleanup_release.sh
 
       - name: Summary
+        if: always()
         run: |
           built=${{ steps.build.outputs.BUILT_COUNT || '0' }}
           failed=${{ steps.build.outputs.FAILED_COUNT || '0' }}
@@ -140,3 +143,7 @@ jobs:
               echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
             done
           fi
+
+      - name: Fail if packages failed
+        if: always() && steps.build.outputs.FAILED_COUNT != '0'
+        run: exit 1

@@ -26,6 +26,11 @@ class Ffmpeg < Formula
   uses_from_macos "libxml2"
 
   def install
+    # Homebrew's build environment on macOS 15 injects its own deployment
+    # target. Override it explicitly so this bottle remains runnable on macOS
+    # 13, which is the oldest supported Intel host for this tap.
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = "13.0"
+
     args = %W[
       --prefix=#{prefix}
       --enable-shared
@@ -47,6 +52,8 @@ class Ffmpeg < Formula
       --enable-openssl
       --disable-indev=avfoundation
       --disable-outdev=avfoundation
+      --extra-cflags=-mmacosx-version-min=13.0
+      --extra-ldflags=-mmacosx-version-min=13.0
     ]
 
     args += %w[--enable-videotoolbox --enable-audiotoolbox] if OS.mac?
