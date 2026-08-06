@@ -175,6 +175,8 @@ local f="$VERSIONS_CACHE_DIR/$1"
 
 needs_build() {
 local pkg="$1"
+local formula_ref="$pkg"
+[ "$pkg" = "ffmpeg" ] && formula_ref="quyleanh/tap/ffmpeg"
 
 if [ "$FORCE_BUILD" = "true" ]; then
 echo "  → Force build enabled"
@@ -182,7 +184,7 @@ return 0
 fi
 
   local info
-  info=$(brew info --json=v1 "$pkg" 2>/dev/null)
+  info=$(brew info --json=v1 "$formula_ref" 2>/dev/null)
   
   local latest
   latest=$(echo "$info" | jq -r '.[0].versions.stable // empty')
@@ -252,6 +254,9 @@ echo "────────────────────────�
 echo "📦 $pkg"
 echo "──────────────────────────────────────"
 
+formula_ref="$pkg"
+[ "$pkg" = "ffmpeg" ] && formula_ref="quyleanh/tap/ffmpeg"
+
 if [ "$pkg" = "ffmpeg" ]; then
   tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"
   if [ -d "$tap_formula_dir" ]; then
@@ -284,7 +289,7 @@ fi
 brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 
 if [ "$pkg" = "ffmpeg" ]; then
-  formula_revision=$(brew info --json=v2 ffmpeg 2>/dev/null |
+  formula_revision=$(brew info --json=v2 quyleanh/tap/ffmpeg 2>/dev/null |
     jq -r '.formulae[0].revision // 0')
   echo "  → FFmpeg formula revision: ${formula_revision:-unknown}"
   if [ "${formula_revision:-0}" -lt 4 ]; then
@@ -297,7 +302,7 @@ fi
 
 # Formulae must be installed by tap-qualified name; Homebrew rejects arbitrary
 # workspace paths that are not registered as taps.
-if brew install --build-bottle --overwrite "$pkg"; then
+if brew install --build-bottle --overwrite "$formula_ref"; then
 echo "  ✅ Installed, packing bottle…"
 
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
