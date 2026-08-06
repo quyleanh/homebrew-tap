@@ -271,7 +271,15 @@ fi
 
 brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 
-if brew install --build-bottle --overwrite "$pkg"; then
+# FFmpeg has a tap-local source recipe with compatibility flags. Passing only
+# the formula name can select Homebrew's API formula instead of this file after
+# a tap refresh, so build this one explicitly from the checked-out recipe.
+install_target="$pkg"
+if [ "$pkg" = "ffmpeg" ]; then
+  install_target="$REPO_ROOT/Formula/ffmpeg.rb"
+fi
+
+if brew install --build-bottle --overwrite "$install_target"; then
 echo "  ✅ Installed, packing bottle…"
 
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
@@ -297,6 +305,13 @@ if [ "$pkg" = "ffmpeg" ]; then
   if nm -u "$cellar_path"/lib/*.dylib 2>/dev/null |
     grep -q "AVCaptureDeviceTypeContinuityCamera"; then
     echo "  ❌ FFmpeg still references the macOS 15-only AVFoundation symbol"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
+  if [ -e "$cellar_path/lib/libavdevice.dylib" ] ||
+    otool -L "$ffmpeg_bin" 2>/dev/null | grep -q '/libavdevice'; then
+    echo "  ❌ FFmpeg still contains libavdevice; refusing to publish"
     FAILED+=("$pkg")
     echo ""
     continue
