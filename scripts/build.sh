@@ -271,15 +271,21 @@ fi
 
 brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 
-# FFmpeg has a tap-local source recipe with compatibility flags. Passing only
-# the formula name can select Homebrew's API formula instead of this file after
-# a tap refresh, so build this one explicitly from the checked-out recipe.
-install_target="$pkg"
 if [ "$pkg" = "ffmpeg" ]; then
-  install_target="$REPO_ROOT/Formula/ffmpeg.rb"
+  formula_revision=$(brew info --json=v2 ffmpeg 2>/dev/null |
+    jq -r '.formulae[0].revision // 0')
+  echo "  → FFmpeg formula revision: ${formula_revision:-unknown}"
+  if [ "${formula_revision:-0}" -lt 4 ]; then
+    echo "  ❌ Homebrew is not seeing FFmpeg revision 4; refusing stale formula build"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
 fi
 
-if brew install --build-bottle --overwrite "$install_target"; then
+# Formulae must be installed by tap-qualified name; Homebrew rejects arbitrary
+# workspace paths that are not registered as taps.
+if brew install --build-bottle --overwrite "$pkg"; then
 echo "  ✅ Installed, packing bottle…"
 
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
