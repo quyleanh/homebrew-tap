@@ -138,12 +138,8 @@ jobs:
             git push
           fi
 
-      - name: Cleanup orphaned assets
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PROTECT_ASSETS_DIR: ${{ github.workspace }}/bottles
-        run: /usr/local/bin/bash scripts/cleanup_release.sh
+      # Release cleanup is intentionally manual. Automatic deletion raced with
+      # formula commits and removed valid bottles such as Node after upload.
 
       - name: Summary
         if: always()
