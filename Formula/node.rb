@@ -6,7 +6,7 @@ class Node < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.7.0.sequoia.bottle.1.tar.gz"
-  sha256 "f555414270cb6b71300785d409f2266692a8866984b1ca9cd8449df07d85371a"
+  sha256 "b51a2772085eed047a37ccc0de342af76e7a0a90d1dc79492b10c536afdc053f"
 
   depends_on "quyleanh/tap/ada-url"
   depends_on "quyleanh/tap/brotli"
