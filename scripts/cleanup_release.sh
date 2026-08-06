@@ -3,6 +3,11 @@
 set -euo pipefail
 PROTECT_ASSETS_DIR="${PROTECT_ASSETS_DIR:-}"
 
+if [ "${ALLOW_RELEASE_CLEANUP:-false}" != "true" ]; then
+    echo "Release cleanup is disabled unless ALLOW_RELEASE_CLEANUP=true."
+    exit 0
+fi
+
 # Check for gh CLI
 if ! command -v gh &> /dev/null; then
     echo "Error: gh CLI is not installed or not in PATH."
