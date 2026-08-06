@@ -252,6 +252,18 @@ echo "────────────────────────�
 echo "📦 $pkg"
 echo "──────────────────────────────────────"
 
+if [ "$pkg" = "ffmpeg" ]; then
+  tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"
+  if [ -d "$tap_formula_dir" ]; then
+    cp "$REPO_ROOT/scripts/ffmpeg.rb" "$tap_formula_dir/ffmpeg.rb"
+  else
+    echo "  ❌ Registered quyleanh/tap directory not found"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
+fi
+
 if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Ensure package is installed locally so dependents can link against it
