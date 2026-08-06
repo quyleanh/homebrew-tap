@@ -20,14 +20,17 @@ if [ ${#JSON_FILES[@]} -eq 0 ] || [ ! -f "${JSON_FILES[0]}" ]; then
 fi
 
 for json_file in "${JSON_FILES[@]}"; do
-  pkg_name=$(jq -r 'keys[0]' "$json_file")
+  pkg_key=$(jq -r 'keys[0]' "$json_file")
+  # Bottle JSON may use a fully-qualified tap key (e.g. quyleanh/tap/ffmpeg),
+  # but generated formulas must always be written as Formula/ffmpeg.rb.
+  pkg_name="${pkg_key##*/}"
   echo "Processing: $pkg_name"
 
   # 1. Extract metadata from JSON
-  version=$(jq -r --arg pkg "$pkg_name" '.[$pkg].formula.pkg_version' "$json_file")
-  sha256=$(jq -r --arg pkg "$pkg_name" '.[$pkg].bottle.tags | to_entries[0].value.sha256' "$json_file")
-  homepage=$(jq -r --arg pkg "$pkg_name" '.[$pkg].formula.homepage' "$json_file")
-  desc=$(jq -r --arg pkg "$pkg_name" '.[$pkg].formula.desc' "$json_file")
+  version=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.pkg_version' "$json_file")
+  sha256=$(jq -r --arg pkg "$pkg_key" '.[$pkg].bottle.tags | to_entries[0].value.sha256' "$json_file")
+  homepage=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.homepage' "$json_file")
+  desc=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.desc' "$json_file")
 
   # 2. Handle Class Name conversion (e.g., Python@3.14 -> PythonAT314, ada-url -> AdaUrl)
   class_name=$(ruby -e '
@@ -40,7 +43,7 @@ for json_file in "${JSON_FILES[@]}"; do
 
   # 3. HIJACK DEPENDENCIES: Point all dependencies to your own Tap
   # This is critical to ensure users stay within your custom ecosystem
-  deps=$(jq -r --arg pkg "$pkg_name" --arg tap "$TAP_NAME" '
+  deps=$(jq -r --arg pkg "$pkg_key" --arg tap "$TAP_NAME" '
     # Homebrew has used both dependencies and runtime_dependencies in bottle
     # metadata. Keep this fallback explicit so a missing field cannot silently
     # turn a dynamically-linked formula into a dependency-free formula.
