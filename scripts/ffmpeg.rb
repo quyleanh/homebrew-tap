@@ -51,9 +51,6 @@ class Ffmpeg < Formula
     args += %w[--enable-videotoolbox --enable-audiotoolbox] if OS.mac?
     system "./configure", *args
     system "make", "install"
-    system "make", "alltools"
-    bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
-    pkgshare.install buildpath/"tools/python"
   end
 
   test do
