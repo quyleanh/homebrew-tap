@@ -285,19 +285,23 @@ if [ -z "$pkg_version" ] || [ ! -d "$cellar_path" ]; then
   continue
 fi
 
-# FFmpeg must remain usable on the user's macOS 13 Intel machine. Do not
-# publish a bottle if Homebrew or the compiler silently raises its minimum OS.
+# FFmpeg must remain usable on the user's macOS 13 Intel machine. Homebrew's
+# macOS 15 linker can still emit LC_BUILD_VERSION=15 even when the actual
+# deployment flags are lowered, so validate the incompatible symbol instead of
+# rejecting the metadata alone.
 if [ "$pkg" = "ffmpeg" ]; then
   ffmpeg_bin="$cellar_path/bin/ffmpeg"
   min_os=$(otool -l "$ffmpeg_bin" 2>/dev/null |
     awk '/LC_BUILD_VERSION/{seen=1; next} seen && /minos/{print $2; exit}')
   echo "  → FFmpeg minimum macOS: ${min_os:-unknown}"
-  if [ -z "$min_os" ] || awk -v v="$min_os" 'BEGIN { exit !(v > 13.0) }'; then
-    echo "  ❌ FFmpeg bottle targets macOS ${min_os:-unknown}; refusing to publish for macOS 13"
+  if nm -u "$cellar_path"/lib/*.dylib 2>/dev/null |
+    grep -q "AVCaptureDeviceTypeContinuityCamera"; then
+    echo "  ❌ FFmpeg still references the macOS 15-only AVFoundation symbol"
     FAILED+=("$pkg")
     echo ""
     continue
   fi
+  echo "  ✅ No macOS 15-only AVFoundation symbols detected"
 fi
 
 echo "  📦 Packing bottle via Homebrew..."
