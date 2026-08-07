@@ -2,11 +2,11 @@
 class Docker < Formula
   desc "Pack, ship and run any application as a lightweight container"
   homepage "https://www.docker.com/"
-  version "29.7.1"
+  version "29.7.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker--29.7.1.sequoia.bottle.1.tar.gz"
-  sha256 "c2f2c33573d190906b229be148c1cf0134dc8707458b3a707f355eb80d275798"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker--29.7.2.sequoia.bottle.1.tar.gz"
+  sha256 "80c67d5b5e2a8fbb44d1a45e3cecac5bf1956a73bb16a82c642f97c3ab8bd632"
 
 
 

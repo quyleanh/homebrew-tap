@@ -2,11 +2,11 @@
 class Swig < Formula
   desc "Generate scripting interfaces to C/C++ code"
   homepage "https://www.swig.org/"
-  version "4.4.1"
+  version "4.5.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/swig--4.4.1.sequoia.bottle.2.tar.gz"
-  sha256 "0999628c56fe204cebaec483fb8705c9df847dd914318da17611c570447d4729"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/swig--4.5.0.sequoia.bottle.1.tar.gz"
+  sha256 "55b9b24734b0ac65104dd360ee11c98ecb4d7d3fb03ffd59f22d2a9887ecf619"
 
   depends_on "quyleanh/tap/pcre2"
 
