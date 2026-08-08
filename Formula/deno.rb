@@ -2,13 +2,14 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.9.4"
+  version "2.9.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.9.4.sequoia.bottle.1.tar.gz"
-  sha256 "46a8ba985c6cb4f2d5c2a06e912a25448f1a9849200c6708268c2e195b75b8e9"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.9.5.sequoia.bottle.1.tar.gz"
+  sha256 "01e39dafabca47b6384de4a9a97062815a3b2516016c87db135fd26ffe3dffe8"
 
-
+  depends_on "quyleanh/tap/little-cms2"
+  depends_on "quyleanh/tap/sqlite"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
