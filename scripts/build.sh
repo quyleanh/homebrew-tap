@@ -190,6 +190,7 @@ needs_build() {
 local pkg="$1"
 local formula_ref="$pkg"
 [ "$pkg" = "ffmpeg" ] && formula_ref="quyleanh/tap/ffmpeg"
+[ "$pkg" = "little-cms2" ] && formula_ref="homebrew/core/little-cms2"
 
 if [ "$FORCE_BUILD" = "true" ]; then
 echo "  → Force build enabled"
@@ -274,6 +275,10 @@ echo "────────────────────────�
 
 formula_ref="$pkg"
 [ "$pkg" = "ffmpeg" ] && formula_ref="quyleanh/tap/ffmpeg"
+# This formula has a missing custom bottle. Build the maintained Homebrew Core
+# source formula so the generated tap wrapper can restore it and its runtime
+# dependency graph.
+[ "$pkg" = "little-cms2" ] && formula_ref="homebrew/core/little-cms2"
 
 if [ "$pkg" = "ffmpeg" ]; then
   tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"

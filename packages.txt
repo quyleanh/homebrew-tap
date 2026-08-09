@@ -22,6 +22,7 @@ libx11
 scrcpy
 
 # Dev / runtimes
+little-cms2
 node
 hugo
 rtk
