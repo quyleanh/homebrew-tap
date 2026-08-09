@@ -17,10 +17,12 @@ on:
   schedule:
     - cron: '13 4 * * *'
 
-  # Run when packages.txt, scripts, or this workflow file are changed
+  # Run when package definitions or the build pipeline changes
   push:
     paths:
       - "packages.txt"
+      - "scripts/**"
+      - ".github/workflows/build.yml"
     branches:
       - main
 

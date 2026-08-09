@@ -29,6 +29,7 @@ for json_file in "${JSON_FILES[@]}"; do
   # 1. Extract metadata from JSON
   version=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.pkg_version' "$json_file")
   sha256=$(jq -r --arg pkg "$pkg_key" '.[$pkg].bottle.tags | to_entries[0].value.sha256' "$json_file")
+  bottle_rebuild=$(jq -r --arg pkg "$pkg_key" '.[$pkg].bottle.rebuild // 0' "$json_file")
   homepage=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.homepage' "$json_file")
   desc=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.desc' "$json_file")
 
@@ -79,7 +80,8 @@ for json_file in "${JSON_FILES[@]}"; do
 
   formula_file="$FORMULA_DIR/${pkg_name}.rb"
 
-  actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.tar.gz" -exec basename {} \; | head -n 1)
+  actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.sequoia.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
+  [ -n "$actual_tar" ] || actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.tar.gz" -exec basename {} \; | head -n 1)
 
   if [[ "$version" == *"_"* ]]; then
     base_ver="${version%%_*}"
@@ -88,6 +90,9 @@ for json_file in "${JSON_FILES[@]}"; do
   else
     version_ruby="version \"$version\""
   fi
+
+  bottle_rebuild_ruby=""
+  [ "$bottle_rebuild" -gt 0 ] && bottle_rebuild_ruby="    rebuild $bottle_rebuild"
 
   # 4. Generate the Formula file content
   cat > "$formula_file" << RUBY
@@ -100,6 +105,12 @@ class ${class_name} < Formula
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "$RELEASE_URL/$actual_tar"
   sha256 "$sha256"
+
+  bottle do
+    root_url "$RELEASE_URL"
+$bottle_rebuild_ruby
+    sha256 cellar: :any_skip_relocation, ventura: "$sha256"
+  end
 
 ${deps}
 

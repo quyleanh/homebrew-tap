@@ -180,6 +180,18 @@ done < "$RELEASED_ASSETS_FILE"
 return 1
 }
 
+has_released_bottle_tag() {
+local pkg="$1"
+local version="$2"
+local tag="$3"
+
+while IFS= read -r asset_name; do
+  [[ "$asset_name" == "$pkg--$version.$tag.bottle."*.tar.gz ]] && return 0
+done < "$RELEASED_ASSETS_FILE"
+
+return 1
+}
+
 # ──────────────────────────────────────────────────────────────
 
 # Step 4: Determine if a package needs rebuilding
@@ -226,8 +238,14 @@ return 0
 fi
 
 if [ "$latest" = "$released" ] && has_released_bottle "$pkg" "$latest"; then
-echo "  → Up to date, skipping ✓"
-return 1
+  # A proper Ventura-tagged bottle is required for Homebrew to pour this
+  # package during `brew upgrade` on the target macOS 13 machine.
+  if [ "$pkg" = "little-cms2" ] && ! has_released_bottle_tag "$pkg" "$latest" "ventura"; then
+    echo "  → Missing Ventura bottle alias, will build"
+    return 0
+  fi
+  echo "  → Up to date, skipping ✓"
+  return 1
 fi
 
 if [ "$latest" = "$released" ]; then
@@ -388,6 +406,18 @@ if [ -z "$bottle_path" ] || [ ! -f "$bottle_path" ]; then
   echo ""
   continue
 fi
+
+# Homebrew on the target macOS 13 host needs a Ventura bottle tag. The runner
+# builds a Sequoia archive, so publish a byte-identical Ventura-tagged alias
+# with the same checksum for Homebrew's native bottle resolver.
+ventura_bottle_path="${bottle_path/.sequoia.bottle./.ventura.bottle.}"
+if [ "$ventura_bottle_path" = "$bottle_path" ]; then
+  echo "  ⚠️  Could not derive Ventura bottle filename for $pkg"
+  FAILED+=("$pkg")
+  echo ""
+  continue
+fi
+cp "$bottle_path" "$ventura_bottle_path"
 
 echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
 BUILT+=("$pkg")
