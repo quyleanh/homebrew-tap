@@ -85,6 +85,15 @@ jobs:
           echo "=== Built bottles ==="
           ls -lh bottles/ 2>/dev/null || echo "No new bottles built"
 
+      # Clean only assets orphaned before this run. Running cleanup after an
+      # upload can delete a newly generated bottle while metadata settles.
+      - name: Cleanup previously orphaned assets
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_RELEASE_CLEANUP: "true"
+        run: /usr/local/bin/bash scripts/cleanup_release.sh
+
       - name: Upload bottles to release
         if: always() && steps.build.outputs.BUILT_COUNT != '0'
         env:
@@ -118,6 +127,21 @@ jobs:
           BOTTLES_DIR: ${{ github.workspace }}/bottles
         run: ./scripts/update_formula.sh
 
+      - name: Verify generated formula assets
+        if: always() && steps.build.outputs.BUILT_COUNT != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote_assets=$(gh release view stable --json assets --jq '.assets[].name')
+          while IFS= read -r asset; do
+            [ -z "$asset" ] && continue
+            if ! grep -Fxq "$asset" <<<"$remote_assets"; then
+              echo "Formula references missing release asset: $asset"
+              exit 1
+            fi
+          done < <(grep -h 'url "https://github.com' Formula/*.rb | sed 's|.*/download/stable/||; s/".*//')
+
       - name: Commit updated formulas
         if: always() && steps.build.outputs.BUILT_COUNT != '0'
         run: |
@@ -137,14 +161,6 @@ jobs:
             git pull --rebase
             git push
           fi
-
-      - name: Cleanup orphaned assets
-        if: success() && steps.build.outputs.BUILT_COUNT != '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ALLOW_RELEASE_CLEANUP: "true"
-          PROTECT_ASSETS_DIR: ${{ github.workspace }}/bottles
-        run: /usr/local/bin/bash scripts/cleanup_release.sh
 
       - name: Summary
         if: always()
