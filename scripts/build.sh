@@ -186,7 +186,7 @@ local version="$2"
 local tag="$3"
 
 while IFS= read -r asset_name; do
-  [[ "$asset_name" == "$pkg--$version.$tag.bottle."*.tar.gz ]] && return 0
+  [[ "$asset_name" == "$pkg-$version.$tag.bottle."*.tar.gz ]] && return 0
 done < "$RELEASED_ASSETS_FILE"
 
 return 1
@@ -410,13 +410,7 @@ fi
 # Homebrew on the target macOS 13 host needs a Ventura bottle tag. The runner
 # builds a Sequoia archive, so publish a byte-identical Ventura-tagged alias
 # with the same checksum for Homebrew's native bottle resolver.
-ventura_bottle_path="${bottle_path/.sequoia.bottle./.ventura.bottle.}"
-if [ "$ventura_bottle_path" = "$bottle_path" ]; then
-  echo "  ⚠️  Could not derive Ventura bottle filename for $pkg"
-  FAILED+=("$pkg")
-  echo ""
-  continue
-fi
+ventura_bottle_path="$OUTPUT_DIR/${pkg}-${pkg_version}.ventura.bottle.1.tar.gz"
 cp "$bottle_path" "$ventura_bottle_path"
 
 echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
