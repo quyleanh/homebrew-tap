@@ -130,6 +130,7 @@ echo ""
 # ──────────────────────────────────────────────────────────────
 
 VERSIONS_CACHE_DIR="$(mktemp -d)"
+RELEASED_ASSETS_FILE="$(mktemp)"
 
 fetch_released_versions() {
 if [ -z "$GITHUB_REPOSITORY" ]; then
@@ -148,6 +149,7 @@ return
 }
 
 while IFS= read -r asset_name; do
+echo "$asset_name" >> "$RELEASED_ASSETS_FILE"
 # Bottle filename format examples: 
 # aria2--1.37.0_1.sequoia.bottle.tar.gz
 # aria2--1.37.0.intel_12.bottle.tar.gz
@@ -165,6 +167,17 @@ echo ""
 get_released_version() {
 local f="$VERSIONS_CACHE_DIR/$1"
 [ -f "$f" ] && cat "$f" || echo ""
+}
+
+has_released_bottle() {
+local pkg="$1"
+local version="$2"
+
+while IFS= read -r asset_name; do
+  [[ "$asset_name" == "$pkg--$version."*.tar.gz ]] && return 0
+done < "$RELEASED_ASSETS_FILE"
+
+return 1
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -211,9 +224,14 @@ echo "  → Not in release yet, will build"
 return 0
 fi
 
-if [ "$latest" = "$released" ]; then
+if [ "$latest" = "$released" ] && has_released_bottle "$pkg" "$latest"; then
 echo "  → Up to date, skipping ✓"
 return 1
+fi
+
+if [ "$latest" = "$released" ]; then
+echo "  → Matching version has no release bottle, will build"
+return 0
 fi
 
 echo "  → New version available, will build"
@@ -379,7 +397,7 @@ fi
 echo ""
 done
 
-rm -rf "$VERSIONS_CACHE_DIR"
+rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE"
 
 # ──────────────────────────────────────────────────────────────
 
