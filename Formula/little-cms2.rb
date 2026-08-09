@@ -6,9 +6,16 @@ class LittleCms2 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2--2.19.sequoia.bottle.1.tar.gz"
-  sha256 "e604113a121d9b63f2ce8e7f5a28ec967d687754d364902cfce8642517fd5fe6"
+  sha256 "2438042eb5376eb2cef4f08322b23d22d029c05bc853db8c17af775b78550dce"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "2438042eb5376eb2cef4f08322b23d22d029c05bc853db8c17af775b78550dce"
+  end
 
+  depends_on "quyleanh/tap/jpeg-turbo"
+  depends_on "quyleanh/tap/libtiff"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +26,24 @@ class LittleCms2 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
