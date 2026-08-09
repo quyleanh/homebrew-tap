@@ -47,8 +47,21 @@ for json_file in "${JSON_FILES[@]}"; do
     # Homebrew has used both dependencies and runtime_dependencies in bottle
     # metadata. Keep this fallback explicit so a missing field cannot silently
     # turn a dynamically-linked formula into a dependency-free formula.
-    (.[$pkg].formula.dependencies // .[$pkg].formula.runtime_dependencies // []) |
-    map(if type == "string" then . else .name end) |
+    (
+      .[$pkg].formula.dependencies
+      // .[$pkg].formula.runtime_dependencies
+      // [
+        .[$pkg].bottle.tags
+        | to_entries[]
+        | .value.tab.runtime_dependencies[]?
+        | select(.declared_directly != false)
+        | (.full_name // .name)
+      ]
+      // []
+    ) |
+    map(if type == "string" then . else (.full_name // .name) end) |
+    map(split("/") | last) |
+    unique |
     map("  depends_on \"" + $tap + "/" + . + "\"") |
     join("\n")
   ' "$json_file")
