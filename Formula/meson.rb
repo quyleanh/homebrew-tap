@@ -2,11 +2,17 @@
 class Meson < Formula
   desc "Fast and user friendly build system"
   homepage "https://mesonbuild.com/"
-  version "1.11.2"
+  version "1.12.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/meson--1.11.2.sequoia.bottle.1.tar.gz"
-  sha256 "c0c6e5712477cfa541e0bc200e276976bd0c6a84f46856a5aad7960409887a4f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/meson--1.12.0.sequoia.bottle.1.tar.gz"
+  sha256 "0a5b3d3ae7915c1318909233d44f57986dd96b339ee7ea94ca360635a08b4ea3"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "0a5b3d3ae7915c1318909233d44f57986dd96b339ee7ea94ca360635a08b4ea3"
+  end
 
   depends_on "quyleanh/tap/ninja"
   depends_on "quyleanh/tap/python@3.14"
