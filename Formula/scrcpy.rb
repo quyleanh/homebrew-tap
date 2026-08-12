@@ -3,10 +3,17 @@ class Scrcpy < Formula
   desc "Display and control your Android device"
   homepage "https://github.com/Genymobile/scrcpy"
   version "4.1"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy--4.1.sequoia.bottle.1.tar.gz"
-  sha256 "6882eac9e7ae947a9fcacbd65e25709f7f5fa2ff794c3fc3df190752fa123ab1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy--4.1_1.sequoia.bottle.1.tar.gz"
+  sha256 "6187ae18d40097d404d48f8ec5658d3640d4c465c2baf041ec6b7c3428651df7"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "6187ae18d40097d404d48f8ec5658d3640d4c465c2baf041ec6b7c3428651df7"
+  end
 
   depends_on "quyleanh/tap/ffmpeg"
   depends_on "quyleanh/tap/libusb"
