@@ -2,11 +2,17 @@
 class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
   homepage "https://libgit2.org/"
-  version "1.9.6"
+  version "1.9.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libgit2--1.9.6.sequoia.bottle.1.tar.gz"
-  sha256 "0f3c1d67b5b55fec4c6c0505a779fdce1c89a263f66bf6bf3d98e1c3a5d7154f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libgit2--1.9.7.sequoia.bottle.1.tar.gz"
+  sha256 "a20e62e283d7ec9084f72483f40ab3b38ff038bddcf6cddffb09abf80b2d5273"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "a20e62e283d7ec9084f72483f40ab3b38ff038bddcf6cddffb09abf80b2d5273"
+  end
 
   depends_on "quyleanh/tap/libssh2"
   depends_on "quyleanh/tap/llhttp"

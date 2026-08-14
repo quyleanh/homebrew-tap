@@ -2,13 +2,23 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.6"
+  version "3.14.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.6.sequoia.bottle.1.tar.gz"
-  sha256 "e88b41833ee76008f34578c041dc3a834ddcd42d1ada4b92942fefd243feb68e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.7.sequoia.bottle.1.tar.gz"
+  sha256 "62f9d0339cc6a39f059446ef5b640a429d887871b4c99159739814f9cbc44f92"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "62f9d0339cc6a39f059446ef5b640a429d887871b4c99159739814f9cbc44f92"
+  end
 
+  depends_on "quyleanh/tap/mpdecimal"
+  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/sqlite"
+  depends_on "quyleanh/tap/xz"
+  depends_on "quyleanh/tap/zstd"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

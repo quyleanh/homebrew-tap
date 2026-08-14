@@ -2,11 +2,17 @@
 class CaCertificates < Formula
   desc "Mozilla CA certificate store"
   homepage "https://curl.se/docs/caextract.html"
-  version "2026-07-16"
+  version "2026-08-13"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-07-16.sequoia.bottle.1.tar.gz"
-  sha256 "0dcb60d466bbdfcbd40539f419f8badb793afa5e92718e165c6ec07cfe233452"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-08-13.sequoia.bottle.1.tar.gz"
+  sha256 "6dc5453c4324c1237431eab3d5c8cb072d20bdd7ee6b50d8ecea019785c7668f"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "6dc5453c4324c1237431eab3d5c8cb072d20bdd7ee6b50d8ecea019785c7668f"
+  end
 
 
 
