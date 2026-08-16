@@ -2,16 +2,16 @@
 class Libpsl < Formula
   desc "C library for the Public Suffix List"
   homepage "https://rockdaboot.github.io/libpsl"
-  version "0.23.2"
+  version "0.23.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libpsl--0.23.2.sequoia.bottle.1.tar.gz"
-  sha256 "5f3fd566ee289e6de6caa9d2fb5f062bd579d3ee2439264d84b171d545f8cfc0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libpsl--0.23.3.sequoia.bottle.1.tar.gz"
+  sha256 "21b9f99154839fb4ad19fd9d19a558c3702ede3b65f475605f95c1325f5a0673"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "5f3fd566ee289e6de6caa9d2fb5f062bd579d3ee2439264d84b171d545f8cfc0"
+    sha256 cellar: :any_skip_relocation, ventura: "21b9f99154839fb4ad19fd9d19a558c3702ede3b65f475605f95c1325f5a0673"
   end
 
 
