@@ -238,9 +238,9 @@ return 0
 fi
 
 if [ "$latest" = "$released" ] && has_released_bottle "$pkg" "$latest"; then
-  # A proper Ventura-tagged bottle is required for Homebrew to pour this
+  # A proper Ventura-tagged bottle is required for Homebrew to pour every
   # package during `brew upgrade` on the target macOS 13 machine.
-  if [ "$pkg" = "little-cms2" ] && ! has_released_bottle_tag "$pkg" "$latest" "ventura"; then
+  if ! has_released_bottle_tag "$pkg" "$latest" "ventura"; then
     echo "  → Missing Ventura bottle alias, will build"
     return 0
   fi

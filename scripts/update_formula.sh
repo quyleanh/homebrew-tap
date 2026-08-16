@@ -80,7 +80,11 @@ for json_file in "${JSON_FILES[@]}"; do
 
   formula_file="$FORMULA_DIR/${pkg_name}.rb"
 
-  actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.sequoia.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
+  # The target machine is macOS 13, so reference the Ventura-compatible alias
+  # when the current build produced one. This also makes release cleanup retain
+  # the asset that Homebrew's bottle resolver will request.
+  actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}-${version}.ventura.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
+  [ -n "$actual_tar" ] || actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.sequoia.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
   [ -n "$actual_tar" ] || actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.tar.gz" -exec basename {} \; | head -n 1)
 
   if [[ "$version" == *"_"* ]]; then
