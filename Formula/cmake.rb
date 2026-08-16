@@ -5,8 +5,14 @@ class Cmake < Formula
   version "4.4.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake--4.4.2.sequoia.bottle.1.tar.gz"
-  sha256 "0fc351f0fd3785a3c3ee3e02d0311c051ddba7b3d5f768ac345ea607b00e2401"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake-4.4.2.ventura.bottle.1.tar.gz"
+  sha256 "81aa580f33bbdccbb6eb98414c5cbe28264928247f3eafa0b66287383508a074"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "81aa580f33bbdccbb6eb98414c5cbe28264928247f3eafa0b66287383508a074"
+  end
 
 
 

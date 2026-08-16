@@ -5,8 +5,14 @@ class Pkgconf < Formula
   version "3.0.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf--3.0.5.sequoia.bottle.1.tar.gz"
-  sha256 "d4a895300076711266b478a08c5382899e1b6300c064a3e0ccc77679ff9c9164"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf-3.0.5.ventura.bottle.1.tar.gz"
+  sha256 "d6624fd6df6cbf709b72efb1d77e65b2f1310a220868e060e4d70abceb8226a1"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "d6624fd6df6cbf709b72efb1d77e65b2f1310a220868e060e4d70abceb8226a1"
+  end
 
 
 

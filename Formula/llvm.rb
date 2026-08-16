@@ -5,13 +5,19 @@ class Llvm < Formula
   version "22.1.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm--22.1.8.sequoia.bottle.1.tar.gz"
-  sha256 "fa70d239ced562b9a601e6d3c526b55b50735c812514710fb57c990aa43f3d86"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm-22.1.8.ventura.bottle.1.tar.gz"
+  sha256 "5d9650a25db583bbabb79749a8f4a780832ebd0a4ba2e901260d6e85650c41aa"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "5d9650a25db583bbabb79749a8f4a780832ebd0a4ba2e901260d6e85650c41aa"
+  end
 
   depends_on "quyleanh/tap/python@3.14"
   depends_on "quyleanh/tap/xz"
-  depends_on "quyleanh/tap/zstd"
   depends_on "quyleanh/tap/z3"
+  depends_on "quyleanh/tap/zstd"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

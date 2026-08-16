@@ -6,10 +6,16 @@ class Libssh2 < Formula
   revision 4
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2--1.11.1_4.sequoia.bottle.1.tar.gz"
-  sha256 "41e82a563d2dff587b3da74d22ee62c135a2440485eb3cac086dbdb917879c97"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2-1.11.1_4.ventura.bottle.1.tar.gz"
+  sha256 "4d4866314ba09c6eae4e1f266943b278f18817010de15a423d6e9f4f89207b0e"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "4d4866314ba09c6eae4e1f266943b278f18817010de15a423d6e9f4f89207b0e"
+  end
 
+  depends_on "quyleanh/tap/openssl@3"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

@@ -5,10 +5,16 @@ class Certifi < Formula
   version "2026.7.22"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi--2026.7.22.sequoia.bottle.1.tar.gz"
-  sha256 "1e9b1ab9dcf8e0409ba2ddfb2e6d271f84803c4c67b0fcff449c67983d9a8e71"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi-2026.7.22.ventura.bottle.1.tar.gz"
+  sha256 "803357bfba0bbe05432d33e35eab154220f00adaacd6ba05a70ef312ec5e7869"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "803357bfba0bbe05432d33e35eab154220f00adaacd6ba05a70ef312ec5e7869"
+  end
 
+  depends_on "quyleanh/tap/ca-certificates"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

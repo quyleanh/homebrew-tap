@@ -5,10 +5,16 @@ class Sqlite < Formula
   version "3.53.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite--3.53.4.sequoia.bottle.1.tar.gz"
-  sha256 "43a7a13c78687988b061463fd4e8e4968fbc83fb586fd9069dbe1c2ddec5922c"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.53.4.ventura.bottle.1.tar.gz"
+  sha256 "7a6f4c9e3928deaec358453a76e53745af5fe6a5876a2c2a507b0ee8b1e5d160"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "7a6f4c9e3928deaec358453a76e53745af5fe6a5876a2c2a507b0ee8b1e5d160"
+  end
 
+  depends_on "quyleanh/tap/readline"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

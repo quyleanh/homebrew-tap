@@ -5,8 +5,14 @@ class Swig < Formula
   version "4.5.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/swig--4.5.0.sequoia.bottle.1.tar.gz"
-  sha256 "55b9b24734b0ac65104dd360ee11c98ecb4d7d3fb03ffd59f22d2a9887ecf619"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/swig-4.5.0.ventura.bottle.1.tar.gz"
+  sha256 "e0f72bb7454048bf15423d528799d95e175f126d37fd86215017db6a05acbd0b"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "e0f72bb7454048bf15423d528799d95e175f126d37fd86215017db6a05acbd0b"
+  end
 
   depends_on "quyleanh/tap/pcre2"
 

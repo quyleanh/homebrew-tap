@@ -5,8 +5,14 @@ class Libunistring < Formula
   version "1.4.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libunistring--1.4.2.sequoia.bottle.1.tar.gz"
-  sha256 "99d627b1e06f6c8f14b2830eb940d2807d5f329b8fe0d04e9a3b9ca20dec3135"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libunistring-1.4.2.ventura.bottle.1.tar.gz"
+  sha256 "c0e85d408531ceaf1df7001549eac3cca8bc4fd9cf338ce57c4385bc1d57545d"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "c0e85d408531ceaf1df7001549eac3cca8bc4fd9cf338ce57c4385bc1d57545d"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Libunistring < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

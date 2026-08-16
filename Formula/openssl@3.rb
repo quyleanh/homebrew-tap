@@ -5,10 +5,16 @@ class OpensslAT3 < Formula
   version "3.6.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3--3.6.3.sequoia.bottle.1.tar.gz"
-  sha256 "622f2c657c2d0b08db8c1c69a9cc1532d5929ce71b006caeb2393f54b081ca67"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@3-3.6.3.ventura.bottle.1.tar.gz"
+  sha256 "f8ad63a373c2a4114bebcd1308a53749945b8ba66e2e51967c7740454535052f"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "f8ad63a373c2a4114bebcd1308a53749945b8ba66e2e51967c7740454535052f"
+  end
 
+  depends_on "quyleanh/tap/ca-certificates"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

@@ -5,13 +5,13 @@ class CaCertificates < Formula
   version "2026-08-13"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates--2026-08-13.sequoia.bottle.1.tar.gz"
-  sha256 "6dc5453c4324c1237431eab3d5c8cb072d20bdd7ee6b50d8ecea019785c7668f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates-2026-08-13.ventura.bottle.1.tar.gz"
+  sha256 "d5c12d4dd34a51c425002744f17a1872b0819ee49a53958305eba60374e540e0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "6dc5453c4324c1237431eab3d5c8cb072d20bdd7ee6b50d8ecea019785c7668f"
+    sha256 cellar: :any_skip_relocation, ventura: "d5c12d4dd34a51c425002744f17a1872b0819ee49a53958305eba60374e540e0"
   end
 
 

@@ -5,8 +5,14 @@ class JpegTurbo < Formula
   version "3.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jpeg-turbo--3.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "f2070ab846d38fbe76115b66654570efb258c2826a5b2b5c4972ecc89df9cc25"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jpeg-turbo-3.2.0.ventura.bottle.1.tar.gz"
+  sha256 "4f87a9769e5aa2b3eb3aed170955ccc863e0ca57f9c8d9ffd13082bf2cec3fad"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "4f87a9769e5aa2b3eb3aed170955ccc863e0ca57f9c8d9ffd13082bf2cec3fad"
+  end
 
 
 

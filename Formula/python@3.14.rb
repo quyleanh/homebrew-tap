@@ -5,13 +5,13 @@ class PythonAT314 < Formula
   version "3.14.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14--3.14.7.sequoia.bottle.1.tar.gz"
-  sha256 "62f9d0339cc6a39f059446ef5b640a429d887871b4c99159739814f9cbc44f92"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.7.ventura.bottle.1.tar.gz"
+  sha256 "f9f629dfa96bb90ccc69b979c4c8a4ff4c01f8040d38588af572a2e36c53e396"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "62f9d0339cc6a39f059446ef5b640a429d887871b4c99159739814f9cbc44f92"
+    sha256 cellar: :any_skip_relocation, ventura: "f9f629dfa96bb90ccc69b979c4c8a4ff4c01f8040d38588af572a2e36c53e396"
   end
 
   depends_on "quyleanh/tap/mpdecimal"

@@ -5,10 +5,17 @@ class Libidn2 < Formula
   version "2.3.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libidn2--2.3.8.sequoia.bottle.1.tar.gz"
-  sha256 "5ae1fdf9d34714c8ddd3efe719d85b616287ead48780f0c2f716c62cea368927"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libidn2-2.3.8.ventura.bottle.1.tar.gz"
+  sha256 "31e01ea7a08f504ec8ff7f8bd1c6ac7d0ad779f550db4b77f5c52d4c46455114"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "31e01ea7a08f504ec8ff7f8bd1c6ac7d0ad779f550db4b77f5c52d4c46455114"
+  end
 
+  depends_on "quyleanh/tap/gettext"
+  depends_on "quyleanh/tap/libunistring"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +26,24 @@ class Libidn2 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

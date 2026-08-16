@@ -5,8 +5,14 @@ class Mpdecimal < Formula
   version "4.0.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpdecimal--4.0.1.sequoia.bottle.1.tar.gz"
-  sha256 "c61a9be34f01a4f002f92f799f75d4e5d1114b4153eedec6d3868bf09057c052"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpdecimal-4.0.1.ventura.bottle.1.tar.gz"
+  sha256 "73b17828fb8e7a0d224cf6916d8601c1c0a6f37b4a95745d603ff349a74c5dd0"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "73b17828fb8e7a0d224cf6916d8601c1c0a6f37b4a95745d603ff349a74c5dd0"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Mpdecimal < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

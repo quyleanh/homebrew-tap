@@ -5,8 +5,14 @@ class Readline < Formula
   version "8.3.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/readline--8.3.3.sequoia.bottle.1.tar.gz"
-  sha256 "457650eb8c67df8821ed1d8b35d07750b7bb9f25a49ac4a6089b5f4bdff5ba57"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/readline-8.3.3.ventura.bottle.1.tar.gz"
+  sha256 "496e159a258b7ca4f6b4cdb7841b48cbfa7e698db40ae92d128245edb167339c"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "496e159a258b7ca4f6b4cdb7841b48cbfa7e698db40ae92d128245edb167339c"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Readline < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

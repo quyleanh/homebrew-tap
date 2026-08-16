@@ -5,10 +5,18 @@ class Webp < Formula
   version "1.6.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/webp--1.6.0.sequoia.bottle.1.tar.gz"
-  sha256 "f8e24e3243afdd9d538192c45205d76ca4ea83e550c1c04c62bab1b61fba60b2"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/webp-1.6.0.ventura.bottle.1.tar.gz"
+  sha256 "a554e2e09be75af1c63d13316f44198d0c3ad0b8da22d33824a7558d815bc520"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "a554e2e09be75af1c63d13316f44198d0c3ad0b8da22d33824a7558d815bc520"
+  end
 
+  depends_on "quyleanh/tap/giflib"
+  depends_on "quyleanh/tap/jpeg-turbo"
+  depends_on "quyleanh/tap/libpng"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

@@ -5,8 +5,14 @@ class Xz < Formula
   version "5.8.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz--5.8.3.sequoia.bottle.1.tar.gz"
-  sha256 "bb6d3c0acd55e58de6aac74f471c573decbdc1facbc2a1f50be7ef1195a8f0d1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz-5.8.3.ventura.bottle.1.tar.gz"
+  sha256 "ca316a73c2bb3df6c1a5dab29d03ce0ab987efe30d48c2343d4801ab84e92a5f"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "ca316a73c2bb3df6c1a5dab29d03ce0ab987efe30d48c2343d4801ab84e92a5f"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Xz < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

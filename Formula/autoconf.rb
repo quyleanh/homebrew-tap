@@ -5,8 +5,14 @@ class Autoconf < Formula
   version "2.73"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/autoconf--2.73.sequoia.bottle.1.tar.gz"
-  sha256 "35396cd545661a3dad4f086607744d30d45cffa3934d48ce54ffee7ee24c9e45"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/autoconf-2.73.ventura.bottle.1.tar.gz"
+  sha256 "83315731548ce227674edd843a5a0464a1e6107738befa4525f1aacd15c2e8f0"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "83315731548ce227674edd843a5a0464a1e6107738befa4525f1aacd15c2e8f0"
+  end
 
   depends_on "quyleanh/tap/m4"
 

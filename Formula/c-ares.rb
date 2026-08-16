@@ -5,8 +5,14 @@ class CAres < Formula
   version "1.34.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares--1.34.8.sequoia.bottle.1.tar.gz"
-  sha256 "e80ab5259b2285ef0049e2b91f9e2ab38c13025b399ad3582422226a30284e07"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares-1.34.8.ventura.bottle.1.tar.gz"
+  sha256 "b71b3ddf2cac1b16f7fa044741446b5191ce5b084c26146a142d46a2feb5cc5e"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "b71b3ddf2cac1b16f7fa044741446b5191ce5b084c26146a142d46a2feb5cc5e"
+  end
 
 
 

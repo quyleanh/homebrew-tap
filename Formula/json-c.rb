@@ -5,8 +5,14 @@ class JsonC < Formula
   version "0.19"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/json-c--0.19.sequoia.bottle.1.tar.gz"
-  sha256 "91257a4b71b72746a4cf41535df6c4b03933a6494549cce9a2e7902d7d9a70bc"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/json-c-0.19.ventura.bottle.1.tar.gz"
+  sha256 "9e2f4650fe8e7a460c6431f16a9ffec7553aaf6f572aa17500ff45e395151110"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "9e2f4650fe8e7a460c6431f16a9ffec7553aaf6f572aa17500ff45e395151110"
+  end
 
 
 

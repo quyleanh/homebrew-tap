@@ -5,10 +5,19 @@ class Libtiff < Formula
   version "4.7.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff--4.7.2.sequoia.bottle.1.tar.gz"
-  sha256 "cb75800ac61342cff7527ffa22e695215a4d28fb0faded77884d8a8bfc1575d1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff-4.7.2.ventura.bottle.1.tar.gz"
+  sha256 "018e866549b76830498f332f797f3a9323fc409c73a00ec8358661ea324cbec2"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "018e866549b76830498f332f797f3a9323fc409c73a00ec8358661ea324cbec2"
+  end
 
+  depends_on "quyleanh/tap/jpeg-turbo"
+  depends_on "quyleanh/tap/webp"
+  depends_on "quyleanh/tap/xz"
+  depends_on "quyleanh/tap/zstd"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

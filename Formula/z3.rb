@@ -5,8 +5,14 @@ class Z3 < Formula
   version "4.16.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/z3--4.16.0.sequoia.bottle.1.tar.gz"
-  sha256 "6e02f5aeabff3996381bf2b2b27ce3d320a2d2513e9bb6511f00c9ce00bcaab9"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/z3-4.16.0.ventura.bottle.1.tar.gz"
+  sha256 "56f4064433293a03071d0bc4ce9af6053f84e78e10958e44da07ac38be5d3cf8"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "56f4064433293a03071d0bc4ce9af6053f84e78e10958e44da07ac38be5d3cf8"
+  end
 
 
 

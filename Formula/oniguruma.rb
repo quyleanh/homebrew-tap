@@ -5,8 +5,14 @@ class Oniguruma < Formula
   version "6.9.10"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/oniguruma--6.9.10.sequoia.bottle.1.tar.gz"
-  sha256 "2e72f71d415a678a95d45c3ebf476358d02a3c74e9b53ea2ce8cade52e9174c1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/oniguruma-6.9.10.ventura.bottle.1.tar.gz"
+  sha256 "ca7eb40fa3bba8808eda7f74a44997098767478ee6c47bd21cb0483cf77abbea"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "ca7eb40fa3bba8808eda7f74a44997098767478ee6c47bd21cb0483cf77abbea"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Oniguruma < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 

@@ -5,8 +5,14 @@ class Ninja < Formula
   version "1.13.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ninja--1.13.2.sequoia.bottle.1.tar.gz"
-  sha256 "052e75c49fe3c828418424ac866e41e3ff8b98d3e0269cbc38ae7fd747df8aa1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ninja-1.13.2.ventura.bottle.1.tar.gz"
+  sha256 "c91d0d10949dd9495e3f07eb1e95a9b949eeb2cbff786eb3cc4ee7d29693ae72"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "c91d0d10949dd9495e3f07eb1e95a9b949eeb2cbff786eb3cc4ee7d29693ae72"
+  end
 
 
 

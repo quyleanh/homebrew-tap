@@ -6,8 +6,14 @@ class Pcre2 < Formula
   revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pcre2--10.47_1.sequoia.bottle.1.tar.gz"
-  sha256 "b7faea639014e6faa2ebd11d34d624b13d9b69b90edcf07a674abf42b472c132"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pcre2-10.47_1.ventura.bottle.1.tar.gz"
+  sha256 "e47fbe07d900ac15d6180b295ff6b7f4ea638176b9d0484ef4333c376ecfb05b"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "e47fbe07d900ac15d6180b295ff6b7f4ea638176b9d0484ef4333c376ecfb05b"
+  end
 
 
 
