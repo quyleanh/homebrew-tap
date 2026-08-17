@@ -5,8 +5,14 @@ class UtilMacros < Formula
   version "1.20.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/util-macros--1.20.2.sequoia.bottle.2.tar.gz"
-  sha256 "d4e6be7f9fdfff94377af9e6725bebdca6e8d2d25ae5b25973c26e667ad61925"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/util-macros-1.20.2.ventura.bottle.1.tar.gz"
+  sha256 "fd414c9ee8e258d35ad1d05110583a5530b44ae7e048b7df4b00d3e9d2badafc"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "fd414c9ee8e258d35ad1d05110583a5530b44ae7e048b7df4b00d3e9d2badafc"
+  end
 
 
 
