@@ -5,13 +5,13 @@ class Libpsl < Formula
   version "0.23.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libpsl--0.23.3.sequoia.bottle.1.tar.gz"
-  sha256 "21b9f99154839fb4ad19fd9d19a558c3702ede3b65f475605f95c1325f5a0673"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libpsl-0.23.3.ventura.bottle.1.tar.gz"
+  sha256 "854d3e8bf3b3b50b86b14f2a71f888c9974c7061fd35b4bf5fcb395ed0d1f7c8"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "21b9f99154839fb4ad19fd9d19a558c3702ede3b65f475605f95c1325f5a0673"
+    sha256 cellar: :any_skip_relocation, ventura: "854d3e8bf3b3b50b86b14f2a71f888c9974c7061fd35b4bf5fcb395ed0d1f7c8"
   end
 
 
