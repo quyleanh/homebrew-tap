@@ -5,13 +5,13 @@ class Libffi < Formula
   version "3.8.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libffi--3.8.0.sequoia.bottle.1.tar.gz"
-  sha256 "c430c2a2faceca542238d478b83b50a61b9a53ba46d9d52996dd5acf2b8b140a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libffi-3.8.0.ventura.bottle.1.tar.gz"
+  sha256 "d3b49f331be7c53aaf366a8f0759c193199671dc0b0efc8da154ae64a9318bc4"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c430c2a2faceca542238d478b83b50a61b9a53ba46d9d52996dd5acf2b8b140a"
+    sha256 cellar: :any_skip_relocation, ventura: "d3b49f331be7c53aaf366a8f0759c193199671dc0b0efc8da154ae64a9318bc4"
   end
 
 
