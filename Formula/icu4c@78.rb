@@ -5,8 +5,14 @@ class Icu4cAT78 < Formula
   version "78.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/icu4c@78--78.3.sequoia.bottle.1.tar.gz"
-  sha256 "fab76a24478fefc8e65c92ce76813f9d89b144e1a989db302f4f04357da44f49"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/icu4c@78-78.3.ventura.bottle.1.tar.gz"
+  sha256 "5d3c439e41aa91faf6e5a8866d5edf48c148447f3ce99270f424a05674a58f43"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "5d3c439e41aa91faf6e5a8866d5edf48c148447f3ce99270f424a05674a58f43"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Icu4cAT78 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
