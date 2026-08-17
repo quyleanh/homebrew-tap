@@ -5,10 +5,16 @@ class AdaUrl < Formula
   version "4.0.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url--4.0.0.sequoia.bottle.1.tar.gz"
-  sha256 "58562bfd4466b2307515d16610046c8ab7afcd57a9a59ffee842b176156eb046"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url-4.0.0.ventura.bottle.1.tar.gz"
+  sha256 "0a477c570692ab9c893c3a2c3852632e41cc572eaa2029e1aca83d718fb9c40d"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "0a477c570692ab9c893c3a2c3852632e41cc572eaa2029e1aca83d718fb9c40d"
+  end
 
+  depends_on "quyleanh/tap/fmt"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
