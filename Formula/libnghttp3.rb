@@ -5,8 +5,14 @@ class Libnghttp3 < Formula
   version "1.18.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp3--1.18.0.sequoia.bottle.1.tar.gz"
-  sha256 "f0f450fe29c2027340cbfc0dcf1073bf9834a9d83bb4a4ca70fb667b735f871e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libnghttp3-1.18.0.ventura.bottle.1.tar.gz"
+  sha256 "d86065aec675104c02ce494207804aea9b9efa32c55adceb0a694688b9ffa74e"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "d86065aec675104c02ce494207804aea9b9efa32c55adceb0a694688b9ffa74e"
+  end
 
 
 
