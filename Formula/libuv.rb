@@ -5,8 +5,14 @@ class Libuv < Formula
   version "1.52.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libuv--1.52.1.sequoia.bottle.1.tar.gz"
-  sha256 "48e5c1a371ef69aa9eb31ae04e24c219349fa9b7a32146957cb10b145023add2"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libuv-1.52.1.ventura.bottle.1.tar.gz"
+  sha256 "ba8dc7cb8c999bef45684ae270dc7cc8e1ff4e52c618ca11b6e5f6b883c8f1cb"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "ba8dc7cb8c999bef45684ae270dc7cc8e1ff4e52c618ca11b6e5f6b883c8f1cb"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Libuv < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
