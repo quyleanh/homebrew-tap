@@ -30,14 +30,15 @@ RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
-MAX_BUILD_TIME=$((5 * 3600)) # 5 hours in seconds
-export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-12.0}"
+MAX_BUILD_TIME="${MAX_BUILD_TIME:-$((5 * 3600))}" # Default: 5 hours in seconds
+export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 
 mkdir -p "$OUTPUT_DIR"
 
 echo "=== Homebrew Bottle Builder ==="
-echo "Output dir  : $OUTPUT_DIR"
-echo "Force build : ${FORCE_BUILD}"
+echo "Output dir     : $OUTPUT_DIR"
+echo "Force build    : ${FORCE_BUILD}"
+echo "Max build time : $((MAX_BUILD_TIME / 60)) minutes ($MAX_BUILD_TIME seconds)"
 echo ""
 
 # ──────────────────────────────────────────────────────────────
@@ -149,16 +150,21 @@ return
 }
 
 while IFS= read -r asset_name; do
+[ -z "$asset_name" ] && continue
 echo "$asset_name" >> "$RELEASED_ASSETS_FILE"
-# Bottle filename format examples: 
-# aria2--1.37.0_1.sequoia.bottle.tar.gz
-# aria2--1.37.0.intel_12.bottle.tar.gz
-if [[ "$asset_name" =~ ^([a-zA-Z0-9_@.-]+)--([^/]+)\.(sequoia|ventura|sonoma|monterey|big_sur|intel[0-9_]*)\. ]]; then
-local pkg="${BASH_REMATCH[1]}"
-local ver="${BASH_REMATCH[2]}"
-echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
-echo "  $pkg @ $ver"
-fi
+# Support both native ventura bottles (pkg-version.ventura.bottle.*) and runner bottles (pkg--version.tag...)
+for pkg in "${ORDERED[@]}"; do
+  if [[ "$asset_name" == "${pkg}-"* || "$asset_name" == "${pkg}--"* ]]; then
+    rest="${asset_name#"${pkg}-"}"
+    rest="${rest#"-"}"
+    if [[ "$rest" =~ ^([0-9a-zA-Z_.-]+)\.(ventura|sequoia|sonoma|monterey|intel[0-9_]*)\.bottle ]]; then
+      ver="${BASH_REMATCH[1]}"
+      echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
+      echo "  $pkg @ $ver"
+      break
+    fi
+  fi
+done
 done <<< "$assets"
 
 echo ""
@@ -174,7 +180,7 @@ local pkg="$1"
 local version="$2"
 
 while IFS= read -r asset_name; do
-  [[ "$asset_name" == "$pkg--$version."*.tar.gz ]] && return 0
+  [[ "$asset_name" == "$pkg-$version."*.tar.gz || "$asset_name" == "$pkg--$version."*.tar.gz ]] && return 0
 done < "$RELEASED_ASSETS_FILE"
 
 return 1
@@ -186,7 +192,7 @@ local version="$2"
 local tag="$3"
 
 while IFS= read -r asset_name; do
-  [[ "$asset_name" == "$pkg-$version.$tag.bottle."*.tar.gz ]] && return 0
+  [[ "$asset_name" == "$pkg-$version.$tag.bottle."*.tar.gz || "$asset_name" == "$pkg--$version.$tag.bottle."*.tar.gz ]] && return 0
 done < "$RELEASED_ASSETS_FILE"
 
 return 1
@@ -258,9 +264,96 @@ return 0
 }
 
 # ──────────────────────────────────────────────────────────────
+# Step 5: Immediate Package Publisher
+# ──────────────────────────────────────────────────────────────
 
-# Step 5: Build loop
+publish_package() {
+  local pkg="$1"
+  local pkg_version="$2"
+  local bottle_file="$3"
+  local json_file="${4:-}"
 
+  # 1. Update the formula file locally
+  if [ -n "$json_file" ] && [ -f "$json_file" ]; then
+    echo "  📝 Generating Formula/${pkg}.rb..."
+    BOTTLES_DIR="$OUTPUT_DIR" GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}" \
+      "$REPO_ROOT/scripts/update_formula.sh" "$json_file" || {
+      echo "  ⚠️  Failed to generate formula for $pkg"
+    }
+  fi
+
+  # 2. Upload to GitHub release immediately if GH_TOKEN & GITHUB_REPOSITORY are set
+  local auth_token="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
+  if [ -n "$GITHUB_REPOSITORY" ] && [ -n "$auth_token" ]; then
+    export GH_TOKEN="$auth_token"
+
+    # Delete older version assets of this package from the GitHub Release
+    echo "  🔍 Checking for older release assets of $pkg to clean up..."
+    local remote_assets
+    remote_assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || echo "")
+
+    if [ -n "$remote_assets" ]; then
+      while IFS= read -r old_asset; do
+        [ -z "$old_asset" ] && continue
+        if [[ "$old_asset" == "${pkg}-"* || "$old_asset" == "${pkg}--"* ]]; then
+          local rest="${old_asset#"${pkg}-"}"
+          rest="${rest#"-"}"
+          if [[ "$rest" =~ ^[0-9r][0-9a-zA-Z_.-]*\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]] || [[ "$rest" =~ ^[0-9r][0-9a-zA-Z_.-]*\.bottle ]]; then
+            if [ "$old_asset" != "$(basename "$bottle_file")" ] && [ "$old_asset" != "$(basename "$json_file")" ]; then
+              echo "  🗑️  Deleting older release asset: $old_asset"
+              gh release delete-asset stable "$old_asset" --repo "$GITHUB_REPOSITORY" -y 2>/dev/null || true
+            fi
+          fi
+        fi
+      done <<< "$remote_assets"
+    fi
+
+    echo "  🚀 Uploading $pkg bottle to GitHub Release (stable)..."
+
+    local upload_files=("$bottle_file")
+    if [ -n "$json_file" ] && [ -f "$json_file" ]; then
+      upload_files+=("$json_file")
+    fi
+
+    if gh release upload stable "${upload_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber; then
+      echo "  ✅ Bottle uploaded to GitHub Release"
+      echo "$pkg_version" > "$VERSIONS_CACHE_DIR/$pkg"
+      echo "$(basename "$bottle_file")" >> "$RELEASED_ASSETS_FILE"
+    else
+      echo "  ⚠️  Failed to upload bottle to GitHub Release"
+    fi
+
+    # 3. Commit and push formula update immediately
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE"
+
+    if ! git diff --staged --quiet; then
+      echo "  💾 Committing & pushing formula update for $pkg..."
+      git commit -m "chore(bottles): update $pkg ($pkg_version) [skip ci]
+
+Built by GitHub Actions
+Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
+
+      local push_success=false
+      for attempt in 1 2 3; do
+        if (git pull --rebase origin main 2>/dev/null || git pull --rebase 2>/dev/null) && (git push origin main 2>/dev/null || git push 2>/dev/null); then
+          push_success=true
+          echo "  ✅ Pushed commit for $pkg"
+          break
+        fi
+        echo "  ⚠️  Push attempt $attempt failed, retrying in 3s..."
+        sleep 3
+      done
+      if [ "$push_success" = false ]; then
+        echo "  ⚠️  Could not push commit immediately. Will be pushed at workflow end."
+      fi
+    fi
+  fi
+}
+
+# ──────────────────────────────────────────────────────────────
+# Step 6: Build loop
 # ──────────────────────────────────────────────────────────────
 
 echo "🔄 Updating Homebrew…"
@@ -280,7 +373,7 @@ ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
 
 if [ "$ELAPSED_TIME" -gt "$MAX_BUILD_TIME" ]; then
   echo "──────────────────────────────────────"
-  echo "⚠️ Time limit reached (5.5 hours). Stopping loop gracefully."
+  echo "⚠️ Time limit reached ($((MAX_BUILD_TIME / 60)) minutes elapsed). Stopping build loop gracefully."
   echo "This saves our progress so the CI can commit formulas and releases."
   echo "Run the workflow again to pick up where it left off!"
   echo "──────────────────────────────────────"
@@ -288,7 +381,7 @@ if [ "$ELAPSED_TIME" -gt "$MAX_BUILD_TIME" ]; then
 fi
 
 echo "──────────────────────────────────────"
-echo "📦 $pkg"
+echo "📦 $pkg (Elapsed: $((ELAPSED_TIME / 60))m / $((MAX_BUILD_TIME / 60))m)"
 echo "──────────────────────────────────────"
 
 formula_ref="$pkg"
@@ -407,14 +500,23 @@ if [ -z "$bottle_path" ] || [ ! -f "$bottle_path" ]; then
   continue
 fi
 
-# Homebrew on the target macOS 13 host needs a Ventura bottle tag. The runner
-# builds a Sequoia archive, so publish a byte-identical Ventura-tagged alias
-# with the same checksum for Homebrew's native bottle resolver.
+# Publish strictly Ventura-tagged bottles for macOS 13+.
+# Rename the runner's bottle archive and JSON metadata to the native Ventura naming format
+# so only Ventura bottles are uploaded to the release.
 ventura_bottle_path="$OUTPUT_DIR/${pkg}-${pkg_version}.ventura.bottle.1.tar.gz"
-cp "$bottle_path" "$ventura_bottle_path"
+mv "$bottle_path" "$ventura_bottle_path"
 
-echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$bottle_path" | cut -f1))"
+json_path=$(find "$OUTPUT_DIR" -maxdepth 1 -name "${pkg}--*${pkg_version}*.json" | head -n 1)
+if [ -n "$json_path" ] && [ -f "$json_path" ]; then
+  ventura_json_path="$OUTPUT_DIR/${pkg}-${pkg_version}.ventura.bottle.json"
+  mv "$json_path" "$ventura_json_path"
+fi
+
+echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$ventura_bottle_path" | cut -f1))"
 BUILT+=("$pkg")
+
+# Immediately publish bottle to GitHub Release and push formula update to git
+publish_package "$pkg" "$pkg_version" "$ventura_bottle_path" "${ventura_json_path:-}"
 
 # Package stays installed in Cellar — next packages link against it for free
 

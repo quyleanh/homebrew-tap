@@ -7,13 +7,21 @@ BOTTLES_DIR="${BOTTLES_DIR:-$REPO_ROOT/bottles}"
 FORMULA_DIR="$REPO_ROOT/Formula"
 # Replace with your actual Username/Repo
 TAP_NAME="quyleanh/tap" 
-RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/stable"
+RELEASE_URL="https://github.com/${GITHUB_REPOSITORY:-quyleanh/homebrew-tap}/releases/download/stable"
 
 mkdir -p "$FORMULA_DIR"
 
 echo "=== Formula Updater (Dependency Hijacking Edition) ==="
 
-JSON_FILES=("$BOTTLES_DIR"/*.bottle.json)
+if [ "$#" -gt 0 ]; then
+  JSON_FILES=("$@")
+else
+  JSON_FILES=("$BOTTLES_DIR"/*.bottle.json)
+  if [ ${#JSON_FILES[@]} -eq 0 ] || [ ! -f "${JSON_FILES[0]}" ]; then
+    JSON_FILES=("$BOTTLES_DIR"/*.json)
+  fi
+fi
+
 if [ ${#JSON_FILES[@]} -eq 0 ] || [ ! -f "${JSON_FILES[0]}" ]; then
   echo "No bottle JSON files found."
   exit 1

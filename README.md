@@ -36,7 +36,7 @@ brew install quyleanh/tap/ffmpeg
 | Component | Specification |
 |-----------|---------------|
 | **Hardware** | Intel-based Macs (e.g., MacBook Pro/Air 2017) |
-| **OS Support** | macOS 12 (Monterey) through macOS 15 (Sequoia) |
+| **OS Support** | macOS 13 (Ventura) through macOS 15 (Sequoia) |
 | **Architecture** | x86_64 (Intel) |
 
 ---

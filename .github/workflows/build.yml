@@ -28,15 +28,16 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  MACOSX_DEPLOYMENT_TARGET: "12.0"  # Target Monterey (12.0) and above
+  MACOSX_DEPLOYMENT_TARGET: "13.0"  # Target Ventura (13.0) and above
 
 permissions:
   contents: write  # Required to commit formula updates and manage releases
 
 jobs:
   build:
-    name: Build Bottles (macOS Intel / Multi-OS 12+)
+    name: Build Bottles (macOS Intel / Ventura 13+)
     runs-on: macos-15-intel
+    timeout-minutes: 350
 
     steps:
       - name: Checkout repo
@@ -78,6 +79,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ inputs.force_build || 'false' }}
         run: /usr/local/bin/bash scripts/build.sh
@@ -87,67 +89,13 @@ jobs:
           echo "=== Built bottles ==="
           ls -lh bottles/ 2>/dev/null || echo "No new bottles built"
 
-      # Clean only assets orphaned before this run. Running cleanup after an
-      # upload can delete a newly generated bottle while metadata settles.
-      - name: Cleanup previously orphaned assets
+      # Clean release assets orphaned by removed packages (formulae no longer in Formula/)
+      - name: Cleanup orphaned release assets
         if: always() && steps.build.outputs.BUILT_COUNT != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALLOW_RELEASE_CLEANUP: "true"
         run: /usr/local/bin/bash scripts/cleanup_release.sh
-
-      - name: Upload bottles to release
-        if: always() && steps.build.outputs.BUILT_COUNT != '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit stable \
-            --title "Stable Bottles" \
-            --notes "Auto-built Homebrew bottles for Intel x86_64. Native support for Monterey (12), Ventura (13), Sonoma (14), and Sequoia (15). Built on macos-15-intel runner with deployment target 12.0. Last updated: run #${{ github.run_number }}"
-          gh release upload stable bottles/*.tar.gz bottles/*.json --clobber
-
-      - name: Verify uploaded bottles
-        if: always() && steps.build.outputs.BUILT_COUNT != '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          remote_assets=$(gh release view stable --json assets --jq '.assets[].name')
-          for bottle in bottles/*.tar.gz; do
-            [ -f "$bottle" ] || continue
-            asset=$(basename "$bottle")
-            if ! grep -Fxq "$asset" <<<"$remote_assets"; then
-              echo "Missing uploaded asset: $asset"
-              exit 1
-            fi
-          done
-
-      - name: Update formula files
-        if: always() && steps.build.outputs.BUILT_COUNT != '0'
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          BOTTLES_DIR: ${{ github.workspace }}/bottles
-        run: ./scripts/update_formula.sh
-
-      - name: Commit updated formulas
-        if: always() && steps.build.outputs.BUILT_COUNT != '0'
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add Formula/
-          git add packages_resolved.txt
-
-          if git diff --staged --quiet; then
-            echo "No formula changes to commit."
-          else
-            git commit -m "chore: update bottles [skip ci]
-
-          Built by GitHub Actions run #${{ github.run_number }}
-          Runner: macos-15-intel (Sequoia, Intel x86_64)"
-            git pull --rebase
-            git push
-          fi
 
       - name: Summary
         if: always()

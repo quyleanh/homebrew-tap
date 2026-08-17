@@ -32,8 +32,8 @@ macos_major=$(echo "$macos_version" | cut -d. -f1)
 
 echo "✅ macOS: $macos_version"
 
-if [ "$macos_major" -lt 12 ]; then
-  echo "⚠️  Warning: macOS $macos_version has not been tested. Bottles are built for 12.0+."
+if [ "$macos_major" -lt 13 ]; then
+  echo "⚠️  Warning: macOS $macos_version has not been tested. Bottles are built for 13.0+ (Ventura)."
 fi
 
 # Add tap
