@@ -5,10 +5,18 @@ class Tmux < Formula
   version "3.7b"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux--3.7b.sequoia.bottle.1.tar.gz"
-  sha256 "0353d23e65e77fe59a3d5ec8331f107a9119a1e17819a45d54e2f467ee04bb19"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux-3.7b.ventura.bottle.1.tar.gz"
+  sha256 "98c7bbd3757e4a56f94c1e3d2d9ae297df797fc9dc5bd8a8f49c1bff36569095"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "98c7bbd3757e4a56f94c1e3d2d9ae297df797fc9dc5bd8a8f49c1bff36569095"
+  end
 
+  depends_on "quyleanh/tap/libevent"
+  depends_on "quyleanh/tap/ncurses"
+  depends_on "quyleanh/tap/utf8proc"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
