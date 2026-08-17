@@ -5,8 +5,14 @@ class SvtAv1 < Formula
   version "4.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/svt-av1--4.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "1616bca8c35a8b75d09e84c46509e2c15fbd6dcfe3be8426a0b62ec95a0449f1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/svt-av1-4.2.0.ventura.bottle.1.tar.gz"
+  sha256 "817542fd47cea4ddb469f29a5bc137570dd1c2dc010f4bf69363b25fbd7cda28"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "817542fd47cea4ddb469f29a5bc137570dd1c2dc010f4bf69363b25fbd7cda28"
+  end
 
 
 
