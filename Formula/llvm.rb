@@ -3,15 +3,16 @@ class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
   version "22.1.8"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm-22.1.8.ventura.bottle.1.tar.gz"
-  sha256 "5d9650a25db583bbabb79749a8f4a780832ebd0a4ba2e901260d6e85650c41aa"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm-22.1.8_1.ventura.bottle.1.tar.gz"
+  sha256 "8e4b901f00d3bfc20554b9a4ae8209de429ffa12f70bbf4ab788c1d91c1b7a48"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "5d9650a25db583bbabb79749a8f4a780832ebd0a4ba2e901260d6e85650c41aa"
+    sha256 cellar: :any_skip_relocation, ventura: "8e4b901f00d3bfc20554b9a4ae8209de429ffa12f70bbf4ab788c1d91c1b7a48"
   end
 
   depends_on "quyleanh/tap/python@3.14"
