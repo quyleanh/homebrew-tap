@@ -5,8 +5,14 @@ class Xtrans < Formula
   version "1.6.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xtrans--1.6.0.sequoia.bottle.1.tar.gz"
-  sha256 "c53249ec873fef9794f67dfde37fec96e10903ec55085f4c3f6636532244dea5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xtrans-1.6.0.ventura.bottle.1.tar.gz"
+  sha256 "86fe70c55766e8c60a43959f46403fadc798cfb8563b1e484929ce398c2457ff"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "86fe70c55766e8c60a43959f46403fadc798cfb8563b1e484929ce398c2457ff"
+  end
 
 
 
