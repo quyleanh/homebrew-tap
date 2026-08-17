@@ -6,10 +6,20 @@ class Aria2 < Formula
   revision 2
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2--1.37.0_2.sequoia.bottle.1.tar.gz"
-  sha256 "56619fc1fe5115f39a6d9c8fc513429e5823922a6fb0c00ac69810649b8c074d"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2-1.37.0_2.ventura.bottle.1.tar.gz"
+  sha256 "3591524130c1c82e23a235de89752d9d8744896f9776c87a9af1937d76cb5e51"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "3591524130c1c82e23a235de89752d9d8744896f9776c87a9af1937d76cb5e51"
+  end
 
+  depends_on "quyleanh/tap/c-ares"
+  depends_on "quyleanh/tap/gettext"
+  depends_on "quyleanh/tap/libssh2"
+  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/sqlite"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -20,6 +30,24 @@ class Aria2 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
