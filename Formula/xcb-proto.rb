@@ -5,8 +5,14 @@ class XcbProto < Formula
   version "1.17.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xcb-proto--1.17.0.sequoia.bottle.3.tar.gz"
-  sha256 "03375617cc88cef81fb59930708e0a104aec89a5683afc033632722704506330"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xcb-proto-1.17.0.ventura.bottle.1.tar.gz"
+  sha256 "fa6dc57289cead700bbeb8c916c03cce9d67ab91c695b5553b35240b69c228fb"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, ventura: "fa6dc57289cead700bbeb8c916c03cce9d67ab91c695b5553b35240b69c228fb"
+  end
 
 
 
