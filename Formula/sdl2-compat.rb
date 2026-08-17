@@ -5,10 +5,16 @@ class Sdl2Compat < Formula
   version "2.32.70"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2-compat--2.32.70.sequoia.bottle.1.tar.gz"
-  sha256 "2944eb54be55cfd63b7c51077ce20482ebdadcb9ca756611b6a6c11450af6bb1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2-compat-2.32.70.ventura.bottle.1.tar.gz"
+  sha256 "de3f1f6b9188820adff2156943f5c559cf85ba56615c88210aea3e7b133b6ae2"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "de3f1f6b9188820adff2156943f5c559cf85ba56615c88210aea3e7b133b6ae2"
+  end
 
+  depends_on "quyleanh/tap/sdl3"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
