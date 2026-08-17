@@ -5,8 +5,14 @@ class Rust < Formula
   version "1.97.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust--1.97.1.sequoia.bottle.1.tar.gz"
-  sha256 "f6942b4b1f61db17e25ef4406f3bebc19a29836bc4a7cdd0099c9295115693b4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.97.1.ventura.bottle.1.tar.gz"
+  sha256 "53a2a98038facea99da570af488df5518df0d670334a3db8d3b05002149b779d"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "53a2a98038facea99da570af488df5518df0d670334a3db8d3b05002149b779d"
+  end
 
   depends_on "quyleanh/tap/libgit2"
   depends_on "quyleanh/tap/libssh2"
