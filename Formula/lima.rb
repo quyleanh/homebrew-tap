@@ -5,8 +5,14 @@ class Lima < Formula
   version "2.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lima--2.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "1c60507439a1d090ba6b86f050d46c48ce9b6e06476c5afedbc6b233f21dc187"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lima-2.2.0.ventura.bottle.1.tar.gz"
+  sha256 "f4fac566676985add6994ec6edd6707aa7a3e9d7e13d366eb9548437f861c4e6"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "f4fac566676985add6994ec6edd6707aa7a3e9d7e13d366eb9548437f861c4e6"
+  end
 
 
 
