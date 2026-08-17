@@ -5,8 +5,14 @@ class Llhttp < Formula
   version "9.4.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp--9.4.3.sequoia.bottle.1.tar.gz"
-  sha256 "f0073dfa6ced2fda31e4cd96d8497ca1938598f9645201dcc07bce1493fbf07e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llhttp-9.4.3.ventura.bottle.1.tar.gz"
+  sha256 "f682849c4f59e6e44ae4634d82d27701c2bb807e9dfacf31d94eae49db0c8a9d"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "f682849c4f59e6e44ae4634d82d27701c2bb807e9dfacf31d94eae49db0c8a9d"
+  end
 
 
 
