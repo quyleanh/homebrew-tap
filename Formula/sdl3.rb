@@ -5,8 +5,14 @@ class Sdl3 < Formula
   version "3.4.14"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3--3.4.14.sequoia.bottle.1.tar.gz"
-  sha256 "8d0556dbdae627e812813ae2a3149035cb4e64fd9823a1445f3a721d6cf36b5e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3-3.4.14.ventura.bottle.1.tar.gz"
+  sha256 "5a78cf960d66e35b4a1b8f840c7dd98d5d1bafc74fd4f6b816d119f44f826bef"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "5a78cf960d66e35b4a1b8f840c7dd98d5d1bafc74fd4f6b816d119f44f826bef"
+  end
 
 
 
