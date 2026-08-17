@@ -5,8 +5,14 @@ class Fmt < Formula
   version "12.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fmt--12.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "c422289064c617faeebf29bc3c0a218509ccd5fac0904c76ada0e74f3b15962b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/fmt-12.2.0.ventura.bottle.1.tar.gz"
+  sha256 "9672d80063239f92e1e52481e35f82871fdd90f083501361276997f546e1060a"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "9672d80063239f92e1e52481e35f82871fdd90f083501361276997f546e1060a"
+  end
 
 
 
