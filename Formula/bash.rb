@@ -5,10 +5,18 @@ class Bash < Formula
   version "5.3.15"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash--5.3.15.sequoia.bottle.1.tar.gz"
-  sha256 "7870e7f3e1aabfea587eac5e74d6acf1952bc48d6064f23ca993b627533dea8f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash-5.3.15.ventura.bottle.1.tar.gz"
+  sha256 "ed6004216c0f5c9a0a6996b110f6cf3795610ccfe54bdd118b27321b537c99d5"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "ed6004216c0f5c9a0a6996b110f6cf3795610ccfe54bdd118b27321b537c99d5"
+  end
 
+  depends_on "quyleanh/tap/gettext"
+  depends_on "quyleanh/tap/ncurses"
+  depends_on "quyleanh/tap/readline"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
