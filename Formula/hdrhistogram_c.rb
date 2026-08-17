@@ -5,8 +5,14 @@ class HdrhistogramC < Formula
   version "0.11.10"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hdrhistogram_c--0.11.10.sequoia.bottle.1.tar.gz"
-  sha256 "46a3af0912b9f3586406a5448bb17f000874d6db99d1fe90509ab7bd76b581a0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hdrhistogram_c-0.11.10.ventura.bottle.1.tar.gz"
+  sha256 "b88040cdc23d221483d166aeeb09fd7c48e170ea97eced81c8e02abb6d6a169e"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "b88040cdc23d221483d166aeeb09fd7c48e170ea97eced81c8e02abb6d6a169e"
+  end
 
 
 
