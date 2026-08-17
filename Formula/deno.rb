@@ -5,8 +5,14 @@ class Deno < Formula
   version "2.9.5"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno--2.9.5.sequoia.bottle.1.tar.gz"
-  sha256 "01e39dafabca47b6384de4a9a97062815a3b2516016c87db135fd26ffe3dffe8"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.5.ventura.bottle.1.tar.gz"
+  sha256 "8744ae5b86ef743cb16b096b8ebb89dbff0a2fbf43c161807b89e1cfd3caedcd"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "8744ae5b86ef743cb16b096b8ebb89dbff0a2fbf43c161807b89e1cfd3caedcd"
+  end
 
   depends_on "quyleanh/tap/little-cms2"
   depends_on "quyleanh/tap/sqlite"
