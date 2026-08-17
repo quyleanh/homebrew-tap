@@ -5,8 +5,14 @@ class Libvmaf < Formula
   version "3.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvmaf--3.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "d2990066e79d10e4e6960e3a74b937c50b1db385ab59ff1871eeddd5e516563a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvmaf-3.2.0.ventura.bottle.1.tar.gz"
+  sha256 "003f33a091ab6a89fa1f965ac9bfc822b8e699b305db795e15e4e54a33767bb9"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "003f33a091ab6a89fa1f965ac9bfc822b8e699b305db795e15e4e54a33767bb9"
+  end
 
 
 
