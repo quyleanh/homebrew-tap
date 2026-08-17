@@ -5,8 +5,14 @@ class Tree < Formula
   version "2.3.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tree--2.3.2.sequoia.bottle.1.tar.gz"
-  sha256 "3c9b1127e3b9156c5a8a4b62fcc6943ba7f6602d0c6b109cf043d0682ba8db94"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tree-2.3.2.ventura.bottle.1.tar.gz"
+  sha256 "062f2ccf213a7cc7f0141b15fc932b1433913b6f3fed2f8408b1fd310e4626cd"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "062f2ccf213a7cc7f0141b15fc932b1433913b6f3fed2f8408b1fd310e4626cd"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Tree < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
