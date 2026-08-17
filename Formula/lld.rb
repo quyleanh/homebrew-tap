@@ -5,8 +5,14 @@ class Lld < Formula
   version "22.1.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld--22.1.8.sequoia.bottle.1.tar.gz"
-  sha256 "8e2ac4e5d407f86b8e0bc6e2b96702f5148fedc33ee7fcd32897efac1e03a9c8"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld-22.1.8.ventura.bottle.1.tar.gz"
+  sha256 "166114bcd6b929f51c0a2e809d8fa5b43be9c45dbafa65dfea28085af8987861"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "166114bcd6b929f51c0a2e809d8fa5b43be9c45dbafa65dfea28085af8987861"
+  end
 
   depends_on "quyleanh/tap/llvm"
   depends_on "quyleanh/tap/zstd"
