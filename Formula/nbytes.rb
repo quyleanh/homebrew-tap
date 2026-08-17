@@ -5,8 +5,14 @@ class Nbytes < Formula
   version "0.1.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/nbytes--0.1.4.sequoia.bottle.1.tar.gz"
-  sha256 "b5bec0087bfc69f66654cd04ed249908a47ad7faae6d75217e96d0356deafda1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/nbytes-0.1.4.ventura.bottle.1.tar.gz"
+  sha256 "82f5ec6725c3a94ce05fdebc89e3b944fdc6a17428356b7c200853423ce9d53c"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "82f5ec6725c3a94ce05fdebc89e3b944fdc6a17428356b7c200853423ce9d53c"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Nbytes < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
