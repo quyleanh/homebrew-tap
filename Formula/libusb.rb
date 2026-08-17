@@ -5,8 +5,14 @@ class Libusb < Formula
   version "1.0.30"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libusb--1.0.30.sequoia.bottle.1.tar.gz"
-  sha256 "a91302b89b9ac86eb275f898370cd66f08e87286a610cd758fca7a87e438c1a0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libusb-1.0.30.ventura.bottle.1.tar.gz"
+  sha256 "fb4b36bf09c4e69c498127c128bc73adce1dd0b425858e1970e4b98c5b1fed78"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "fb4b36bf09c4e69c498127c128bc73adce1dd0b425858e1970e4b98c5b1fed78"
+  end
 
 
 
