@@ -5,10 +5,16 @@ class Libngtcp2 < Formula
   version "1.25.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2--1.25.0.sequoia.bottle.1.tar.gz"
-  sha256 "9661eb2aab5e8954411818f620d311ce7447246aad5fe29dc723aa3626fdf172"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libngtcp2-1.25.0.ventura.bottle.1.tar.gz"
+  sha256 "bc5fb51f9f81aaf49833a592dca42a2b391257d0cabe395ac0fa1c2bea9ecb19"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "bc5fb51f9f81aaf49833a592dca42a2b391257d0cabe395ac0fa1c2bea9ecb19"
+  end
 
+  depends_on "quyleanh/tap/openssl@3"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
