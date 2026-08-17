@@ -6,12 +6,12 @@ class Tree < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tree-2.3.2.ventura.bottle.1.tar.gz"
-  sha256 "062f2ccf213a7cc7f0141b15fc932b1433913b6f3fed2f8408b1fd310e4626cd"
+  sha256 "8eba2c63e82cfcfbb191f7da5fe967544f7a734eee837997791fb31124220abc"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "062f2ccf213a7cc7f0141b15fc932b1433913b6f3fed2f8408b1fd310e4626cd"
+    sha256 cellar: :any_skip_relocation, ventura: "8eba2c63e82cfcfbb191f7da5fe967544f7a734eee837997791fb31124220abc"
   end
 
 
