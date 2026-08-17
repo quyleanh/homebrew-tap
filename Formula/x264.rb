@@ -5,8 +5,14 @@ class X264 < Formula
   version "r3222"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/x264--r3222.sequoia.bottle.1.tar.gz"
-  sha256 "54805c0e9ad59cc0e021f56b26d1687ae898530c1c5be5f4239b56975a70b167"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/x264-r3222.ventura.bottle.1.tar.gz"
+  sha256 "2ec2459c408881b2be4e76da0bb351a59b6606086e240656b3e9ff45bc75b8fe"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "2ec2459c408881b2be4e76da0bb351a59b6606086e240656b3e9ff45bc75b8fe"
+  end
 
 
 
@@ -19,6 +25,24 @@ class X264 < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
