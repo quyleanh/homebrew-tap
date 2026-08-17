@@ -5,8 +5,14 @@ class Dav1d < Formula
   version "1.5.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/dav1d--1.5.4.sequoia.bottle.1.tar.gz"
-  sha256 "3bbbd8e8473fdea94c6f1d7dff39eb12bcb48e3f3cf0def8ad3f1e7e71885a5b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/dav1d-1.5.4.ventura.bottle.1.tar.gz"
+  sha256 "46027423645a090bb7da3ee0d4c96070ab1c03e0c94161ea4e1f3810c3eadd24"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "46027423645a090bb7da3ee0d4c96070ab1c03e0c94161ea4e1f3810c3eadd24"
+  end
 
 
 
