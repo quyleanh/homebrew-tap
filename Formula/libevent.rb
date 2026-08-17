@@ -5,10 +5,16 @@ class Libevent < Formula
   version "2.1.13"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent--2.1.13.sequoia.bottle.1.tar.gz"
-  sha256 "7b42a140a72c4882a241792e7c13034c3efef96b57329d5964bbbd66a378353b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent-2.1.13.ventura.bottle.1.tar.gz"
+  sha256 "f98371c01f4228b22bd1521e6ad57a7dc52159433a446644f493c65cc35ebc39"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "f98371c01f4228b22bd1521e6ad57a7dc52159433a446644f493c65cc35ebc39"
+  end
 
+  depends_on "quyleanh/tap/openssl@3"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
