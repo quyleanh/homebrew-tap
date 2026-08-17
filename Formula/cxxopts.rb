@@ -5,8 +5,14 @@ class Cxxopts < Formula
   version "3.3.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cxxopts--3.3.1.sequoia.bottle.2.tar.gz"
-  sha256 "f86991a6d708c0f250246a8a40d0129641a2d4a7589eeb800ee25dc8fbaefaf5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cxxopts-3.3.1.ventura.bottle.1.tar.gz"
+  sha256 "903a19cd28cb48ef6560af035ad29221e1432bf1be3e10983d146ff92ff91c36"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "903a19cd28cb48ef6560af035ad29221e1432bf1be3e10983d146ff92ff91c36"
+  end
 
 
 
