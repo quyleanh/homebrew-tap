@@ -5,13 +5,13 @@ class Libgit2 < Formula
   version "1.9.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libgit2--1.9.7.sequoia.bottle.1.tar.gz"
-  sha256 "a20e62e283d7ec9084f72483f40ab3b38ff038bddcf6cddffb09abf80b2d5273"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libgit2-1.9.7.ventura.bottle.1.tar.gz"
+  sha256 "ae4f175e85979a7df99e0e5c616213ccac6c4f5b16eebac94584787f2727cb6f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "a20e62e283d7ec9084f72483f40ab3b38ff038bddcf6cddffb09abf80b2d5273"
+    sha256 cellar: :any_skip_relocation, ventura: "ae4f175e85979a7df99e0e5c616213ccac6c4f5b16eebac94584787f2727cb6f"
   end
 
   depends_on "quyleanh/tap/libssh2"
