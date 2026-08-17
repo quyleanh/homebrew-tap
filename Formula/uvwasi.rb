@@ -5,10 +5,16 @@ class Uvwasi < Formula
   version "0.0.23"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/uvwasi--0.0.23.sequoia.bottle.2.tar.gz"
-  sha256 "44f6191c08c62afcea00acc06ebc900212dabb1ce4861fa4c2df635ae630603e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/uvwasi-0.0.23.ventura.bottle.1.tar.gz"
+  sha256 "23d12a6ae529fba0f914d8073190bb31c1e967c55c873baf8879852763c45ee4"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "23d12a6ae529fba0f914d8073190bb31c1e967c55c873baf8879852763c45ee4"
+  end
 
+  depends_on "quyleanh/tap/libuv"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +25,24 @@ class Uvwasi < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
