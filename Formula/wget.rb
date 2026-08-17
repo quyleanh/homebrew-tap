@@ -5,10 +5,20 @@ class Wget < Formula
   version "1.25.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/wget--1.25.0.sequoia.bottle.2.tar.gz"
-  sha256 "fcbccd3ef68e576050fe2dc129027745788198aa7397ac57ef667442b47e32f0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/wget-1.25.0.ventura.bottle.1.tar.gz"
+  sha256 "a731ef5199334c25054dcdd46b3babcfe24ef79746333678b869cce063762e8c"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, ventura: "a731ef5199334c25054dcdd46b3babcfe24ef79746333678b869cce063762e8c"
+  end
 
+  depends_on "quyleanh/tap/gettext"
+  depends_on "quyleanh/tap/libidn2"
+  depends_on "quyleanh/tap/libpsl"
+  depends_on "quyleanh/tap/libunistring"
+  depends_on "quyleanh/tap/openssl@3"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +29,24 @@ class Wget < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
