@@ -5,10 +5,16 @@ class Jq < Formula
   version "1.8.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jq--1.8.2.sequoia.bottle.1.tar.gz"
-  sha256 "574071a303e5e01bb6399d93f57efde7c0459e98d1de0af4b0469fced1c61219"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jq-1.8.2.ventura.bottle.1.tar.gz"
+  sha256 "b1fa46c085163e85fd33da957192ac188e01ee831c0608fa8e070f122c7eb893"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "b1fa46c085163e85fd33da957192ac188e01ee831c0608fa8e070f122c7eb893"
+  end
 
+  depends_on "quyleanh/tap/oniguruma"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
