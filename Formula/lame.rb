@@ -5,10 +5,16 @@ class Lame < Formula
   version "4.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lame--4.0.sequoia.bottle.1.tar.gz"
-  sha256 "4da2281b02a84d1656ab263470150ba4be74623800565c3344032c05456e2e19"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lame-4.0.ventura.bottle.1.tar.gz"
+  sha256 "9968f6dbd7b0d54a1017dc82ab13bf4dd82b83f5614f20ae417e76bb15561394"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "9968f6dbd7b0d54a1017dc82ab13bf4dd82b83f5614f20ae417e76bb15561394"
+  end
 
+  depends_on "quyleanh/tap/mpg123"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
