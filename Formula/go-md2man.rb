@@ -5,8 +5,14 @@ class GoMd2man < Formula
   version "2.0.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go-md2man--2.0.7.sequoia.bottle.1.tar.gz"
-  sha256 "837a886c3bbceea303cdcb7dcf4ee6fd8bd180e0f5fd23730bf3f46d9840502a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go-md2man-2.0.7.ventura.bottle.1.tar.gz"
+  sha256 "5227ed0d652aecb21a2ec5d8b6804deaf7dcb322df7566e1336fcf2ce7802228"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "5227ed0d652aecb21a2ec5d8b6804deaf7dcb322df7566e1336fcf2ce7802228"
+  end
 
 
 
