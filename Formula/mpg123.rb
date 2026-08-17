@@ -5,8 +5,14 @@ class Mpg123 < Formula
   version "1.33.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpg123--1.33.7.sequoia.bottle.1.tar.gz"
-  sha256 "332fc30fe45ecce21a8f0becab07a9676775fa84d3c745b79823dfa99f06f467"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpg123-1.33.7.ventura.bottle.1.tar.gz"
+  sha256 "46f62c0909134e506f24056cdde3afbdcf850ea513373230ada88bd34cedeba9"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "46f62c0909134e506f24056cdde3afbdcf850ea513373230ada88bd34cedeba9"
+  end
 
 
 
