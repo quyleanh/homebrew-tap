@@ -5,10 +5,16 @@ class Simdutf < Formula
   version "9.0.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf--9.0.0.sequoia.bottle.1.tar.gz"
-  sha256 "f837aae965526286bfd80a46cc0ddad43058b4ddd2ca063402ca09942b7684b7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf-9.0.0.ventura.bottle.1.tar.gz"
+  sha256 "3c9effc64f87579154ae2a63da3c231624b984ba0e4753ac8ea2307070d1e31c"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "3c9effc64f87579154ae2a63da3c231624b984ba0e4753ac8ea2307070d1e31c"
+  end
 
+  depends_on "quyleanh/tap/icu4c@78"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +25,24 @@ class Simdutf < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
