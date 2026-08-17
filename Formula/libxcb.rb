@@ -5,10 +5,17 @@ class Libxcb < Formula
   version "1.17.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libxcb--1.17.0.sequoia.bottle.2.tar.gz"
-  sha256 "96614c90d32d258ace28ea729a2bb80fd61229882c72c50d54d49d5b64a7f8c8"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libxcb-1.17.0.ventura.bottle.1.tar.gz"
+  sha256 "efdd47e0fe2850c0e79b063e4b04c3949f3375e2acedc610b3b784efe4e5f7f3"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, ventura: "efdd47e0fe2850c0e79b063e4b04c3949f3375e2acedc610b3b784efe4e5f7f3"
+  end
 
+  depends_on "quyleanh/tap/libxau"
+  depends_on "quyleanh/tap/libxdmcp"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -19,6 +26,24 @@ class Libxcb < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
