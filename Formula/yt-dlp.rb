@@ -5,10 +5,18 @@ class YtDlp < Formula
   version "2026.7.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp--2026.7.4.sequoia.bottle.1.tar.gz"
-  sha256 "5b0244fe80c89223c8cdef70b4d2b14476ed55e001156d83a7d15812544a47f0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.7.4.ventura.bottle.1.tar.gz"
+  sha256 "7350b9e5b91e7830d6e5588e1d1c2fbd24b6153f1f64049dc94aebf2fd393203"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "7350b9e5b91e7830d6e5588e1d1c2fbd24b6153f1f64049dc94aebf2fd393203"
+  end
 
+  depends_on "quyleanh/tap/certifi"
+  depends_on "quyleanh/tap/deno"
+  depends_on "quyleanh/tap/python@3.14"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
