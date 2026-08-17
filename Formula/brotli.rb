@@ -5,8 +5,14 @@ class Brotli < Formula
   version "1.2.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/brotli--1.2.0.sequoia.bottle.1.tar.gz"
-  sha256 "7b2449e259077ca3febe5411dace5e84b528635d2a71ac183c0bb6625963b3d7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/brotli-1.2.0.ventura.bottle.1.tar.gz"
+  sha256 "383cf627a5b7416524e889297a27b986a5d75e8bbd58c5361910a2d95e10db6e"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "383cf627a5b7416524e889297a27b986a5d75e8bbd58c5361910a2d95e10db6e"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Brotli < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
