@@ -5,8 +5,14 @@ class AklompBase64 < Formula
   version "0.5.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aklomp-base64--0.5.2.sequoia.bottle.1.tar.gz"
-  sha256 "a997a6af2ed520c0eba00b622a630a99085ff734216a59d62bd491f013212b89"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aklomp-base64-0.5.2.ventura.bottle.1.tar.gz"
+  sha256 "6b4e2704212b4761d8465ade47f41eb462049f2c1d16697696594a9e11e6ff7e"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "6b4e2704212b4761d8465ade47f41eb462049f2c1d16697696594a9e11e6ff7e"
+  end
 
 
 
