@@ -5,8 +5,14 @@ class Opus < Formula
   version "1.6.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/opus--1.6.1.sequoia.bottle.1.tar.gz"
-  sha256 "7a1a1c717c1896a7bfa031bfb7b3e5c50b22b184bab3da2cd380451f2b6c4535"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/opus-1.6.1.ventura.bottle.1.tar.gz"
+  sha256 "0c3a47ff724f38183ff1165ec8e340f5246bf8fd0b2e94ed3a59c1f7bc69bbb6"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "0c3a47ff724f38183ff1165ec8e340f5246bf8fd0b2e94ed3a59c1f7bc69bbb6"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Opus < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
