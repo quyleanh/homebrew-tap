@@ -5,8 +5,14 @@ class Libvpx < Formula
   version "1.16.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvpx--1.16.0.sequoia.bottle.1.tar.gz"
-  sha256 "a51fe02a3778545c8b8ec6ec6250d73f3e3de3a1f5d35663c37b54adf4d717a8"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvpx-1.16.0.ventura.bottle.1.tar.gz"
+  sha256 "88ef04860585ed4ff1a8a425f6f4ae13e49fcf3ca475f0b8d85ac7f949abb867"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "88ef04860585ed4ff1a8a425f6f4ae13e49fcf3ca475f0b8d85ac7f949abb867"
+  end
 
 
 
@@ -19,6 +25,24 @@ class Libvpx < Formula
       prefix.install Dir["#{content_root}/*"]
     else
       prefix.install Dir["*"]
+    end
+
+    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    Dir.glob("#{prefix}/**/*").each do |f|
+      next unless File.file?(f) && !File.symlink?(f)
+      begin
+        content = File.binread(f, 1024)
+        if content && !content.include?("\x00")
+          text = File.read(f, encoding: "UTF-8")
+          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+            File.write(f, text, encoding: "UTF-8")
+          end
+        end
+      rescue
+        # Ignore binary or encoding errors
+      end
     end
   end
 
