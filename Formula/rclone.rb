@@ -5,8 +5,14 @@ class Rclone < Formula
   version "1.75.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone--1.75.0.sequoia.bottle.1.tar.gz"
-  sha256 "d7cb736af97b67cb54a30b6eb7d2c7a144d9ca76a98a1e10fd3325448b382c38"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone-1.75.0.ventura.bottle.1.tar.gz"
+  sha256 "72ecf9acd96ad317910092863e87e85617381c76e25d52f88b21bc1ba29b8738"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "72ecf9acd96ad317910092863e87e85617381c76e25d52f88b21bc1ba29b8738"
+  end
 
 
 
