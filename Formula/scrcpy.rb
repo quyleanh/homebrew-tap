@@ -6,13 +6,13 @@ class Scrcpy < Formula
   revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy--4.1_1.sequoia.bottle.1.tar.gz"
-  sha256 "6187ae18d40097d404d48f8ec5658d3640d4c465c2baf041ec6b7c3428651df7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy-4.1_1.ventura.bottle.1.tar.gz"
+  sha256 "cab8d0f786e8a59b75f5b6fc77673afa14c034699b1eea373cb4a5fc6a996c27"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "6187ae18d40097d404d48f8ec5658d3640d4c465c2baf041ec6b7c3428651df7"
+    sha256 cellar: :any_skip_relocation, ventura: "cab8d0f786e8a59b75f5b6fc77673afa14c034699b1eea373cb4a5fc6a996c27"
   end
 
   depends_on "quyleanh/tap/ffmpeg"
