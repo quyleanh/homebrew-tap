@@ -5,13 +5,13 @@ class Hugo < Formula
   version "0.165.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo--0.165.0.sequoia.bottle.1.tar.gz"
-  sha256 "1b984874d966d1acbb9db34606ac70f3b802686da63ce81b9a149422aade9de1"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo-0.165.0.ventura.bottle.1.tar.gz"
+  sha256 "7f28490b72f34504cca54e034a1c311d1c762bbb52ff7e29e0f8a026a08cd5a4"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "1b984874d966d1acbb9db34606ac70f3b802686da63ce81b9a149422aade9de1"
+    sha256 cellar: :any_skip_relocation, ventura: "7f28490b72f34504cca54e034a1c311d1c762bbb52ff7e29e0f8a026a08cd5a4"
   end
 
 
