@@ -5,10 +5,16 @@ class Colima < Formula
   version "0.10.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/colima--0.10.3.sequoia.bottle.1.tar.gz"
-  sha256 "788ac79af8b12d7dc3e40705586b46d93e8bd2bcaa691a3d76ab9fecd09bfda7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/colima-0.10.3.ventura.bottle.1.tar.gz"
+  sha256 "70c89e7d07c08d2a8997f7789ebc7592c2fc54d42035f598fa6df62dcb26b18a"
 
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "70c89e7d07c08d2a8997f7789ebc7592c2fc54d42035f598fa6df62dcb26b18a"
+  end
 
+  depends_on "quyleanh/tap/lima"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
