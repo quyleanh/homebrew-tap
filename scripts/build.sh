@@ -149,15 +149,21 @@ echo "⚠️  Could not fetch release info — will build all packages"
 return
 }
 
+# Sort candidate packages by length in descending order so longer names (e.g. go-md2man, docker-compose)
+# are evaluated before their prefix sub-names (e.g. go, docker).
+local sorted_pkgs=()
+mapfile -t sorted_pkgs < <(for p in "${ORDERED[@]}"; do echo "$p"; done | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2-)
+
 while IFS= read -r asset_name; do
 [ -z "$asset_name" ] && continue
 echo "$asset_name" >> "$RELEASED_ASSETS_FILE"
 # Support both native ventura bottles (pkg-version.ventura.bottle.*) and runner bottles (pkg--version.tag...)
-for pkg in "${ORDERED[@]}"; do
+for pkg in "${sorted_pkgs[@]}"; do
   if [[ "$asset_name" == "${pkg}-"* || "$asset_name" == "${pkg}--"* ]]; then
     rest="${asset_name#"${pkg}-"}"
     rest="${rest#"-"}"
-    if [[ "$rest" =~ ^([0-9a-zA-Z_.-]+)\.(ventura|sequoia|sonoma|monterey|intel[0-9_]*)\.bottle ]]; then
+    # Version must start with a digit (e.g. 1.26.6, 2026-08-13) or 'r' followed by a digit (e.g. r3222)
+    if [[ "$rest" =~ ^(([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*)\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]]; then
       ver="${BASH_REMATCH[1]}"
       echo "$ver" > "$VERSIONS_CACHE_DIR/$pkg"
       echo "  $pkg @ $ver"
@@ -298,7 +304,7 @@ publish_package() {
         if [[ "$old_asset" == "${pkg}-"* || "$old_asset" == "${pkg}--"* ]]; then
           local rest="${old_asset#"${pkg}-"}"
           rest="${rest#"-"}"
-          if [[ "$rest" =~ ^[0-9r][0-9a-zA-Z_.-]*\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]] || [[ "$rest" =~ ^[0-9r][0-9a-zA-Z_.-]*\.bottle ]]; then
+          if [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]] || [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.bottle ]]; then
             if [ "$old_asset" != "$(basename "$bottle_file")" ] && [ "$old_asset" != "$(basename "$json_file")" ]; then
               echo "  🗑️  Deleting older release asset: $old_asset"
               gh release delete-asset stable "$old_asset" --repo "$GITHUB_REPOSITORY" -y 2>/dev/null || true
