@@ -5,8 +5,14 @@ class Docker < Formula
   version "29.7.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker--29.7.2.sequoia.bottle.1.tar.gz"
-  sha256 "80c67d5b5e2a8fbb44d1a45e3cecac5bf1956a73bb16a82c642f97c3ab8bd632"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-29.7.2.ventura.bottle.1.tar.gz"
+  sha256 "daccd263878c068727d54b6236b14a464c0f6360dc39ffae57c273c6729090ba"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "daccd263878c068727d54b6236b14a464c0f6360dc39ffae57c273c6729090ba"
+  end
 
 
 
