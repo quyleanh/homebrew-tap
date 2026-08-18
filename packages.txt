@@ -31,3 +31,6 @@ docker
 docker-compose
 colima
 nasm
+git-filter-repo
+gitleaks
+potrace
