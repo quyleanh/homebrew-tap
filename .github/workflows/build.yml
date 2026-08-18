@@ -72,6 +72,8 @@ jobs:
       
           brew link --overwrite bash || true
           brew link --overwrite jq || true
+          brew trust aws/tap
+          brew trust quyleanh/tap
 
       - name: Build bottles
         id: build
