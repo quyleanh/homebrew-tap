@@ -2,18 +2,19 @@
 class Tmux < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  version "3.7b"
+  version "3.7c"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux-3.7b.ventura.bottle.1.tar.gz"
-  sha256 "98c7bbd3757e4a56f94c1e3d2d9ae297df797fc9dc5bd8a8f49c1bff36569095"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/tmux-3.7c.ventura.bottle.1.tar.gz"
+  sha256 "ff569b7613b67f101b475122d7a658adc74f4068622fa3a143e4ee296ba64865"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "98c7bbd3757e4a56f94c1e3d2d9ae297df797fc9dc5bd8a8f49c1bff36569095"
+    sha256 cellar: :any_skip_relocation, ventura: "ff569b7613b67f101b475122d7a658adc74f4068622fa3a143e4ee296ba64865"
   end
 
+  depends_on "quyleanh/tap/jemalloc"
   depends_on "quyleanh/tap/libevent"
   depends_on "quyleanh/tap/ncurses"
   depends_on "quyleanh/tap/utf8proc"
