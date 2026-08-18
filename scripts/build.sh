@@ -364,6 +364,11 @@ Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
 
 echo "🔄 Updating Homebrew…"
 brew update --quiet
+
+if ! brew tap | grep -qx "homebrew/core"; then
+  echo "📥 Tapping homebrew/core for brew bottle support…"
+  brew tap --force homebrew/core 2>/dev/null || true
+fi
 echo ""
 
 fetch_released_versions

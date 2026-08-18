@@ -49,6 +49,7 @@ jobs:
         run: |
           brew untap quyleanh/tap 2>/dev/null || true
           brew tap --custom-remote quyleanh/tap "${GITHUB_WORKSPACE}"
+          brew tap --force homebrew/core
 
       - name: Set Homebrew env
         run: |
