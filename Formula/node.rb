@@ -5,8 +5,14 @@ class Node < Formula
   version "26.7.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node--26.7.0.sequoia.bottle.1.tar.gz"
-  sha256 "b51a2772085eed047a37ccc0de342af76e7a0a90d1dc79492b10c536afdc053f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.7.0.ventura.bottle.1.tar.gz"
+  sha256 "6494ffba5c053c442116fed5cf893d64ff2332aa1a7c050a61752f5baf063a2b"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "6494ffba5c053c442116fed5cf893d64ff2332aa1a7c050a61752f5baf063a2b"
+  end
 
   depends_on "quyleanh/tap/ada-url"
   depends_on "quyleanh/tap/brotli"
