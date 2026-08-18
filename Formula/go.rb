@@ -6,12 +6,12 @@ class Go < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/go-1.26.6.ventura.bottle.1.tar.gz"
-  sha256 "865b43f89269c4d3c7de99323ce5cd9bbea5639865a0191b4e098203705bda88"
+  sha256 "efdce5de8aa226c757e29f5dd8de3bf3841017ac9b235ee300ea5340ffd9bb4a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "865b43f89269c4d3c7de99323ce5cd9bbea5639865a0191b4e098203705bda88"
+    sha256 cellar: :any_skip_relocation, ventura: "efdce5de8aa226c757e29f5dd8de3bf3841017ac9b235ee300ea5340ffd9bb4a"
   end
 
 
