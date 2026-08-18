@@ -5,8 +5,14 @@ class Rtk < Formula
   version "0.45.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk--0.45.0.sequoia.bottle.1.tar.gz"
-  sha256 "1b7fedc1b910d3c93cb3b48ac8f1e80592f3464a650ffc65e7a9a8f2c90d39f4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk-0.45.0.ventura.bottle.1.tar.gz"
+  sha256 "da2b2656fd1bb8963837e4906be7caec7500a8fed1f41b17a17bf37edc5c16b0"
+
+  bottle do
+    root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, ventura: "da2b2656fd1bb8963837e4906be7caec7500a8fed1f41b17a17bf37edc5c16b0"
+  end
 
 
 
