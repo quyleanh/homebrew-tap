@@ -10,7 +10,7 @@ class XcbProto < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 3
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "fa6dc57289cead700bbeb8c916c03cce9d67ab91c695b5553b35240b69c228fb"
   end
 

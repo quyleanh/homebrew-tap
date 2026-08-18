@@ -103,8 +103,12 @@ for json_file in "${JSON_FILES[@]}"; do
     version_ruby="version \"$version\""
   fi
 
-  bottle_rebuild_ruby=""
-  [ "$bottle_rebuild" -gt 0 ] && bottle_rebuild_ruby="    rebuild $bottle_rebuild"
+  # Extract the rebuild number directly from actual_tar so Homebrew download requests
+  # always match the exact filename uploaded to the release
+  bottle_rebuild_ruby="    rebuild 1"
+  if [[ "$actual_tar" =~ \.bottle\.([0-9]+)\.tar\.gz$ ]]; then
+    bottle_rebuild_ruby="    rebuild ${BASH_REMATCH[1]}"
+  fi
 
   # 4. Generate the Formula file content
   cat > "$formula_file" << RUBY

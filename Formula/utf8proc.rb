@@ -10,7 +10,7 @@ class Utf8proc < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "33535a747e9ef34ceff4563ccf195ab878b0c552fbac68dfdb37382428dc53ba"
   end
 

@@ -10,7 +10,7 @@ class Potrace < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "04daf35ac57650a45da85e8fa8c78b073f2e7aebae72a373f5ab529d1dbb7db1"
   end
 

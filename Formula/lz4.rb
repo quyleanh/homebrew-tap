@@ -10,7 +10,7 @@ class Lz4 < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "a58e64379d357905cd25bd451d5a1149eb4b90f65f57cd7bce3ba6c72cfdc025"
   end
 

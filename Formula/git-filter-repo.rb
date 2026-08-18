@@ -10,7 +10,7 @@ class GitFilterRepo < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "2c958ffc4385252ac241d4536f960685fae0ba02f353ae8b0a99a9e2e79601e3"
   end
 

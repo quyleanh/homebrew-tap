@@ -10,7 +10,7 @@ class Wget < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 3
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "a731ef5199334c25054dcdd46b3babcfe24ef79746333678b869cce063762e8c"
   end
 

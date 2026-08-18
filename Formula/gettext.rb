@@ -10,7 +10,7 @@ class Gettext < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "0f3244e93b1b7901ad8148b148a724b5264507f24a79ccdb738794ae5d27c475"
   end
 

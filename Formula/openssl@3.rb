@@ -10,7 +10,7 @@ class OpensslAT3 < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "f8ad63a373c2a4114bebcd1308a53749945b8ba66e2e51967c7740454535052f"
   end
 

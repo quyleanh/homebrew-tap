@@ -10,7 +10,7 @@ class Libtiff < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "018e866549b76830498f332f797f3a9323fc409c73a00ec8358661ea324cbec2"
   end
 

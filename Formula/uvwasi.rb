@@ -10,7 +10,7 @@ class Uvwasi < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "23d12a6ae529fba0f914d8073190bb31c1e967c55c873baf8879852763c45ee4"
   end
 

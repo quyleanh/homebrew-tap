@@ -10,7 +10,7 @@ class Cxxopts < Formula
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
-    rebuild 2
+    rebuild 1
     sha256 cellar: :any_skip_relocation, ventura: "903a19cd28cb48ef6560af035ad29221e1432bf1be3e10983d146ff92ff91c36"
   end
 
