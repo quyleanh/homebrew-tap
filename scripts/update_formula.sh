@@ -94,6 +94,7 @@ for json_file in "${JSON_FILES[@]}"; do
   actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}-${version}.ventura.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
   [ -n "$actual_tar" ] || actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.sequoia.bottle.*.tar.gz" -exec basename {} \; | head -n 1)
   [ -n "$actual_tar" ] || actual_tar=$(find "$BOTTLES_DIR" -maxdepth 1 -name "${pkg_name}--*.tar.gz" -exec basename {} \; | head -n 1)
+  [ -n "$actual_tar" ] || actual_tar="${pkg_name}-${version}.ventura.bottle.1.tar.gz"
 
   if [[ "$version" == *"_"* ]]; then
     base_ver="${version%%_*}"
