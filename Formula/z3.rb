@@ -2,16 +2,16 @@
 class Z3 < Formula
   desc "High-performance theorem prover"
   homepage "https://github.com/Z3Prover/z3"
-  version "5.0.0"
+  version "5.1.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/z3-5.0.0.ventura.bottle.1.tar.gz"
-  sha256 "0df6b3eb52957149924f78b68d6ec2084bd9eda733cea1ebd211f87c26dd4e03"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/z3-5.1.0.ventura.bottle.1.tar.gz"
+  sha256 "b10cd1f981ba667f9ab96c2117dae0568c4f44d6e298e03b36d742a0b43d7a9f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "0df6b3eb52957149924f78b68d6ec2084bd9eda733cea1ebd211f87c26dd4e03"
+    sha256 cellar: :any_skip_relocation, ventura: "b10cd1f981ba667f9ab96c2117dae0568c4f44d6e298e03b36d742a0b43d7a9f"
   end
 
 
