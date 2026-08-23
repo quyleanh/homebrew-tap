@@ -2,17 +2,16 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  version "1.97.1"
-  revision 1
+  version "1.98.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.97.1_1.ventura.bottle.1.tar.gz"
-  sha256 "d81b57390dc46154dfdadb1b2a471b2163781a10f45069acd17f9353d66202da"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.98.0.ventura.bottle.1.tar.gz"
+  sha256 "b928a79cbcfd9c0d38f61bafb9cbb4b9efc2154e2ce3cb253416202dde5fd299"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "d81b57390dc46154dfdadb1b2a471b2163781a10f45069acd17f9353d66202da"
+    sha256 cellar: :any_skip_relocation, ventura: "b928a79cbcfd9c0d38f61bafb9cbb4b9efc2154e2ce3cb253416202dde5fd299"
   end
 
   depends_on "quyleanh/tap/libgit2"
