@@ -2,16 +2,16 @@
 class Simdjson < Formula
   desc "SIMD-accelerated C++ JSON parser"
   homepage "https://simdjson.org"
-  version "4.6.7"
+  version "4.6.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson-4.6.7.ventura.bottle.1.tar.gz"
-  sha256 "aaf4c9022d082e6663e3332a27713a4a5af697421a38f8f65579cdc441bf1a6e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson-4.6.8.ventura.bottle.1.tar.gz"
+  sha256 "4ab39cf0f92a8c38233052002bb616c59df52c473fade40f9053dd8fa71e16c4"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "aaf4c9022d082e6663e3332a27713a4a5af697421a38f8f65579cdc441bf1a6e"
+    sha256 cellar: :any_skip_relocation, ventura: "4ab39cf0f92a8c38233052002bb616c59df52c473fade40f9053dd8fa71e16c4"
   end
 
 
