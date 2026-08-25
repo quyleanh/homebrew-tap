@@ -2,16 +2,16 @@
 class LittleCms2 < Formula
   desc "Color management engine supporting ICC profiles"
   homepage "https://www.littlecms.com/"
-  version "2.19"
+  version "2.19.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2-2.19.ventura.bottle.1.tar.gz"
-  sha256 "36d2a2223c42602a9ef6c580fa06ccae90f8a98fafd0bfe48f8cb210110682cf"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2-2.19.1.ventura.bottle.1.tar.gz"
+  sha256 "5393263804c215ca578dc430de0737a244268ce79245d36444507f412f8dd97e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "36d2a2223c42602a9ef6c580fa06ccae90f8a98fafd0bfe48f8cb210110682cf"
+    sha256 cellar: :any_skip_relocation, ventura: "5393263804c215ca578dc430de0737a244268ce79245d36444507f412f8dd97e"
   end
 
   depends_on "quyleanh/tap/jpeg-turbo"
