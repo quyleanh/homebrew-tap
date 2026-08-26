@@ -2,16 +2,16 @@
 class Libvpx < Formula
   desc "VP8/VP9 video codec"
   homepage "https://www.webmproject.org/code/"
-  version "1.16.0"
+  version "1.17.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvpx-1.16.0.ventura.bottle.1.tar.gz"
-  sha256 "88ef04860585ed4ff1a8a425f6f4ae13e49fcf3ca475f0b8d85ac7f949abb867"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libvpx-1.17.0.ventura.bottle.1.tar.gz"
+  sha256 "bc1b1dcad982aeb838a02fcce5a92ba801fabd88162f2fa93fdb1700c41d6c52"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "88ef04860585ed4ff1a8a425f6f4ae13e49fcf3ca475f0b8d85ac7f949abb867"
+    sha256 cellar: :any_skip_relocation, ventura: "bc1b1dcad982aeb838a02fcce5a92ba801fabd88162f2fa93fdb1700c41d6c52"
   end
 
 
