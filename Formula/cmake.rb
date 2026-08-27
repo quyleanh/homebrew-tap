@@ -2,16 +2,16 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  version "4.4.2"
+  version "4.4.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake-4.4.2.ventura.bottle.1.tar.gz"
-  sha256 "81aa580f33bbdccbb6eb98414c5cbe28264928247f3eafa0b66287383508a074"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake-4.4.3.ventura.bottle.1.tar.gz"
+  sha256 "a27795931eb9b1c80968b9d11f4dc1d54cb542db6b8d730740b551eec73a2d38"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "81aa580f33bbdccbb6eb98414c5cbe28264928247f3eafa0b66287383508a074"
+    sha256 cellar: :any_skip_relocation, ventura: "a27795931eb9b1c80968b9d11f4dc1d54cb542db6b8d730740b551eec73a2d38"
   end
 
 
