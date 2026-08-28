@@ -2,16 +2,16 @@
 class Lld < Formula
   desc "LLVM Project Linker"
   homepage "https://lld.llvm.org/"
-  version "22.1.8"
+  version "23.1.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld-22.1.8.ventura.bottle.1.tar.gz"
-  sha256 "166114bcd6b929f51c0a2e809d8fa5b43be9c45dbafa65dfea28085af8987861"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld-23.1.0.ventura.bottle.1.tar.gz"
+  sha256 "3699799ee5f522a774167e1bf3fedff98c1ee78411591cd99fa96755efc62b25"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "166114bcd6b929f51c0a2e809d8fa5b43be9c45dbafa65dfea28085af8987861"
+    sha256 cellar: :any_skip_relocation, ventura: "3699799ee5f522a774167e1bf3fedff98c1ee78411591cd99fa96755efc62b25"
   end
 
   depends_on "quyleanh/tap/llvm"
