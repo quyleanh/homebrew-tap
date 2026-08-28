@@ -2,16 +2,16 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.9.5"
+  version "2.9.6"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.5.ventura.bottle.1.tar.gz"
-  sha256 "8744ae5b86ef743cb16b096b8ebb89dbff0a2fbf43c161807b89e1cfd3caedcd"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.6.ventura.bottle.1.tar.gz"
+  sha256 "336899a18b6db9316baa582c04e2d1c4e3cd94b97c93a56874b4ee882167de77"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "8744ae5b86ef743cb16b096b8ebb89dbff0a2fbf43c161807b89e1cfd3caedcd"
+    sha256 cellar: :any_skip_relocation, ventura: "336899a18b6db9316baa582c04e2d1c4e3cd94b97c93a56874b4ee882167de77"
   end
 
   depends_on "quyleanh/tap/little-cms2"
