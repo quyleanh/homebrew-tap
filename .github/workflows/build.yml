@@ -47,10 +47,12 @@ jobs:
 
       - name: Register checkout as local tap
         run: |
-          # GitHub-hosted runners may include stale third-party taps. This build
-          # does not use them, and letting `brew update` load them can emit
-          # import failures or deprecation notices from the runner image.
-          brew untap aws/tap hashicorp/tap 2>/dev/null || true
+          # GitHub-hosted runners may include stale third-party taps. Do not use
+          # `brew untap` here: it imports their formulae before removing them,
+          # and HashiCorp's preinstalled Vagrant formula can no longer load.
+          # The runner is ephemeral, so remove only those known-unused tap dirs.
+          rm -rf /usr/local/Homebrew/Library/Taps/aws/homebrew-tap
+          rm -rf /usr/local/Homebrew/Library/Taps/hashicorp/homebrew-tap
           brew untap quyleanh/tap 2>/dev/null || true
           brew tap --custom-remote quyleanh/tap "${GITHUB_WORKSPACE}"
           brew trust quyleanh/tap
