@@ -418,8 +418,17 @@ if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Ensure package is installed locally so dependents can link against it
 if ! brew list --formula "$pkg" &>/dev/null; then
-  echo "  ℹ️  Installing locally so dependents can link..."
-  brew install "$pkg" 2>/dev/null || true
+  # The runner is macOS 15 while published tap bottles are deliberately tagged
+  # for the macOS 13 target. Homebrew will not pour that older-tagged bottle on
+  # the runner, so run the generated wrapper formula as a source install. Its
+  # URL is the published archive and the wrapper unpacks it into the Cellar.
+  echo "  ℹ️  Installing locally for dependents..."
+  if ! brew install --build-from-source "$formula_ref"; then
+    echo "  ❌ Could not install required dependency: $pkg"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
 else
   echo "  ℹ️  Already installed locally ✓"
 fi
