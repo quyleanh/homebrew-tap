@@ -28,9 +28,12 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PACKAGES_FILE="$REPO_ROOT/packages.txt"
 RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
+BUILD_TIME_ESTIMATES_FILE="$REPO_ROOT/.github/build-times.tsv"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 MAX_BUILD_TIME="${MAX_BUILD_TIME:-$((5 * 3600))}" # Default: 5 hours in seconds
+DEFAULT_BUILD_ESTIMATE_SECONDS="${DEFAULT_BUILD_ESTIMATE_SECONDS:-3600}"
+BUILD_TIME_RESERVE_SECONDS="${BUILD_TIME_RESERVE_SECONDS:-1200}"
 export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 
 mkdir -p "$OUTPUT_DIR"
@@ -39,6 +42,7 @@ echo "=== Homebrew Bottle Builder ==="
 echo "Output dir     : $OUTPUT_DIR"
 echo "Force build    : ${FORCE_BUILD}"
 echo "Max build time : $((MAX_BUILD_TIME / 60)) minutes ($MAX_BUILD_TIME seconds)"
+echo "Publish reserve: $((BUILD_TIME_RESERVE_SECONDS / 60)) minutes"
 echo ""
 
 # ──────────────────────────────────────────────────────────────
@@ -332,7 +336,7 @@ publish_package() {
     # 3. Commit and push formula update immediately
     git config user.name "github-actions[bot]"
     git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE"
+    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE"
 
     if ! git diff --staged --quiet; then
       echo "  💾 Committing & pushing formula update for $pkg..."
@@ -358,6 +362,41 @@ Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
   fi
 }
 
+get_build_time_estimate() {
+  local pkg="$1"
+  local estimate
+  estimate=$(awk -v package="$pkg" '$1 == package { print $2; exit }' \
+    "$BUILD_TIME_ESTIMATES_FILE" 2>/dev/null || true)
+  if [[ ! "$estimate" =~ ^[0-9]+$ ]]; then
+    estimate="$DEFAULT_BUILD_ESTIMATE_SECONDS"
+  fi
+  echo "$estimate"
+}
+
+record_build_time() {
+  local pkg="$1"
+  local observed_seconds="$2"
+  local previous_seconds
+  local recorded_seconds="$observed_seconds"
+  local estimates_tmp
+
+  previous_seconds=$(awk -v package="$pkg" '$1 == package { print $2; exit }' \
+    "$BUILD_TIME_ESTIMATES_FILE" 2>/dev/null || true)
+  if [[ "$previous_seconds" =~ ^[0-9]+$ ]] &&
+    [ "$previous_seconds" -gt "$recorded_seconds" ]; then
+    recorded_seconds="$previous_seconds"
+  fi
+
+  estimates_tmp=$(mktemp)
+  awk -v package="$pkg" -v seconds="$recorded_seconds" '
+    BEGIN { updated = 0 }
+    $1 == package { print package "\t" seconds; updated = 1; next }
+    { print }
+    END { if (!updated) print package "\t" seconds }
+  ' "$BUILD_TIME_ESTIMATES_FILE" > "$estimates_tmp"
+  mv "$estimates_tmp" "$BUILD_TIME_ESTIMATES_FILE"
+}
+
 # ──────────────────────────────────────────────────────────────
 # Step 6: Build loop
 # ──────────────────────────────────────────────────────────────
@@ -376,6 +415,7 @@ fetch_released_versions
 BUILT=()
 SKIPPED=()
 FAILED=()
+DEFERRED=()
 START_TIME=$(date +%s)
 
 for pkg in "${ORDERED[@]}"; do
@@ -422,8 +462,12 @@ if ! brew list --formula "$pkg" &>/dev/null; then
   # for the macOS 13 target. Homebrew will not pour that older-tagged bottle on
   # the runner, so run the generated wrapper formula as a source install. Its
   # URL is the published archive and the wrapper unpacks it into the Cellar.
-  echo "  ℹ️  Installing locally for dependents..."
-  if ! brew install --build-from-source "$formula_ref"; then
+  released_formula_ref="$formula_ref"
+  if [ -f "$REPO_ROOT/Formula/${pkg}.rb" ]; then
+    released_formula_ref="quyleanh/tap/$pkg"
+  fi
+  echo "  ℹ️  Restoring published bottle for dependents..."
+  if ! brew install --build-from-source "$released_formula_ref"; then
     echo "  ❌ Could not install required dependency: $pkg"
     FAILED+=("$pkg")
     echo ""
@@ -436,6 +480,24 @@ fi
 echo ""
 continue
 
+fi
+
+# Avoid starting a real source build that cannot finish with enough time left
+# to bottle, upload and commit it. Estimates persist between workflow runs.
+CURRENT_TIME=$(date +%s)
+ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
+REMAINING_TIME=$((MAX_BUILD_TIME - ELAPSED_TIME))
+BUILD_ESTIMATE=$(get_build_time_estimate "$pkg")
+PADDED_ESTIMATE=$(((BUILD_ESTIMATE * 125 + 99) / 100))
+REQUIRED_TIME=$((PADDED_ESTIMATE + BUILD_TIME_RESERVE_SECONDS))
+
+echo "  → Estimated build: $((BUILD_ESTIMATE / 60))m + 25% safety"
+echo "  → Time remaining : $((REMAINING_TIME / 60))m (including publish reserve)"
+
+if [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
+  echo "  ⏸️  Deferring $pkg and the remaining dependency-ordered queue to the next run"
+  DEFERRED+=("$pkg")
+  break
 fi
 
 # Uninstall for a clean build
@@ -456,7 +518,12 @@ fi
 
 # Formulae must be installed by tap-qualified name; Homebrew rejects arbitrary
 # workspace paths that are not registered as taps.
+BUILD_STARTED_AT=$(date +%s)
 if brew install --build-bottle --overwrite "$formula_ref"; then
+BUILD_FINISHED_AT=$(date +%s)
+BUILD_DURATION=$((BUILD_FINISHED_AT - BUILD_STARTED_AT))
+record_build_time "$pkg" "$BUILD_DURATION"
+echo "  → Recorded build time: $((BUILD_DURATION / 60))m"
 echo "  ✅ Installed, packing bottle…"
 
 # Resolve actual Cellar path — may include revision suffix (_1, _2...)
@@ -561,6 +628,7 @@ echo "Build Summary"
 echo "══════════════════════════════════════"
 echo "✅ Built   (${#BUILT[@]}): ${BUILT[*]:-none}"
 echo "⏭️  Skipped (${#SKIPPED[@]}): ${SKIPPED[*]:-none}"
+echo "⏸️  Deferred (${#DEFERRED[@]}): ${DEFERRED[*]:-none}"
 echo "❌ Failed  (${#FAILED[@]}): ${FAILED[*]:-none}"
 echo ""
 
