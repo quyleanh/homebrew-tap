@@ -268,6 +268,47 @@ local receipt="$(brew --cellar)/$pkg/$version/INSTALL_RECEIPT.json"
 jq -e '.source.tap == "quyleanh/tap"' "$receipt" >/dev/null 2>&1
 }
 
+package_needed_by_later_formula() {
+local dependency="$1"
+local consumer
+local formula_file
+local dependency_seen=false
+
+for consumer in "${ORDERED[@]}"; do
+  if [ "$dependency_seen" = true ]; then
+    formula_file="$REPO_ROOT/Formula/${consumer}.rb"
+    if [ -f "$formula_file" ] &&
+      grep -Fq "depends_on \"quyleanh/tap/$dependency\"" "$formula_file"; then
+      return 0
+    fi
+  fi
+  [ "$consumer" = "$dependency" ] && dependency_seen=true
+done
+
+return 1
+}
+
+ensure_pkgconf_opt_aliases() {
+local pkgconf_prefix
+local opt_dir
+local alias_name
+local alias_path
+
+pkgconf_prefix=$(brew --prefix quyleanh/tap/pkgconf)
+opt_dir="$(brew --prefix)/opt"
+
+for alias_name in pkg-config pkgconfig; do
+  alias_path="$opt_dir/$alias_name"
+  if [ -e "$alias_path" ] && [ ! -L "$alias_path" ]; then
+    echo "  ❌ Cannot create pkgconf alias over non-symlink: $alias_path"
+    return 1
+  fi
+  ln -sfn "$pkgconf_prefix" "$alias_path"
+done
+
+echo "  ℹ️  Restored pkgconf opt aliases: pkg-config, pkgconfig"
+}
+
 # ──────────────────────────────────────────────────────────────
 
 # Step 4: Determine if a package needs rebuilding
@@ -519,6 +560,13 @@ fi
 
 if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
+# Published leaves do not need to be installed on the ephemeral builder. Only
+# restore a skipped formula when a later formula in ORDERED declares it.
+if ! package_needed_by_later_formula "$pkg"; then
+  echo "  ℹ️  No later package depends on $pkg; local restore not needed"
+  echo ""
+  continue
+fi
 # Ensure package is installed locally so dependents can link against it
 released_version=$(get_released_version "$pkg")
 if ! tap_formula_version_installed "$pkg" "$released_version"; then
@@ -550,6 +598,12 @@ if ! tap_formula_version_installed "$pkg" "$released_version"; then
   fi
 else
   echo "  ℹ️  Tap bottle already installed locally ✓"
+fi
+
+if [ "$pkg" = "pkgconf" ] && ! ensure_pkgconf_opt_aliases; then
+  FAILED+=("$pkg")
+  echo ""
+  continue
 fi
 
 echo ""
