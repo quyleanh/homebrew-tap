@@ -532,10 +532,11 @@ if ! tap_formula_version_installed "$pkg" "$released_version"; then
   fi
   echo "  ℹ️  Restoring published bottle for dependents..."
   # A GitHub runner may already have the same formula name from Homebrew Core.
-  # Remove it before installing the tap-owned keg, then skip recursive dependency
-  # resolution because ORDERED already guarantees dependencies come first.
+  # Remove it before installing the tap-owned keg. ORDERED guarantees that each
+  # declared dependency has already been restored and verified, so Homebrew's
+  # supported dependency check will find it installed without recursive work.
   brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
-  if ! brew install --build-from-source --ignore-dependencies "$released_formula_ref"; then
+  if ! brew install --build-from-source "$released_formula_ref"; then
     echo "  ❌ Could not install required dependency: $pkg"
     FAILED+=("$pkg")
     echo ""
