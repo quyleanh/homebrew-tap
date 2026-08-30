@@ -573,9 +573,21 @@ if ! tap_formula_version_installed "$pkg" "$released_version"; then
   # supported dependency check will find it installed without recursive work.
   brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
   # Intel GitHub runners may still have openssl@1.1 linked globally. Keep its
-  # keg installed, but remove those links so openssl@3 can link cleanly.
+  # keg installed, but remove those links so openssl@3 can link cleanly. Some
+  # runner images contain a stale symlink that `brew unlink` does not track, so
+  # remove only that exact conflict after verifying its target.
   if [ "$pkg" = "openssl@3" ]; then
     brew unlink openssl@1.1 2>/dev/null || true
+    openssl_link="$(brew --prefix)/bin/openssl"
+    if [ -L "$openssl_link" ]; then
+      openssl_link_target="$(readlink "$openssl_link")"
+      case "$openssl_link_target" in
+        */openssl@1.1/*)
+          echo "  ℹ️  Removing stale openssl@1.1 symlink: $openssl_link"
+          rm "$openssl_link"
+          ;;
+      esac
+    fi
   fi
   restore_status=0
   brew install --build-from-source "$released_formula_ref" || restore_status=$?
