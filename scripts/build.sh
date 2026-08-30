@@ -136,6 +136,7 @@ echo ""
 
 VERSIONS_CACHE_DIR="$(mktemp -d)"
 RELEASED_ASSETS_FILE="$(mktemp)"
+RELEASED_ASSET_DIGESTS_FILE="$(mktemp)"
 
 fetch_released_versions() {
 if [ -z "$GITHUB_REPOSITORY" ]; then
@@ -146,9 +147,11 @@ fi
 echo "🔍 Fetching released asset list from GitHub using gh CLI…"
 export GH_TOKEN="${GITHUB_TOKEN:-}"
 
-# Use gh feature to fetch ALL assets instead of just the first 30 (curl pagination limit)
-local assets
-assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null) || {
+# Fetch names and server-computed digests in one request. The digest lets us
+# reject a stale formula checksum before Homebrew downloads the archive.
+local asset_rows
+asset_rows=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/stable" \
+  --jq '.assets[] | [.name, (.digest // "")] | @tsv' 2>/dev/null) || {
 echo "⚠️  Could not fetch release info — will build all packages"
 return
 }
@@ -158,9 +161,10 @@ return
 local sorted_pkgs=()
 mapfile -t sorted_pkgs < <(for p in "${ORDERED[@]}"; do echo "$p"; done | awk '{ print length, $0 }' | sort -rn | cut -d" " -f2-)
 
-while IFS= read -r asset_name; do
+while IFS=$'\t' read -r asset_name asset_digest; do
 [ -z "$asset_name" ] && continue
 echo "$asset_name" >> "$RELEASED_ASSETS_FILE"
+printf '%s\t%s\n' "$asset_name" "$asset_digest" >> "$RELEASED_ASSET_DIGESTS_FILE"
 # Support both native ventura bottles (pkg-version.ventura.bottle.*) and runner bottles (pkg--version.tag...)
 for pkg in "${sorted_pkgs[@]}"; do
   if [[ "$asset_name" == "${pkg}-"* || "$asset_name" == "${pkg}--"* ]]; then
@@ -175,7 +179,7 @@ for pkg in "${sorted_pkgs[@]}"; do
     fi
   fi
 done
-done <<< "$assets"
+done <<< "$asset_rows"
 
 echo ""
 }
@@ -206,6 +210,62 @@ while IFS= read -r asset_name; do
 done < "$RELEASED_ASSETS_FILE"
 
 return 1
+}
+
+released_bottle_asset() {
+local pkg="$1"
+local version="$2"
+local tag="$3"
+
+while IFS= read -r asset_name; do
+  if [[ "$asset_name" == "$pkg-$version.$tag.bottle."*.tar.gz ||
+    "$asset_name" == "$pkg--$version.$tag.bottle."*.tar.gz ]]; then
+    echo "$asset_name"
+    return 0
+  fi
+done < "$RELEASED_ASSETS_FILE"
+
+return 1
+}
+
+released_formula_checksum_matches() {
+local pkg="$1"
+local version="$2"
+local formula_file="$REPO_ROOT/Formula/${pkg}.rb"
+local asset_name
+local release_digest
+local formula_digest
+
+[ -f "$formula_file" ] || return 0
+asset_name=$(released_bottle_asset "$pkg" "$version" "ventura") || return 0
+release_digest=$(awk -F '\t' -v asset="$asset_name" '
+  $1 == asset { sub(/^sha256:/, "", $2); print $2; exit }
+' "$RELEASED_ASSET_DIGESTS_FILE")
+formula_digest=$(awk '$1 == "sha256" { gsub(/"/, "", $2); print $2; exit }' \
+  "$formula_file")
+
+if [ -z "$release_digest" ] || [ -z "$formula_digest" ]; then
+  echo "  → Checksum metadata unavailable; skipping release checksum validation"
+  return 0
+fi
+
+if [ "$release_digest" != "$formula_digest" ]; then
+  echo "  → Formula checksum differs from published asset; will rebuild"
+  echo "    Formula: $formula_digest"
+  echo "    Release: $release_digest"
+  return 1
+fi
+
+return 0
+}
+
+tap_formula_version_installed() {
+local pkg="$1"
+local version="$2"
+local receipt="$(brew --cellar)/$pkg/$version/INSTALL_RECEIPT.json"
+
+[ -f "$receipt" ] || return 1
+jq -e '.source.tap == "quyleanh/tap"' "$receipt" >/dev/null 2>&1
 }
 
 # ──────────────────────────────────────────────────────────────
@@ -258,6 +318,9 @@ if [ "$latest" = "$released" ] && has_released_bottle "$pkg" "$latest"; then
   # package during `brew upgrade` on the target macOS 13 machine.
   if ! has_released_bottle_tag "$pkg" "$latest" "ventura"; then
     echo "  → Missing Ventura bottle alias, will build"
+    return 0
+  fi
+  if ! released_formula_checksum_matches "$pkg" "$latest"; then
     return 0
   fi
   echo "  → Up to date, skipping ✓"
@@ -457,7 +520,8 @@ fi
 if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Ensure package is installed locally so dependents can link against it
-if ! brew list --formula "$pkg" &>/dev/null; then
+released_version=$(get_released_version "$pkg")
+if ! tap_formula_version_installed "$pkg" "$released_version"; then
   # The runner is macOS 15 while published tap bottles are deliberately tagged
   # for the macOS 13 target. Homebrew will not pour that older-tagged bottle on
   # the runner, so run the generated wrapper formula as a source install. Its
@@ -467,14 +531,24 @@ if ! brew list --formula "$pkg" &>/dev/null; then
     released_formula_ref="quyleanh/tap/$pkg"
   fi
   echo "  ℹ️  Restoring published bottle for dependents..."
-  if ! brew install --build-from-source "$released_formula_ref"; then
+  # A GitHub runner may already have the same formula name from Homebrew Core.
+  # Remove it before installing the tap-owned keg, then skip recursive dependency
+  # resolution because ORDERED already guarantees dependencies come first.
+  brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
+  if ! brew install --build-from-source --ignore-dependencies "$released_formula_ref"; then
     echo "  ❌ Could not install required dependency: $pkg"
     FAILED+=("$pkg")
     echo ""
     continue
   fi
+  if ! tap_formula_version_installed "$pkg" "$released_version"; then
+    echo "  ❌ Restored keg is not $released_formula_ref @ $released_version"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
 else
-  echo "  ℹ️  Already installed locally ✓"
+  echo "  ℹ️  Tap bottle already installed locally ✓"
 fi
 
 echo ""
@@ -615,7 +689,7 @@ fi
 echo ""
 done
 
-rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE"
+rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE"
 
 # ──────────────────────────────────────────────────────────────
 

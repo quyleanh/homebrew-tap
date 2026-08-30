@@ -6,12 +6,12 @@ class Gitleaks < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gitleaks-8.30.1.ventura.bottle.1.tar.gz"
-  sha256 "d3bf88c78d76c111d739aa6f2feb9274c7cd59b322a4c34237eae88fdca8f27a"
+  sha256 "2175f1004ba478ad08a33c709180ea97c8cd1ddc3fbbf845886c377a223a73db"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "d3bf88c78d76c111d739aa6f2feb9274c7cd59b322a4c34237eae88fdca8f27a"
+    sha256 cellar: :any_skip_relocation, ventura: "2175f1004ba478ad08a33c709180ea97c8cd1ddc3fbbf845886c377a223a73db"
   end
 
 
