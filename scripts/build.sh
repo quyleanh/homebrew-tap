@@ -546,18 +546,6 @@ formula_ref="$pkg"
 # dependency graph.
 [ "$pkg" = "little-cms2" ] && formula_ref="homebrew/core/little-cms2"
 
-if [ "$pkg" = "ffmpeg" ]; then
-  tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"
-  if [ -d "$tap_formula_dir" ]; then
-    cp "$REPO_ROOT/scripts/ffmpeg.rb" "$tap_formula_dir/ffmpeg.rb"
-  else
-    echo "  ❌ Registered quyleanh/tap directory not found"
-    FAILED+=("$pkg")
-    echo ""
-    continue
-  fi
-fi
-
 if ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Published leaves do not need to be installed on the ephemeral builder. Only
@@ -584,17 +572,21 @@ if ! tap_formula_version_installed "$pkg" "$released_version"; then
   # declared dependency has already been restored and verified, so Homebrew's
   # supported dependency check will find it installed without recursive work.
   brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
-  if ! brew install --build-from-source "$released_formula_ref"; then
-    echo "  ❌ Could not install required dependency: $pkg"
+  # Intel GitHub runners may still have openssl@1.1 linked globally. Keep its
+  # keg installed, but remove those links so openssl@3 can link cleanly.
+  if [ "$pkg" = "openssl@3" ]; then
+    brew unlink openssl@1.1 2>/dev/null || true
+  fi
+  restore_status=0
+  brew install --build-from-source "$released_formula_ref" || restore_status=$?
+  if ! tap_formula_version_installed "$pkg" "$released_version"; then
+    echo "  ❌ Could not restore $released_formula_ref @ $released_version"
     FAILED+=("$pkg")
     echo ""
     continue
   fi
-  if ! tap_formula_version_installed "$pkg" "$released_version"; then
-    echo "  ❌ Restored keg is not $released_formula_ref @ $released_version"
-    FAILED+=("$pkg")
-    echo ""
-    continue
+  if [ "$restore_status" -ne 0 ]; then
+    echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
   fi
 else
   echo "  ℹ️  Tap bottle already installed locally ✓"
@@ -627,6 +619,20 @@ if [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
   echo "  ⏸️  Deferring $pkg and the remaining dependency-ordered queue to the next run"
   DEFERRED+=("$pkg")
   break
+fi
+
+# Keep the generated bottle wrapper in place while deciding whether FFmpeg is
+# current. Replace it with the maintained source formula only for a real build.
+if [ "$pkg" = "ffmpeg" ]; then
+  tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"
+  if [ -d "$tap_formula_dir" ]; then
+    cp "$REPO_ROOT/scripts/ffmpeg.rb" "$tap_formula_dir/ffmpeg.rb"
+  else
+    echo "  ❌ Registered quyleanh/tap directory not found"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
 fi
 
 # Uninstall for a clean build
