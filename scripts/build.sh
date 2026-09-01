@@ -268,6 +268,43 @@ local receipt="$(brew --cellar)/$pkg/$version/INSTALL_RECEIPT.json"
 jq -e '.source.tap == "quyleanh/tap"' "$receipt" >/dev/null 2>&1
 }
 
+prepare_openssl_link_for_restore() {
+brew unlink openssl@1.1 2>/dev/null || true
+
+local openssl_link="$(brew --prefix)/bin/openssl"
+if [ -L "$openssl_link" ]; then
+  local openssl_link_target="$(readlink "$openssl_link")"
+  case "$openssl_link_target" in
+    */openssl@1.1/*)
+      echo "  ℹ️  Removing stale openssl@1.1 symlink: $openssl_link"
+      rm "$openssl_link"
+      ;;
+  esac
+fi
+}
+
+restore_tap_formula() {
+local pkg="$1"
+local version="$2"
+local formula_ref="$3"
+local restore_status=0
+
+# A GitHub runner may already have the same formula name from Homebrew Core.
+# Remove it before installing the tap-owned keg.
+brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
+if [ "$pkg" = "openssl@3" ]; then
+  prepare_openssl_link_for_restore
+fi
+
+brew install --build-from-source "$formula_ref" || restore_status=$?
+tap_formula_version_installed "$pkg" "$version" || return 1
+
+if [ "$restore_status" -ne 0 ]; then
+  echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
+fi
+return 0
+}
+
 package_needed_by_later_formula() {
 local dependency="$1"
 local consumer
@@ -567,38 +604,13 @@ if ! tap_formula_version_installed "$pkg" "$released_version"; then
     released_formula_ref="quyleanh/tap/$pkg"
   fi
   echo "  ℹ️  Restoring published bottle for dependents..."
-  # A GitHub runner may already have the same formula name from Homebrew Core.
-  # Remove it before installing the tap-owned keg. ORDERED guarantees that each
-  # declared dependency has already been restored and verified, so Homebrew's
-  # supported dependency check will find it installed without recursive work.
-  brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
-  # Intel GitHub runners may still have openssl@1.1 linked globally. Keep its
-  # keg installed, but remove those links so openssl@3 can link cleanly. Some
-  # runner images contain a stale symlink that `brew unlink` does not track, so
-  # remove only that exact conflict after verifying its target.
-  if [ "$pkg" = "openssl@3" ]; then
-    brew unlink openssl@1.1 2>/dev/null || true
-    openssl_link="$(brew --prefix)/bin/openssl"
-    if [ -L "$openssl_link" ]; then
-      openssl_link_target="$(readlink "$openssl_link")"
-      case "$openssl_link_target" in
-        */openssl@1.1/*)
-          echo "  ℹ️  Removing stale openssl@1.1 symlink: $openssl_link"
-          rm "$openssl_link"
-          ;;
-      esac
-    fi
-  fi
-  restore_status=0
-  brew install --build-from-source "$released_formula_ref" || restore_status=$?
-  if ! tap_formula_version_installed "$pkg" "$released_version"; then
+  # ORDERED guarantees that each declared dependency has already been restored
+  # and verified, so Homebrew will not recursively rebuild the dependency graph.
+  if ! restore_tap_formula "$pkg" "$released_version" "$released_formula_ref"; then
     echo "  ❌ Could not restore $released_formula_ref @ $released_version"
     FAILED+=("$pkg")
     echo ""
     continue
-  fi
-  if [ "$restore_status" -ne 0 ]; then
-    echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
   fi
 else
   echo "  ℹ️  Tap bottle already installed locally ✓"
@@ -752,7 +764,18 @@ BUILT+=("$pkg")
 # Immediately publish bottle to GitHub Release and push formula update to git
 publish_package "$pkg" "$pkg_version" "$ventura_bottle_path" "${ventura_json_path:-}"
 
-# Package stays installed in Cellar — next packages link against it for free
+# Core source builds are recorded as homebrew/core, but generated wrappers use
+# tap-qualified dependencies. Replace a newly built dependency with the bottle
+# that was just generated and uploaded so later formulae see quyleanh/tap.
+if package_needed_by_later_formula "$pkg"; then
+  echo "  ℹ️  Reinstalling newly published tap bottle for later dependents..."
+  if ! restore_tap_formula "$pkg" "$pkg_version" "quyleanh/tap/$pkg"; then
+    echo "  ❌ Could not activate quyleanh/tap/$pkg @ $pkg_version"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
+fi
 
 else
 echo "  ❌ Build failed: $pkg"
