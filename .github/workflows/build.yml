@@ -33,6 +33,10 @@ env:
 permissions:
   contents: write  # Required to commit formula updates and manage releases
 
+concurrency:
+  group: build-bottles-stable-release
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build Bottles (macOS Intel / Ventura 13+)
@@ -97,7 +101,7 @@ jobs:
 
       # Clean release assets orphaned by removed packages (formulae no longer in Formula/)
       - name: Cleanup orphaned release assets
-        if: always() && steps.build.outputs.BUILT_COUNT != '0'
+        if: always() && steps.build.outcome == 'success' && steps.build.outputs.BUILT_COUNT != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALLOW_RELEASE_CLEANUP: "true"

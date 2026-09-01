@@ -305,6 +305,23 @@ fi
 return 0
 }
 
+sync_registered_tap_formula() {
+local pkg="$1"
+local source_formula="$REPO_ROOT/Formula/${pkg}.rb"
+local tap_formula_dir
+
+tap_formula_dir="$(brew --repository quyleanh/tap 2>/dev/null)/Formula"
+if [ ! -f "$source_formula" ] || [ ! -d "$tap_formula_dir" ]; then
+  return 1
+fi
+
+# `brew tap --custom-remote` may use a separate checkout. Refresh that copy so
+# the next brew process resolves the formula version generated in this run.
+if ! cmp -s "$source_formula" "$tap_formula_dir/${pkg}.rb"; then
+  cp "$source_formula" "$tap_formula_dir/${pkg}.rb"
+fi
+}
+
 package_needed_by_later_formula() {
 local dependency="$1"
 local consumer
@@ -438,27 +455,6 @@ publish_package() {
   if [ -n "$GITHUB_REPOSITORY" ] && [ -n "$auth_token" ]; then
     export GH_TOKEN="$auth_token"
 
-    # Delete older version assets of this package from the GitHub Release
-    echo "  🔍 Checking for older release assets of $pkg to clean up..."
-    local remote_assets
-    remote_assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || echo "")
-
-    if [ -n "$remote_assets" ]; then
-      while IFS= read -r old_asset; do
-        [ -z "$old_asset" ] && continue
-        if [[ "$old_asset" == "${pkg}-"* || "$old_asset" == "${pkg}--"* ]]; then
-          local rest="${old_asset#"${pkg}-"}"
-          rest="${rest#"-"}"
-          if [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]] || [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.bottle ]]; then
-            if [ "$old_asset" != "$(basename "$bottle_file")" ] && [ "$old_asset" != "$(basename "$json_file")" ]; then
-              echo "  🗑️  Deleting older release asset: $old_asset"
-              gh release delete-asset stable "$old_asset" --repo "$GITHUB_REPOSITORY" -y 2>/dev/null || true
-            fi
-          fi
-        fi
-      done <<< "$remote_assets"
-    fi
-
     echo "  🚀 Uploading $pkg bottle to GitHub Release (stable)..."
 
     local upload_files=("$bottle_file")
@@ -466,7 +462,9 @@ publish_package() {
       upload_files+=("$json_file")
     fi
 
+    local upload_success=false
     if gh release upload stable "${upload_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber; then
+      upload_success=true
       echo "  ✅ Bottle uploaded to GitHub Release"
       echo "$pkg_version" > "$VERSIONS_CACHE_DIR/$pkg"
       echo "$(basename "$bottle_file")" >> "$RELEASED_ASSETS_FILE"
@@ -479,7 +477,9 @@ publish_package() {
     git config user.email "github-actions[bot]@users.noreply.github.com"
     git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE"
 
+    local formula_published=true
     if ! git diff --staged --quiet; then
+      formula_published=false
       echo "  💾 Committing & pushing formula update for $pkg..."
       git commit -m "chore(bottles): update $pkg ($pkg_version) [skip ci]
 
@@ -490,6 +490,7 @@ Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
       for attempt in 1 2 3; do
         if (git pull --rebase origin main 2>/dev/null || git pull --rebase 2>/dev/null) && (git push origin main 2>/dev/null || git push 2>/dev/null); then
           push_success=true
+          formula_published=true
           echo "  ✅ Pushed commit for $pkg"
           break
         fi
@@ -500,7 +501,41 @@ Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
         echo "  ⚠️  Could not push commit immediately. Will be pushed at workflow end."
       fi
     fi
+
+    # Keep the old asset available until both its replacement and the formula
+    # referencing that replacement are published. This avoids a transient 404
+    # for users and for later packages in this workflow.
+    local replacement_verified=false
+    if [ "$upload_success" = true ] && [ "$formula_published" = true ] &&
+      grep -Fq "$(basename "$bottle_file")" "$REPO_ROOT/Formula/${pkg}.rb"; then
+      replacement_verified=true
+      echo "  🔍 Checking for older release assets of $pkg to clean up..."
+      local remote_assets
+      remote_assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || echo "")
+
+      if [ -n "$remote_assets" ]; then
+        while IFS= read -r old_asset; do
+          [ -z "$old_asset" ] && continue
+          if [[ "$old_asset" == "${pkg}-"* || "$old_asset" == "${pkg}--"* ]]; then
+            local rest="${old_asset#"${pkg}-"}"
+            rest="${rest#"-"}"
+            if [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.(ventura|sequoia|sonoma|monterey|big_sur|intel[0-9_]*)\.bottle ]] || [[ "$rest" =~ ^([0-9]+|r[0-9]+)[0-9a-zA-Z_+.~-]*\.bottle ]]; then
+              if [ "$old_asset" != "$(basename "$bottle_file")" ] && [ "$old_asset" != "$(basename "$json_file")" ]; then
+                echo "  🗑️  Deleting older release asset: $old_asset"
+                gh release delete-asset stable "$old_asset" --repo "$GITHUB_REPOSITORY" -y 2>/dev/null || true
+              fi
+            fi
+          fi
+        done <<< "$remote_assets"
+      fi
+    else
+      echo "  ℹ️  Retaining older $pkg assets until replacement publication is verified"
+    fi
+
+    [ "$replacement_verified" = true ] || return 1
   fi
+
+  return 0
 }
 
 get_build_time_estimate() {
@@ -752,6 +787,7 @@ fi
 ventura_bottle_path="$OUTPUT_DIR/${pkg}-${pkg_version}.ventura.bottle.1.tar.gz"
 mv "$bottle_path" "$ventura_bottle_path"
 
+ventura_json_path=""
 json_path=$(find "$OUTPUT_DIR" -maxdepth 1 -name "${pkg}--*${pkg_version}*.json" | head -n 1)
 if [ -n "$json_path" ] && [ -f "$json_path" ]; then
   ventura_json_path="$OUTPUT_DIR/${pkg}-${pkg_version}.ventura.bottle.json"
@@ -761,14 +797,26 @@ fi
 echo "  ✅ Done: $pkg @ $pkg_version ($(du -h "$ventura_bottle_path" | cut -f1))"
 BUILT+=("$pkg")
 
-# Immediately publish bottle to GitHub Release and push formula update to git
-publish_package "$pkg" "$pkg_version" "$ventura_bottle_path" "${ventura_json_path:-}"
+# Immediately publish bottle to GitHub Release and push formula update to git.
+# Do not continue into dependent packages after a partial publication.
+if ! publish_package "$pkg" "$pkg_version" "$ventura_bottle_path" "$ventura_json_path"; then
+  echo "  ❌ Publication was not fully verified for $pkg"
+  FAILED+=("$pkg")
+  echo ""
+  continue
+fi
 
 # Core source builds are recorded as homebrew/core, but generated wrappers use
 # tap-qualified dependencies. Replace a newly built dependency with the bottle
 # that was just generated and uploaded so later formulae see quyleanh/tap.
 if package_needed_by_later_formula "$pkg"; then
   echo "  ℹ️  Reinstalling newly published tap bottle for later dependents..."
+  if ! sync_registered_tap_formula "$pkg"; then
+    echo "  ❌ Could not refresh the registered tap formula for $pkg"
+    FAILED+=("$pkg")
+    echo ""
+    continue
+  fi
   if ! restore_tap_formula "$pkg" "$pkg_version" "quyleanh/tap/$pkg"; then
     echo "  ❌ Could not activate quyleanh/tap/$pkg @ $pkg_version"
     FAILED+=("$pkg")
