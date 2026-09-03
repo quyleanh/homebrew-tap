@@ -2,16 +2,16 @@
 class Sdl2Compat < Formula
   desc "SDL2 compatibility layer that uses SDL3 behind the scenes"
   homepage "https://github.com/libsdl-org/sdl2-compat"
-  version "2.32.70"
+  version "2.32.72"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2-compat-2.32.70.ventura.bottle.1.tar.gz"
-  sha256 "de3f1f6b9188820adff2156943f5c559cf85ba56615c88210aea3e7b133b6ae2"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl2-compat-2.32.72.ventura.bottle.1.tar.gz"
+  sha256 "e2ffd1a3b2e9dcafa584aa64b3c8279b29a4736abcc24033ebb1b4ef9704c1b3"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "de3f1f6b9188820adff2156943f5c559cf85ba56615c88210aea3e7b133b6ae2"
+    sha256 cellar: :any_skip_relocation, ventura: "e2ffd1a3b2e9dcafa584aa64b3c8279b29a4736abcc24033ebb1b4ef9704c1b3"
   end
 
   depends_on "quyleanh/tap/sdl3"
