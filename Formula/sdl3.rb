@@ -2,16 +2,16 @@
 class Sdl3 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://libsdl.org/"
-  version "3.4.14"
+  version "3.4.16"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3-3.4.14.ventura.bottle.1.tar.gz"
-  sha256 "5a78cf960d66e35b4a1b8f840c7dd98d5d1bafc74fd4f6b816d119f44f826bef"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sdl3-3.4.16.ventura.bottle.1.tar.gz"
+  sha256 "a2d95ed784d3a0a0e6bae1477dbedaefa69e26f083353b4854db13bd75368a9b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "5a78cf960d66e35b4a1b8f840c7dd98d5d1bafc74fd4f6b816d119f44f826bef"
+    sha256 cellar: :any_skip_relocation, ventura: "a2d95ed784d3a0a0e6bae1477dbedaefa69e26f083353b4854db13bd75368a9b"
   end
 
 
