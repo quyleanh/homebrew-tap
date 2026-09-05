@@ -128,6 +128,83 @@ done
 echo "📝 Resolved list written to: packages_resolved.txt"
 echo ""
 
+NEEDED_DEPENDENCIES_FILE="$(mktemp)"
+
+compute_needed_dependencies() {
+  echo "🔍 Precomputing needed dependencies for later builds..."
+  local deps_file
+  deps_file="$(mktemp)"
+  HOMEBREW_NO_ENV_HINTS=1 brew deps --for-each --include-build "${ORDERED[@]}" 2>/dev/null > "$deps_file" || true
+
+  awk -v repo="$REPO_ROOT" -v deps_file="$deps_file" '
+    BEGIN {
+      while ((getline line < deps_file) > 0) {
+        idx = index(line, ":")
+        if (idx > 0) {
+          c = substr(line, 1, idx - 1)
+          rest = substr(line, idx + 1)
+          split(rest, words, " ")
+          for (w in words) {
+            dep_map[c, words[w]] = 1
+          }
+        }
+      }
+      close(deps_file)
+    }
+    {
+      ordered[NR] = $1
+    }
+    END {
+      for (i = 1; i <= NR; i++) {
+        c = ordered[i]
+        ffile = repo "/Formula/" c ".rb"
+        while ((getline fline < ffile) > 0) {
+          if (fline ~ /depends_on "quyleanh\/tap\//) {
+            sub(/.*depends_on "quyleanh\/tap\//, "", fline)
+            sub(/".*/, "", fline)
+            dep_map[c, fline] = 1
+          }
+        }
+        close(ffile)
+        if (c == "ffmpeg") {
+          sfile = repo "/scripts/ffmpeg.rb"
+          while ((getline sline < sfile) > 0) {
+            if (sline ~ /depends_on "/) {
+              sub(/.*depends_on "/, "", sline)
+              sub(/".*/, "", sline)
+              dep_map[c, sline] = 1
+            }
+          }
+          close(sfile)
+        }
+      }
+
+      for (i = 1; i <= NR; i++) {
+        d = ordered[i]
+        needed = 0
+        for (j = i + 1; j <= NR; j++) {
+          c = ordered[j]
+          if ((c, d) in dep_map) {
+            needed = 1
+            break
+          }
+        }
+        if (needed) {
+          print d
+        }
+      }
+    }
+  ' <(printf '%s\n' "${ORDERED[@]}") > "$NEEDED_DEPENDENCIES_FILE"
+
+  rm -f "$deps_file"
+  local count
+  count=$(wc -l < "$NEEDED_DEPENDENCIES_FILE" | tr -d ' ')
+  echo "  ✅ Identified $count required dependency packages"
+  echo ""
+}
+
+compute_needed_dependencies
+
 # ──────────────────────────────────────────────────────────────
 
 # Step 3: Version cache (temp files, bash 3.2 compatible)
@@ -283,28 +360,6 @@ if [ -L "$openssl_link" ]; then
 fi
 }
 
-restore_tap_formula() {
-local pkg="$1"
-local version="$2"
-local formula_ref="$3"
-local restore_status=0
-
-# A GitHub runner may already have the same formula name from Homebrew Core.
-# Remove it before installing the tap-owned keg.
-brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
-if [ "$pkg" = "openssl@3" ]; then
-  prepare_openssl_link_for_restore
-fi
-
-brew install --build-from-source "$formula_ref" || restore_status=$?
-tap_formula_version_installed "$pkg" "$version" || return 1
-
-if [ "$restore_status" -ne 0 ]; then
-  echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
-fi
-return 0
-}
-
 sync_registered_tap_formula() {
 local pkg="$1"
 local source_formula="$REPO_ROOT/Formula/${pkg}.rb"
@@ -322,24 +377,41 @@ if ! cmp -s "$source_formula" "$tap_formula_dir/${pkg}.rb"; then
 fi
 }
 
+restore_tap_formula() {
+local pkg="$1"
+local version="$2"
+local formula_ref="$3"
+local restore_status=0
+
+# A GitHub runner may already have the same formula name from Homebrew Core.
+# Remove it before installing the tap-owned keg.
+brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
+if [ "$pkg" = "openssl@3" ]; then
+  prepare_openssl_link_for_restore
+fi
+
+if [[ "$formula_ref" == "quyleanh/tap/"* ]]; then
+  sync_registered_tap_formula "$pkg" || true
+fi
+
+brew install --build-from-source "$formula_ref" || restore_status=$?
+tap_formula_version_installed "$pkg" "$version" || return 1
+
+if [ "$restore_status" -ne 0 ]; then
+  echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
+fi
+return 0
+}
+
 package_needed_by_later_formula() {
 local dependency="$1"
-local consumer
-local formula_file
-local dependency_seen=false
 
-for consumer in "${ORDERED[@]}"; do
-  if [ "$dependency_seen" = true ]; then
-    formula_file="$REPO_ROOT/Formula/${consumer}.rb"
-    if [ -f "$formula_file" ] &&
-      grep -Fq "depends_on \"quyleanh/tap/$dependency\"" "$formula_file"; then
-      return 0
-    fi
-  fi
-  [ "$consumer" = "$dependency" ] && dependency_seen=true
-done
+if [ -s "$NEEDED_DEPENDENCIES_FILE" ]; then
+  grep -qFx "$dependency" "$NEEDED_DEPENDENCIES_FILE" 2>/dev/null
+  return $?
+fi
 
-return 1
+return 0
 }
 
 ensure_pkgconf_opt_aliases() {
@@ -833,7 +905,7 @@ fi
 echo ""
 done
 
-rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE"
+rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE" "$NEEDED_DEPENDENCIES_FILE"
 
 # ──────────────────────────────────────────────────────────────
 
