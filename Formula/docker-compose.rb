@@ -6,12 +6,12 @@ class DockerCompose < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-compose-5.5.1.ventura.bottle.1.tar.gz"
-  sha256 "67d0d5481679758d1e1894ba9196fc8b3a34518b44299e52396bb506c1611e06"
+  sha256 "beb4a1dc957437860a88b05485b79ee2f4f30f0f16601058e645c6eec3e1f980"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "67d0d5481679758d1e1894ba9196fc8b3a34518b44299e52396bb506c1611e06"
+    sha256 cellar: :any_skip_relocation, ventura: "beb4a1dc957437860a88b05485b79ee2f4f30f0f16601058e645c6eec3e1f980"
   end
 
 
