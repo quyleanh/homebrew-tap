@@ -2,16 +2,16 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  version "1.75.0"
+  version "1.75.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone-1.75.0.ventura.bottle.1.tar.gz"
-  sha256 "72ecf9acd96ad317910092863e87e85617381c76e25d52f88b21bc1ba29b8738"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone-1.75.1.ventura.bottle.1.tar.gz"
+  sha256 "c48b239d508fd884018c1bb17e627197af48df9bb9155d5a9ff2f4c426104e56"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "72ecf9acd96ad317910092863e87e85617381c76e25d52f88b21bc1ba29b8738"
+    sha256 cellar: :any_skip_relocation, ventura: "c48b239d508fd884018c1bb17e627197af48df9bb9155d5a9ff2f4c426104e56"
   end
 
 
