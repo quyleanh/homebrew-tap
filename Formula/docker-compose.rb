@@ -2,16 +2,16 @@
 class DockerCompose < Formula
   desc "Isolated development environments using Docker"
   homepage "https://docs.docker.com/compose/"
-  version "5.5.0"
+  version "5.5.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-compose-5.5.0.ventura.bottle.1.tar.gz"
-  sha256 "8abc6a59cf67de264e6579960e403db1d801b4fe9e64d36d08eb36a2e5a3a633"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-compose-5.5.1.ventura.bottle.1.tar.gz"
+  sha256 "67d0d5481679758d1e1894ba9196fc8b3a34518b44299e52396bb506c1611e06"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "8abc6a59cf67de264e6579960e403db1d801b4fe9e64d36d08eb36a2e5a3a633"
+    sha256 cellar: :any_skip_relocation, ventura: "67d0d5481679758d1e1894ba9196fc8b3a34518b44299e52396bb506c1611e06"
   end
 
 
@@ -27,12 +27,29 @@ class DockerCompose < Formula
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
+        magic = File.binread(f, 4)
+        if magic && [0xfeedfacf, 0xcafebabe, 0xfeedface, 0xbebafeca].include?(magic.unpack1("N"))
+          loads = `otool -L "#{f}" 2>/dev/null`
+          if loads.include?("@@HOMEBREW")
+            File.chmod(0755, f)
+            dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+            if dylib_id && dylib_id.include?("@@HOMEBREW_PREFIX@@")
+              new_id = dylib_id.gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              system "install_name_tool", "-id", new_id, f
+            end
+            loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                             .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                system "install_name_tool", "-change", dep, new_dep, f
+              end
+            end
+          end
+        elsif magic && !magic.include?("\x00")
           text = File.read(f, encoding: "UTF-8")
           if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
             text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
