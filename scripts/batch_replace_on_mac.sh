@@ -70,7 +70,48 @@ for pkg in $FORMULAS; do
   echo ">> Linking $pkg..."
   brew unlink "$pkg" 2>/dev/null || true
   brew link --overwrite "$pkg" || echo "[-] Warning: Failed to link $pkg"
+
+  # Relocate any unexpanded placeholders in installed binaries/dylibs
+  keg_dir="$(brew --cellar)/$pkg"
+  if [ -d "$keg_dir" ]; then
+    for f in $(find "$keg_dir" -type f \( -name "*.dylib" -o -perm +111 \) 2>/dev/null); do
+      [ -L "$f" ] && continue
+      loads=$(otool -L "$f" 2>/dev/null | grep "@@HOMEBREW" || true)
+      if [ -n "$loads" ]; then
+        echo ">> Relocating Mach-O placeholders in $f..."
+        chmod +w "$f" 2>/dev/null || true
+        dylib_id=$(otool -D "$f" 2>/dev/null | tail -n 1)
+        if [[ "$dylib_id" == *"@@HOMEBREW_PREFIX@@"* ]]; then
+          new_id="${dylib_id//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
+          install_name_tool -id "$new_id" "$f" 2>/dev/null || true
+        fi
+        while read -r bad_path; do
+          [ -z "$bad_path" ] && continue
+          good_path="${bad_path//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
+          good_path="${good_path//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
+          install_name_tool -change "$bad_path" "$good_path" "$f" 2>/dev/null || true
+        done < <(otool -L "$f" 2>/dev/null | grep "@@HOMEBREW" | awk '{print $1}')
+        chmod -w "$f" 2>/dev/null || true
+      fi
+    done
+  fi
 done
+
+echo ""
+echo "=== Verifying system linkage ==="
+unrelocated_found=0
+for lib in $(find /usr/local/opt/*/lib -name "*.dylib" -type f 2>/dev/null); do
+  if otool -L "$lib" 2>/dev/null | grep -q "@@HOMEBREW"; then
+    echo "[-] Warning: Found unrelocated dylib: $lib"
+    unrelocated_found=1
+  fi
+done
+
+if [ "$unrelocated_found" -eq 0 ]; then
+  echo "✅ All dynamic libraries are properly relocated."
+else
+  echo "⚠️ Some libraries still need relocation. Run a scan with install_name_tool."
+fi
 
 echo ""
 echo "=== Batch replacement finished! ==="

@@ -40,6 +40,14 @@ for json_file in "${JSON_FILES[@]}"; do
   bottle_rebuild=$(jq -r --arg pkg "$pkg_key" '.[$pkg].bottle.rebuild // 0' "$json_file")
   homepage=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.homepage' "$json_file")
   desc=$(jq -r --arg pkg "$pkg_key" '.[$pkg].formula.desc' "$json_file")
+  cellar=$(jq -r --arg pkg "$pkg_key" '.[$pkg].bottle.cellar // (.[$pkg].bottle.tags | to_entries[0].value.cellar) // "any"' "$json_file")
+  if [ "$cellar" = "any" ] || [ "$cellar" = ":any" ]; then
+    cellar_ruby=":any"
+  elif [ "$cellar" = "any_skip_relocation" ] || [ "$cellar" = ":any_skip_relocation" ]; then
+    cellar_ruby=":any_skip_relocation"
+  else
+    cellar_ruby="\"$cellar\""
+  fi
 
   # 2. Handle Class Name conversion (e.g., Python@3.14 -> PythonAT314, ada-url -> AdaUrl)
   class_name=$(ruby -e '
@@ -126,7 +134,7 @@ class ${class_name} < Formula
   bottle do
     root_url "$RELEASE_URL"
 $bottle_rebuild_ruby
-    sha256 cellar: :any_skip_relocation, ventura: "$sha256"
+    sha256 cellar: ${cellar_ruby}, ventura: "$sha256"
   end
 
 ${deps}
@@ -142,12 +150,29 @@ ${deps}
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
+        magic = File.binread(f, 4)
+        if magic && [0xfeedfacf, 0xcafebabe, 0xfeedface, 0xbebafeca].include?(magic.unpack1("N"))
+          loads = \`otool -L "#{f}" 2>/dev/null\`
+          if loads.include?("@@HOMEBREW")
+            File.chmod(0755, f)
+            dylib_id = \`otool -D "#{f}" 2>/dev/null\`.lines.last&.strip
+            if dylib_id && dylib_id.include?("@@HOMEBREW_PREFIX@@")
+              new_id = dylib_id.gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              system "install_name_tool", "-id", new_id, f
+            end
+            loads.scan(/^\\s+([^\\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                             .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                system "install_name_tool", "-change", dep, new_dep, f
+              end
+            end
+          end
+        elsif magic && !magic.include?("\x00")
           text = File.read(f, encoding: "UTF-8")
           if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
             text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
