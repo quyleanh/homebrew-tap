@@ -2,16 +2,16 @@
 class Simdjson < Formula
   desc "SIMD-accelerated C++ JSON parser"
   homepage "https://simdjson.org"
-  version "4.6.10"
+  version "4.6.11"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson-4.6.10.ventura.bottle.1.tar.gz"
-  sha256 "8752ed861791e27765075fc10abc4fc70b2baeca6e57e8ff2b4a4f2222bccb7a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdjson-4.6.11.ventura.bottle.1.tar.gz"
+  sha256 "5d6b8cfd3746df0c0c40633ebe14a593d0441170bb37380272f6fbaf471cb268"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "8752ed861791e27765075fc10abc4fc70b2baeca6e57e8ff2b4a4f2222bccb7a"
+    sha256 cellar: :any, ventura: "5d6b8cfd3746df0c0c40633ebe14a593d0441170bb37380272f6fbaf471cb268"
   end
 
 
@@ -27,12 +27,29 @@ class Simdjson < Formula
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
+        magic = File.binread(f, 4)
+        if magic && [0xfeedfacf, 0xcafebabe, 0xfeedface, 0xbebafeca].include?(magic.unpack1("N"))
+          loads = `otool -L "#{f}" 2>/dev/null`
+          if loads.include?("@@HOMEBREW")
+            File.chmod(0755, f)
+            dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+            if dylib_id && dylib_id.include?("@@HOMEBREW_PREFIX@@")
+              new_id = dylib_id.gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              system "install_name_tool", "-id", new_id, f
+            end
+            loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                             .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                system "install_name_tool", "-change", dep, new_dep, f
+              end
+            end
+          end
+        elsif magic && !magic.include?("\x00")
           text = File.read(f, encoding: "UTF-8")
           if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
             text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
