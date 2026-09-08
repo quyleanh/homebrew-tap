@@ -3,19 +3,22 @@ class YtDlp < Formula
   desc "Feature-rich command-line audio/video downloader"
   homepage "https://github.com/yt-dlp/yt-dlp"
   version "2026.8.19"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.8.19.ventura.bottle.1.tar.gz"
-  sha256 "f50cb67ffa135c171b0f740f0ea2e9264258d70b6d2e08f10a8b435eb1e8cba5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.8.19_1.ventura.bottle.1.tar.gz"
+  sha256 "9b6f2d793357c25439db00f725283fdbb3dce6fe3d008a0d3f1f2c9eb12ba372"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "f50cb67ffa135c171b0f740f0ea2e9264258d70b6d2e08f10a8b435eb1e8cba5"
+    sha256 cellar: :any_skip_relocation, ventura: "9b6f2d793357c25439db00f725283fdbb3dce6fe3d008a0d3f1f2c9eb12ba372"
   end
 
   depends_on "quyleanh/tap/certifi"
+  depends_on "quyleanh/tap/cffi"
   depends_on "quyleanh/tap/deno"
+  depends_on "quyleanh/tap/pycparser"
   depends_on "quyleanh/tap/python@3.14"
 
   def install
@@ -29,12 +32,29 @@ class YtDlp < Formula
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
+        magic = File.binread(f, 4)
+        if magic && [0xfeedfacf, 0xcafebabe, 0xfeedface, 0xbebafeca].include?(magic.unpack1("N"))
+          loads = `otool -L "#{f}" 2>/dev/null`
+          if loads.include?("@@HOMEBREW")
+            File.chmod(0755, f)
+            dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+            if dylib_id && dylib_id.include?("@@HOMEBREW_PREFIX@@")
+              new_id = dylib_id.gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              system "install_name_tool", "-id", new_id, f
+            end
+            loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                             .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                system "install_name_tool", "-change", dep, new_dep, f
+              end
+            end
+          end
+        elsif magic && !magic.include?("\x00")
           text = File.read(f, encoding: "UTF-8")
           if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
             text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
