@@ -31,17 +31,82 @@ class PythonAT314 < Formula
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
+    # Homebrew's relocation vocabulary is PREFIX/CELLAR/LIBRARY/REPOSITORY; bottles do
+    # carry LIBRARY (python bakes it into _sysconfigdata, the file pip reads for
+    # PKG_CONFIG_LIBDIR), so substitute every placeholder, not just the first two.
+    placeholders = {
+      "@@HOMEBREW_PREFIX@@" => HOMEBREW_PREFIX.to_s,
+      "@@HOMEBREW_CELLAR@@" => HOMEBREW_CELLAR.to_s,
+      "@@HOMEBREW_LIBRARY@@" => HOMEBREW_LIBRARY.to_s,
+      "@@HOMEBREW_REPOSITORY@@" => HOMEBREW_REPOSITORY.to_s,
+      # See Library/Homebrew/keg_relocate.rb (PERL is deterministic; JAVA is resolved
+      # per openjdk dependency at bottle time, so it cannot be resolved generically.)
+      "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
+    }
+    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+
+    macho_magics = [
+      0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
+      0xfeedface, 0xcefaedfe, # 32-bit MH_MAGIC & MH_CIGAM
+      0xcafebabe, 0xbebafeca, # Universal Fat binary (BE & LE)
+      0xcafebabf, 0xbfbafeca  # 64-bit Fat binary (BE & LE)
+    ]
+
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
-          text = File.read(f, encoding: "UTF-8")
-          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
-            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
-            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
-            File.write(f, text, encoding: "UTF-8")
+        magic = File.binread(f, 4) rescue nil
+        next unless magic
+
+        if macho_magics.include?(magic.unpack1("N"))
+          loads = `otool -L "#{f}" 2>/dev/null`
+          dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+          otool_l = `otool -l "#{f}" 2>/dev/null`
+          modified = false
+
+          if loads.include?("@@HOMEBREW") || (dylib_id && dylib_id.include?("@@HOMEBREW")) || (otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW"))
+            File.chmod(File.stat(f).mode | 0755, f)
+            if dylib_id && dylib_id.include?("@@HOMEBREW")
+              new_id = sub_ph.call(dylib_id)
+              system "install_name_tool", "-id", new_id, f
+              modified = true
+            end
+            loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = sub_ph.call(dep)
+                system "install_name_tool", "-change", dep, new_dep, f
+                modified = true
+              end
+            end
+            if otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW")
+              otool_l.scan(/cmd LC_RPATH\s+cmdsize \d+\s+path ([^\s\n]+)/).flatten.each do |rpath|
+                if rpath.include?("@@HOMEBREW")
+                  new_rpath = sub_ph.call(rpath)
+                  system "install_name_tool", "-rpath", rpath, new_rpath, f
+                  modified = true
+                end
+              end
+            end
+            if modified
+              system "codesign", "-f", "-s", "-", f
+            end
+          end
+        else
+          sample = File.binread(f, 4096) rescue nil
+          if sample && !sample.include?("\x00")
+            text = File.binread(f)
+            if placeholders.any? { |k, _| text.include?(k) }
+              File.chmod(File.stat(f).mode | 0200, f)
+              File.binwrite(f, sub_ph.call(text))
+              # A stale .pyc embeds the same placeholder and cannot be rewritten in
+              # place; it would shadow the fixed source at import time, so drop the
+              # cache entry and let Python regenerate it on first import.
+              stem = File.basename(f, ".py")
+              Dir[File.join(File.dirname(f), "__pycache__", "#{stem}.cpython-*.pyc")].each do |pyc|
+                FileUtils.rm_f(pyc)
+              end
+            end
           end
         end
       rescue
