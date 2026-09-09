@@ -31,33 +31,65 @@ class PythonAT313 < Formula
     end
 
     # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
+    macho_magics = [
+      0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
+      0xfeedface, 0xcefaedfe, # 32-bit MH_MAGIC & MH_CIGAM
+      0xcafebabe, 0xbebafeca, # Universal Fat binary (BE & LE)
+      0xcafebabf, 0xbfbafeca  # 64-bit Fat binary (BE & LE)
+    ]
+
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        magic = File.binread(f, 4)
-        if magic && [0xfeedfacf, 0xcafebabe, 0xfeedface, 0xbebafeca].include?(magic.unpack1("N"))
+        magic = File.binread(f, 4) rescue nil
+        next unless magic
+
+        if macho_magics.include?(magic.unpack1("N"))
           loads = `otool -L "#{f}" 2>/dev/null`
-          if loads.include?("@@HOMEBREW")
-            File.chmod(0755, f)
-            dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
-            if dylib_id && dylib_id.include?("@@HOMEBREW_PREFIX@@")
-              new_id = dylib_id.gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+          dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+          otool_l = `otool -l "#{f}" 2>/dev/null`
+          modified = false
+
+          if loads.include?("@@HOMEBREW") || (dylib_id && dylib_id.include?("@@HOMEBREW")) || (otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW"))
+            File.chmod(File.stat(f).mode | 0755, f)
+            if dylib_id && dylib_id.include?("@@HOMEBREW")
+              new_id = dylib_id.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                               .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
               system "install_name_tool", "-id", new_id, f
+              modified = true
             end
             loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
               if dep.include?("@@HOMEBREW")
                 new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
                              .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
                 system "install_name_tool", "-change", dep, new_dep, f
+                modified = true
               end
             end
+            if otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW")
+              otool_l.scan(/cmd LC_RPATH\s+cmdsize \d+\s+path ([^\s\n]+)/).flatten.each do |rpath|
+                if rpath.include?("@@HOMEBREW")
+                  new_rpath = rpath.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                                   .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                  system "install_name_tool", "-rpath", rpath, new_rpath, f
+                  modified = true
+                end
+              end
+            end
+            if modified
+              system "codesign", "-f", "-s", "-", f
+            end
           end
-        elsif magic && !magic.include?("\x00")
-          text = File.read(f, encoding: "UTF-8")
-          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
-            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
-            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
-            File.write(f, text, encoding: "UTF-8")
+        else
+          sample = File.binread(f, 4096) rescue nil
+          if sample && !sample.include?("\x00")
+            text = File.binread(f)
+            if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+              File.chmod(File.stat(f).mode | 0200, f)
+              text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+              text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              File.binwrite(f, text)
+            end
           end
         end
       rescue

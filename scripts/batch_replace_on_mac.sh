@@ -71,18 +71,21 @@ for pkg in $FORMULAS; do
   brew unlink "$pkg" 2>/dev/null || true
   brew link --overwrite "$pkg" || echo "[-] Warning: Failed to link $pkg"
 
-  # Relocate any unexpanded placeholders in installed binaries/dylibs
+  # Relocate any unexpanded placeholders in installed binaries/dylibs/text files
   keg_dir="$(brew --cellar)/$pkg"
   if [ -d "$keg_dir" ]; then
-    for f in $(find "$keg_dir" -type f \( -name "*.dylib" -o -perm +111 \) 2>/dev/null); do
+    # 1. Mach-O binaries, dylibs, and Python .so bundles
+    for f in $(find "$keg_dir" -type f \( -name "*.dylib" -o -name "*.so" -o -perm +111 \) 2>/dev/null); do
       [ -L "$f" ] && continue
       loads=$(otool -L "$f" 2>/dev/null | grep "@@HOMEBREW" || true)
-      if [ -n "$loads" ]; then
+      dylib_id=$(otool -D "$f" 2>/dev/null | tail -n 1)
+      rpath_match=$(otool -l "$f" 2>/dev/null | grep -A 2 "cmd LC_RPATH" | grep "@@HOMEBREW" || true)
+      if [ -n "$loads" ] || [[ "$dylib_id" == *"@@HOMEBREW"* ]] || [ -n "$rpath_match" ]; then
         echo ">> Relocating Mach-O placeholders in $f..."
         chmod +w "$f" 2>/dev/null || true
-        dylib_id=$(otool -D "$f" 2>/dev/null | tail -n 1)
-        if [[ "$dylib_id" == *"@@HOMEBREW_PREFIX@@"* ]]; then
+        if [[ "$dylib_id" == *"@@HOMEBREW"* ]]; then
           new_id="${dylib_id//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
+          new_id="${new_id//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
           install_name_tool -id "$new_id" "$f" 2>/dev/null || true
         fi
         while read -r bad_path; do
@@ -91,7 +94,29 @@ for pkg in $FORMULAS; do
           good_path="${good_path//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
           install_name_tool -change "$bad_path" "$good_path" "$f" 2>/dev/null || true
         done < <(otool -L "$f" 2>/dev/null | grep "@@HOMEBREW" | awk '{print $1}')
-        chmod -w "$f" 2>/dev/null || true
+        if [ -n "$rpath_match" ]; then
+          while read -r bad_rpath; do
+            [ -z "$bad_rpath" ] && continue
+            good_rpath="${bad_rpath//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
+            good_rpath="${good_rpath//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
+            install_name_tool -rpath "$bad_rpath" "$good_rpath" "$f" 2>/dev/null || true
+          done < <(otool -l "$f" 2>/dev/null | awk '/cmd LC_RPATH/{flag=1; next} flag && /path /{if ($2 ~ /@@HOMEBREW/) print $2; flag=0}')
+        fi
+        # Re-sign with ad-hoc signature so macOS kernel won't SIGKILL it
+        codesign -f -s - "$f" 2>/dev/null || true
+      fi
+    done
+
+    # 2. Text files (shebangs, pc files, config scripts)
+    for tf in $(find "$keg_dir" -type f \( -path "*/bin/*" -o -path "*/lib/pkgconfig/*" -o -name "*.py" -o -name "Makefile" \) 2>/dev/null); do
+      [ -L "$tf" ] && continue
+      if grep -q "@@HOMEBREW" "$tf" 2>/dev/null; then
+        echo ">> Relocating text placeholders in $tf..."
+        chmod +w "$tf" 2>/dev/null || true
+        sed -i '' \
+          -e "s|@@HOMEBREW_CELLAR@@|$(brew --cellar)|g" \
+          -e "s|@@HOMEBREW_PREFIX@@|$(brew --prefix)|g" \
+          "$tf" 2>/dev/null || true
       fi
     done
   fi
