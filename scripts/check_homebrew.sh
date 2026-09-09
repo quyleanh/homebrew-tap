@@ -106,4 +106,22 @@ else
     fi
 fi
 
+# 6. Check for unresolved Homebrew relocation placeholders
+#    A poured keg must not contain any @@HOMEBREW_*@@ token left over. They are
+#    substituted at install time; anything still standing is a broken install
+#    (a bad shebang, a wrong pkg-config path, ...).
+echo ">> Checking for unresolved @@HOMEBREW placeholders..."
+placeholder_found=0
+for dir in /usr/local/Cellar /usr/local/opt /usr/local/share /usr/local/etc /usr/local/lib /usr/local/bin /usr/local/sbin; do
+    [ -d "$dir" ] || continue
+    while IFS= read -r file; do
+        [ -n "$file" ] || continue
+        echo "   [!] $file"
+        placeholder_found=1
+    done < <(grep -rIl "@@HOMEBREW" "$dir" 2>/dev/null)
+done
+if [ "$placeholder_found" -eq 0 ]; then
+    echo "   [OK] No unresolved placeholders."
+fi
+
 echo "=== Audit Finished ==="

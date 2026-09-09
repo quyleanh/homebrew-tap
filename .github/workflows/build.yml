@@ -68,6 +68,12 @@ jobs:
           echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
           echo "HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1" >> $GITHUB_ENV
           echo "HOMEBREW_NO_ENV_HINTS=1" >> $GITHUB_ENV
+          # Homebrew does not support Intel runners and prints an "You are using macOS on
+          # Intel" banner on stderr for every brew call, which the runner promotes into an
+          # error annotation on failing steps. check_for_unsupported_macos skips itself for
+          # developers. Side effect to know about: HOMEBREW_DEVELOPER also promotes
+          # deprecation warnings into hard errors, which is what we want in CI anyway.
+          echo "HOMEBREW_DEVELOPER=1" >> $GITHUB_ENV
 
       - name: Update Homebrew
         run: brew update --quiet
