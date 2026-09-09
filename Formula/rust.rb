@@ -2,16 +2,16 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  version "1.98.0"
+  version "1.98.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.98.0.ventura.bottle.1.tar.gz"
-  sha256 "b928a79cbcfd9c0d38f61bafb9cbb4b9efc2154e2ce3cb253416202dde5fd299"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.98.1.ventura.bottle.1.tar.gz"
+  sha256 "426ff7ca20cd6ed0de414450a83ec9b6f82833fab69a7d817d3eb8c712ef2a40"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "b928a79cbcfd9c0d38f61bafb9cbb4b9efc2154e2ce3cb253416202dde5fd299"
+    sha256 cellar: :any, ventura: "426ff7ca20cd6ed0de414450a83ec9b6f82833fab69a7d817d3eb8c712ef2a40"
   end
 
   depends_on "quyleanh/tap/libgit2"
@@ -32,17 +32,66 @@ class Rust < Formula
       prefix.install Dir["*"]
     end
 
-    # Resolve Homebrew placeholders in poured files (since we bypass bottle relocation)
+    # Resolve Homebrew placeholders in poured files (both Mach-O binaries and text files)
+    macho_magics = [
+      0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
+      0xfeedface, 0xcefaedfe, # 32-bit MH_MAGIC & MH_CIGAM
+      0xcafebabe, 0xbebafeca, # Universal Fat binary (BE & LE)
+      0xcafebabf, 0xbfbafeca  # 64-bit Fat binary (BE & LE)
+    ]
+
     Dir.glob("#{prefix}/**/*").each do |f|
       next unless File.file?(f) && !File.symlink?(f)
       begin
-        content = File.binread(f, 1024)
-        if content && !content.include?("\x00")
-          text = File.read(f, encoding: "UTF-8")
-          if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
-            text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
-            text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
-            File.write(f, text, encoding: "UTF-8")
+        magic = File.binread(f, 4) rescue nil
+        next unless magic
+
+        if macho_magics.include?(magic.unpack1("N"))
+          loads = `otool -L "#{f}" 2>/dev/null`
+          dylib_id = `otool -D "#{f}" 2>/dev/null`.lines.last&.strip
+          otool_l = `otool -l "#{f}" 2>/dev/null`
+          modified = false
+
+          if loads.include?("@@HOMEBREW") || (dylib_id && dylib_id.include?("@@HOMEBREW")) || (otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW"))
+            File.chmod(File.stat(f).mode | 0755, f)
+            if dylib_id && dylib_id.include?("@@HOMEBREW")
+              new_id = dylib_id.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                               .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              system "install_name_tool", "-id", new_id, f
+              modified = true
+            end
+            loads.scan(/^\s+([^\s]+)/).flatten.each do |dep|
+              if dep.include?("@@HOMEBREW")
+                new_dep = dep.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                             .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                system "install_name_tool", "-change", dep, new_dep, f
+                modified = true
+              end
+            end
+            if otool_l.include?("cmd LC_RPATH") && otool_l.include?("@@HOMEBREW")
+              otool_l.scan(/cmd LC_RPATH\s+cmdsize \d+\s+path ([^\s\n]+)/).flatten.each do |rpath|
+                if rpath.include?("@@HOMEBREW")
+                  new_rpath = rpath.gsub("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+                                   .gsub("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+                  system "install_name_tool", "-rpath", rpath, new_rpath, f
+                  modified = true
+                end
+              end
+            end
+            if modified
+              system "codesign", "-f", "-s", "-", f
+            end
+          end
+        else
+          sample = File.binread(f, 4096) rescue nil
+          if sample && !sample.include?("\x00")
+            text = File.binread(f)
+            if text.include?("@@HOMEBREW_CELLAR@@") || text.include?("@@HOMEBREW_PREFIX@@")
+              File.chmod(File.stat(f).mode | 0200, f)
+              text.gsub!("@@HOMEBREW_CELLAR@@", HOMEBREW_CELLAR.to_s)
+              text.gsub!("@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX.to_s)
+              File.binwrite(f, text)
+            end
           end
         end
       rescue
