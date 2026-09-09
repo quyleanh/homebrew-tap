@@ -4,6 +4,24 @@ set -euo pipefail
 
 TAP_NAME="quyleanh/tap"
 
+# Homebrew's relocation vocabulary: bottles can carry any of these placeholders
+# (python bakes @@HOMEBREW_LIBRARY@@ into _sysconfigdata, which is what pip reads
+# for PKG_CONFIG_LIBDIR), so expand all of them, not just PREFIX/CELLAR.
+HP="$(brew --prefix)"
+HC="$(brew --cellar)"
+HL="$(brew --repository)/Library"   # no `brew --library` CLI flag; HOMEBREW_LIBRARY == <repository>/Library
+HR="$(brew --repository)"
+HP_PERL="$HP/opt/perl/bin/perl"
+resolve_ph() {
+  local s="$1"
+  s="${s//@@HOMEBREW_PREFIX@@/$HP}"
+  s="${s//@@HOMEBREW_CELLAR@@/$HC}"
+  s="${s//@@HOMEBREW_LIBRARY@@/$HL}"
+  s="${s//@@HOMEBREW_REPOSITORY@@/$HR}"
+  s="${s//@@HOMEBREW_PERL@@/$HP_PERL}"
+  printf '%s' "$s"
+}
+
 LOG_DIR="$HOME/Library/Logs/homebrew-tap-replace"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/replace_$(date '+%Y%m%d_%H%M%S').log"
@@ -84,21 +102,18 @@ for pkg in $FORMULAS; do
         echo ">> Relocating Mach-O placeholders in $f..."
         chmod +w "$f" 2>/dev/null || true
         if [[ "$dylib_id" == *"@@HOMEBREW"* ]]; then
-          new_id="${dylib_id//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
-          new_id="${new_id//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
+          new_id="$(resolve_ph "$dylib_id")"
           install_name_tool -id "$new_id" "$f" 2>/dev/null || true
         fi
         while read -r bad_path; do
           [ -z "$bad_path" ] && continue
-          good_path="${bad_path//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
-          good_path="${good_path//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
+          good_path="$(resolve_ph "$bad_path")"
           install_name_tool -change "$bad_path" "$good_path" "$f" 2>/dev/null || true
         done < <(otool -L "$f" 2>/dev/null | grep "@@HOMEBREW" | awk '{print $1}')
         if [ -n "$rpath_match" ]; then
           while read -r bad_rpath; do
             [ -z "$bad_rpath" ] && continue
-            good_rpath="${bad_rpath//@@HOMEBREW_PREFIX@@/$(brew --prefix)}"
-            good_rpath="${good_rpath//@@HOMEBREW_CELLAR@@/$(brew --cellar)}"
+            good_rpath="$(resolve_ph "$bad_rpath")"
             install_name_tool -rpath "$bad_rpath" "$good_rpath" "$f" 2>/dev/null || true
           done < <(otool -l "$f" 2>/dev/null | awk '/cmd LC_RPATH/{flag=1; next} flag && /path /{if ($2 ~ /@@HOMEBREW/) print $2; flag=0}')
         fi
@@ -107,18 +122,33 @@ for pkg in $FORMULAS; do
       fi
     done
 
-    # 2. Text files (shebangs, pc files, config scripts)
-    for tf in $(find "$keg_dir" -type f \( -path "*/bin/*" -o -path "*/lib/pkgconfig/*" -o -name "*.py" -o -name "Makefile" \) 2>/dev/null); do
+    # 2. Text files (shebangs, pc files, config scripts, python sources)
+    { grep -rlIZ "@@HOMEBREW" "$keg_dir" 2>/dev/null || true; } | while IFS= read -r -d '' tf; do
       [ -L "$tf" ] && continue
-      if grep -q "@@HOMEBREW" "$tf" 2>/dev/null; then
-        echo ">> Relocating text placeholders in $tf..."
-        chmod +w "$tf" 2>/dev/null || true
-        sed -i '' \
-          -e "s|@@HOMEBREW_CELLAR@@|$(brew --cellar)|g" \
-          -e "s|@@HOMEBREW_PREFIX@@|$(brew --prefix)|g" \
-          "$tf" 2>/dev/null || true
-      fi
+      echo ">> Relocating text placeholders in $tf..."
+      chmod +w "$tf" 2>/dev/null || true
+      sed -i '' \
+        -e "s|@@HOMEBREW_PREFIX@@|$HP|g" \
+        -e "s|@@HOMEBREW_CELLAR@@|$HC|g" \
+        -e "s|@@HOMEBREW_LIBRARY@@|$HL|g" \
+        -e "s|@@HOMEBREW_REPOSITORY@@|$HR|g" \
+        -e "s|@@HOMEBREW_PERL@@|$HP_PERL|g" \
+        "$tf" 2>/dev/null || true
     done
+
+    # 3. Bytecode caches embed the placeholder too and cannot be rewritten in
+    #    place; a stale .pyc shadows the fixed source at import time, so drop it
+    #    (only when the source is present) and let Python regenerate it.
+    while IFS= read -r -d '' pyc; do
+      [ -L "$pyc" ] && continue
+      grep -q "@@HOMEBREW" "$pyc" 2>/dev/null || continue
+      stem=$(basename "$pyc" | sed -E 's/(\.cpython-[^.]+)?\.pyc$//')
+      if [ -f "$(dirname "$pyc")/../$stem.py" ] || [ -f "$(dirname "$pyc")/$stem.py" ]; then
+        echo ">> Dropping stale bytecode cache $pyc"
+        chmod +w "$pyc" 2>/dev/null || true
+        rm -f "$pyc"
+      fi
+    done < <(find "$keg_dir" -type f -name "*.pyc" -print0 2>/dev/null)
   fi
 done
 
