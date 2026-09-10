@@ -518,8 +518,41 @@ verify_package "$pkg" || return 1
 
 if [ "$restore_status" -ne 0 ]; then
   echo "  ℹ️  Bottle restored successfully despite a non-zero Homebrew link step"
+  # On the runners that failure is the image owning a /usr/local/bin shim — its
+  # python.org framework links pip3.13/idle3.13 there, so ours loses the race and
+  # PATH ends up pointing at the image's python. This pipeline uses our keg, so let
+  # it win the link.
+  if brew link --overwrite "$pkg" >/dev/null 2>&1; then
+    echo "  → relinked with --overwrite"
+  fi
 fi
 return 0
+}
+
+# One-off diagnostic for the python-build failure: pycparser/cffi die with "No
+# module named pip.__main__; 'pip' is a package" even though the same interpreter
+# answers fine from a plain shell, so something about Homebrew's build environment
+# changes what `import pip` resolves to. Print what answers, and what pip resolves
+# to under a PYTHONPATH like Homebrew's (the install prefix's own site-packages).
+PYTHON_PROBE_DONE=0
+python_probe() {
+  [ "$PYTHON_PROBE_DONE" = "1" ] && return 0
+  brew deps --include-build "$1" 2>/dev/null | grep -q '^python@' || return 0
+  PYTHON_PROBE_DONE=1
+
+  local py="$(brew --prefix python@3.13 2>/dev/null)/bin/python3.13"
+  [ -x "$py" ] || py="$(brew --prefix python@3.14 2>/dev/null)/bin/python3.14"
+  [ -x "$py" ] || { echo "  → probe: no python on the prefix"; return 0; }
+
+  local probe_dir="$(mktemp -d)"
+  mkdir -p "$probe_dir/lib/python3.13/site-packages"
+  local q='import sys,importlib.util as u;print("exec:",sys.executable);print("path:",sys.path);print("pip:",u.find_spec("pip"));print("pip.__main__:",u.find_spec("pip.__main__"))'
+  echo "  → probe (clean env):"
+  "$py" -c "$q" 2>&1 | sed 's/^/     /'
+  echo "  → probe (as Homebrew runs it: cwd=stage, PYTHONPATH=own prefix):"
+  ( cd "$probe_dir" && PYTHONPATH="$probe_dir/lib/python3.13/site-packages" "$py" -c "$q" 2>&1 | sed 's/^/     /' )
+  env | grep -i '^PY' | sed 's/^/     env /'
+  rm -rf "$probe_dir"
 }
 
 package_needed_by_later_formula() {
@@ -993,6 +1026,8 @@ if [ -z "$ONLY_PACKAGE" ] &&
   BUILD_CAP_SECONDS=$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))
 fi
 echo "  → Per-build cap: $((BUILD_CAP_SECONDS / 60))m"
+python_probe "$pkg"
+
 BUILD_EXIT=0
 run_with_cap "$BUILD_CAP_SECONDS" brew install --build-bottle --overwrite "$formula_ref" || BUILD_EXIT=$?
 if [ "$BUILD_EXIT" -eq 0 ]; then
