@@ -6,12 +6,12 @@ class Gettext < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gettext-1.0.ventura.bottle.1.tar.gz"
-  sha256 "0f3244e93b1b7901ad8148b148a724b5264507f24a79ccdb738794ae5d27c475"
+  sha256 "1509ce7a4e1cc87c3471bba9461250a83f99fdee3f1b55734f870e99655dcd8a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "0f3244e93b1b7901ad8148b148a724b5264507f24a79ccdb738794ae5d27c475"
+    sha256 cellar: "/usr/local/Cellar", ventura: "1509ce7a4e1cc87c3471bba9461250a83f99fdee3f1b55734f870e99655dcd8a"
   end
 
   depends_on "quyleanh/tap/json-c"
