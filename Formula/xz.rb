@@ -6,12 +6,12 @@ class Xz < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz-5.8.3.ventura.bottle.1.tar.gz"
-  sha256 "ca316a73c2bb3df6c1a5dab29d03ce0ab987efe30d48c2343d4801ab84e92a5f"
+  sha256 "79a84a56d23bd36a185ec24fa0c027af5a9ddbb790f15a72640dd822cf747637"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "ca316a73c2bb3df6c1a5dab29d03ce0ab987efe30d48c2343d4801ab84e92a5f"
+    sha256 cellar: :any, ventura: "79a84a56d23bd36a185ec24fa0c027af5a9ddbb790f15a72640dd822cf747637"
   end
 
 
