@@ -34,6 +34,19 @@ FORCE_BUILD="${FORCE_BUILD:-false}"
 MAX_BUILD_TIME="${MAX_BUILD_TIME:-$((5 * 3600))}" # Default: 5 hours in seconds
 DEFAULT_BUILD_ESTIMATE_SECONDS="${DEFAULT_BUILD_ESTIMATE_SECONDS:-3600}"
 BUILD_TIME_RESERVE_SECONDS="${BUILD_TIME_RESERVE_SECONDS:-1200}"
+# Hard ceiling for a single package build. Without one, a package whose estimate
+# lied (llvm really needs ~5h40m while the estimate said 3h) runs until the job
+# timeout kills the whole workflow: that build is lost, everything queued behind
+# it never runs, and because the estimate is only learned from *completed*
+# builds the next run trusts the same lying number and dies in the same place.
+# Now we kill the build at the cap, record the real duration, and stop the loop
+# cleanly so everything already published stays published. Must stay below the
+# job timeout in .github/workflows/build.yml.
+BUILD_HARD_CAP_SECONDS="${BUILD_HARD_CAP_SECONDS:-$((6 * 3600))}"
+# Optional: restrict a run to one package (workflow_dispatch input). Used for
+# packages that can no longer fit in a shared window — llvm needs ~5h40m on its
+# own, so a normal run defers it and a dedicated dispatch gives it the whole run.
+ONLY_PACKAGE="${ONLY_PACKAGE:-}"
 export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 
 mkdir -p "$OUTPUT_DIR"
@@ -725,6 +738,58 @@ get_build_time_estimate() {
   echo "$estimate"
 }
 
+# Run a build under a wall-clock cap. macOS has no timeout(1), so use perl's
+# alarm: exec replaces perl with the command, SIGALRM kills it at N seconds and
+# the exit status is 128+14=142 (our signal that the estimate lied, not a failure).
+# The build runs in the background and we wait on it, so a cancellation signal runs
+# the trap straight away instead of after the build has run to completion.
+BUILD_BG_PID=""
+run_with_cap() {
+  local cap="$1"
+  shift
+  BUILD_BG_PID=""
+  perl -e 'alarm shift; exec @ARGV or die "spawn failed: $!"' "$cap" "$@" &
+  BUILD_BG_PID=$!
+  wait "$BUILD_BG_PID"
+  local status=$?
+  BUILD_BG_PID=""
+  return "$status"
+}
+
+# Push the estimates file on its own. A run that gets killed cannot report the one
+# measurement that matters — how long the package it died during actually needs.
+persist_build_times() {
+  local reason="$1"
+  git -C "$REPO_ROOT" add "$BUILD_TIME_ESTIMATES_FILE" 2>/dev/null || return 1
+  git -C "$REPO_ROOT" diff --cached --quiet -- "$BUILD_TIME_ESTIMATES_FILE" && return 0
+  git -C "$REPO_ROOT" commit -q -m "chore(ci): update build time estimates ($reason) [skip ci]" -- \
+    "$BUILD_TIME_ESTIMATES_FILE" || return 1
+  (cd "$REPO_ROOT" && git pull --rebase origin main >/dev/null 2>&1 && git push origin main >/dev/null 2>&1) ||
+    git -C "$REPO_ROOT" push origin main >/dev/null 2>&1 || return 1
+  echo "  💾 Pushed updated build-time estimates ($reason)"
+  return 0
+}
+
+CURRENT_BUILD_PKG=""
+CURRENT_BUILD_STARTED_AT=0
+
+on_signal() {
+  local sig="$1"
+  [ -n "$BUILD_BG_PID" ] && kill "$BUILD_BG_PID" 2>/dev/null
+  if [ -n "$CURRENT_BUILD_PKG" ] && [ "$CURRENT_BUILD_STARTED_AT" -gt 0 ]; then
+    local took
+    took=$(( $(date +%s) - CURRENT_BUILD_STARTED_AT ))
+    echo ""
+    echo "⚠️  SIG$sig with $CURRENT_BUILD_PKG in flight after $((took / 60))m; recording a floor estimate."
+    record_build_time "$CURRENT_BUILD_PKG" "$took"
+    persist_build_times "aborted during $CURRENT_BUILD_PKG after $((took / 60))m" ||
+      echo "  ⚠️  Could not persist the estimate; the next run will repeat this build"
+  fi
+  exit 143
+}
+trap 'on_signal TERM' TERM
+trap 'on_signal INT' INT
+
 record_build_time() {
   local pkg="$1"
   local observed_seconds="$2"
@@ -768,9 +833,16 @@ BUILT=()
 SKIPPED=()
 FAILED=()
 DEFERRED=()
+# Packages that were never started because they cannot fit in one workflow window
+# and nothing depends on them. Kept separate from SKIPPED (which means up-to-date).
+SKIPPED_BUDGET=()
 START_TIME=$(date +%s)
 
 for pkg in "${ORDERED[@]}"; do
+if [ -n "$ONLY_PACKAGE" ] && [ "$pkg" != "$ONLY_PACKAGE" ]; then
+  continue
+fi
+
 CURRENT_TIME=$(date +%s)
 ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
 
@@ -794,7 +866,9 @@ formula_ref="$pkg"
 # dependency graph.
 [ "$pkg" = "little-cms2" ] && formula_ref="homebrew/core/little-cms2"
 
-if ! needs_build "$pkg"; then
+# A dedicated --only/only_package dispatch is an explicit request: build it even
+# if the release already has it (that is the point of a dedicated run).
+if [ -z "$ONLY_PACKAGE" ] && ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Published leaves do not need to be installed on the ephemeral builder. Only
 # restore a skipped formula when a later formula in ORDERED declares it.
@@ -850,10 +924,18 @@ REQUIRED_TIME=$((PADDED_ESTIMATE + BUILD_TIME_RESERVE_SECONDS))
 echo "  → Estimated build: $((BUILD_ESTIMATE / 60))m + 25% safety"
 echo "  → Time remaining : $((REMAINING_TIME / 60))m (including publish reserve)"
 
-if [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
-  echo "  ⏸️  Deferring $pkg and the remaining dependency-ordered queue to the next run"
-  DEFERRED+=("$pkg")
-  break
+if [ -z "$ONLY_PACKAGE" ] && [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
+  # A package that can never fit in one window must not block the queue behind it.
+  # Only block (defer the rest) when a later formula genuinely needs it.
+  if package_needed_by_later_formula "$pkg"; then
+    echo "  ⏸️  Deferring $pkg and the remaining dependency-ordered queue to the next run"
+    DEFERRED+=("$pkg")
+    break
+  fi
+  echo "  ⏭️  Skipping $pkg: needs $((REQUIRED_TIME / 60))m, $((REMAINING_TIME / 60))m left, and nothing later depends on it"
+  echo "      (estimate $((BUILD_ESTIMATE / 60))m; build it with a dedicated dispatch: only_package=$pkg)"
+  SKIPPED_BUDGET+=("$pkg")
+  continue
 fi
 
 # Keep the generated bottle wrapper in place while deciding whether FFmpeg is
@@ -889,10 +971,28 @@ fi
 # Formulae must be installed by tap-qualified name; Homebrew rejects arbitrary
 # workspace paths that are not registered as taps.
 BUILD_STARTED_AT=$(date +%s)
-if brew install --build-bottle --overwrite "$formula_ref"; then
+CURRENT_BUILD_PKG="$pkg"
+CURRENT_BUILD_STARTED_AT=$BUILD_STARTED_AT
+
+# Cap the build so a wildly wrong estimate cannot eat the whole job window. A
+# dedicated single-package run gets the full window (no other package needs it).
+# A dedicated single-package run owns the whole window, so it keeps the full hard
+# cap; inside a shared run the cap has to leave room to publish and commit.
+BUILD_CAP_SECONDS=$BUILD_HARD_CAP_SECONDS
+BUILD_TIME_LEFT=$((MAX_BUILD_TIME - (BUILD_STARTED_AT - START_TIME)))
+if [ -z "$ONLY_PACKAGE" ] &&
+  [ "$BUILD_CAP_SECONDS" -gt "$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))" ]; then
+  BUILD_CAP_SECONDS=$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))
+fi
+echo "  → Per-build cap: $((BUILD_CAP_SECONDS / 60))m"
+BUILD_EXIT=0
+run_with_cap "$BUILD_CAP_SECONDS" brew install --build-bottle --overwrite "$formula_ref" || BUILD_EXIT=$?
+if [ "$BUILD_EXIT" -eq 0 ]; then
 BUILD_FINISHED_AT=$(date +%s)
 BUILD_DURATION=$((BUILD_FINISHED_AT - BUILD_STARTED_AT))
 record_build_time "$pkg" "$BUILD_DURATION"
+CURRENT_BUILD_PKG=""
+CURRENT_BUILD_STARTED_AT=0
 echo "  → Recorded build time: $((BUILD_DURATION / 60))m"
 echo "  ✅ Installed, packing bottle…"
 
@@ -1002,7 +1102,25 @@ if package_needed_by_later_formula "$pkg"; then
 fi
 
 else
-echo "  ❌ Build failed: $pkg"
+BUILD_FINISHED_AT=$(date +%s)
+BUILD_DURATION=$((BUILD_FINISHED_AT - BUILD_STARTED_AT))
+CURRENT_BUILD_PKG=""
+CURRENT_BUILD_STARTED_AT=0
+
+# Exit 142 = SIGALRM from run_with_cap, i.e. our own cap, not a real build error.
+# A killed build always under-measures, so record what it got through; that alone
+# breaks the loop where the same lying estimate gets the same package started, eats
+# the whole window and gets killed in the same place every single run.
+if [ "$BUILD_EXIT" -eq 142 ]; then
+  echo "  ⏱️  Killed $pkg after $((BUILD_DURATION / 60))m — past the $((BUILD_CAP_SECONDS / 60))m per-build cap"
+  record_build_time "$pkg" "$BUILD_DURATION"
+  persist_build_times "cap kill during $pkg" || echo "  ⚠️  Could not persist the estimate"
+  DEFERRED+=("$pkg")
+  echo "      Stopping the loop so work already published stays published; the next run defers it from the start."
+  break
+fi
+
+echo "  ❌ Build failed: $pkg (exit $BUILD_EXIT)"
 FAILED+=("$pkg")
 fi
 
@@ -1023,6 +1141,7 @@ echo "════════════════════════�
 echo "✅ Built   (${#BUILT[@]}): ${BUILT[*]:-none}"
 echo "⏭️  Skipped (${#SKIPPED[@]}): ${SKIPPED[*]:-none}"
 echo "⏸️  Deferred (${#DEFERRED[@]}): ${DEFERRED[*]:-none}"
+echo "⏭️  Skipped for the time budget (${#SKIPPED_BUDGET[@]}): ${SKIPPED_BUDGET[*]:-none}"
 echo "❌ Failed  (${#FAILED[@]}): ${FAILED[*]:-none}"
 echo ""
 

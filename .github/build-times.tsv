@@ -1,6 +1,12 @@
 # Formula	Conservative build-time estimate in seconds
-llvm	10800
-llvm@22	10800
+# Measured floors, not guesses: entries are raised automatically when a build
+# finishes, when a build is killed by the per-build cap, and when the job is
+# cancelled mid-build. Anything whose padded estimate no longer fits a shared
+# window is skipped (or deferred if something later needs it) and has to be
+# built by a dedicated dispatch with only_package=<pkg>.
+# llvm measured: started at +8m, killed by the job timeout at 5h50m (>= 340m).
+llvm	21600
+llvm@22	21600
 node	9853
 openssl@3	1046
 go	312

@@ -12,6 +12,10 @@ on:
         options:
           - "false"
           - "true"
+      only_package:
+        description: "Build only this package with the whole window (e.g. llvm). Empty = normal run"
+        required: false
+        default: ""
 
   # Run automatically every 12 hours
   schedule:
@@ -41,7 +45,10 @@ jobs:
   build:
     name: Build Bottles (macOS Intel / Ventura 13+)
     runs-on: macos-15-intel
-    timeout-minutes: 350
+    # GitHub's ceiling for a hosted macOS job. llvm alone needs ~5h40m, so a
+    # dedicated only_package run of llvm lands at ~5h45m; everything else lives
+    # comfortably under the per-build cap in build.sh.
+    timeout-minutes: 360
 
     steps:
       - name: Checkout repo
@@ -98,6 +105,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_DIR: ${{ github.workspace }}/bottles
           FORCE_BUILD: ${{ inputs.force_build || 'false' }}
+          ONLY_PACKAGE: ${{ inputs.only_package }}
         run: /usr/local/bin/bash scripts/build.sh
 
       - name: List built bottles
