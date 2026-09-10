@@ -6,12 +6,12 @@ class Certifi < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi-2026.7.22.ventura.bottle.1.tar.gz"
-  sha256 "803357bfba0bbe05432d33e35eab154220f00adaacd6ba05a70ef312ec5e7869"
+  sha256 "08ce1065d3df023afe039831ea618a240cc60062ebac09edcdd3dee052ec5999"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "803357bfba0bbe05432d33e35eab154220f00adaacd6ba05a70ef312ec5e7869"
+    sha256 cellar: :any_skip_relocation, ventura: "08ce1065d3df023afe039831ea618a240cc60062ebac09edcdd3dee052ec5999"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
