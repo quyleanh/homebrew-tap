@@ -6,12 +6,12 @@ class LittleCms2 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/little-cms2-2.19.1.ventura.bottle.1.tar.gz"
-  sha256 "5393263804c215ca578dc430de0737a244268ce79245d36444507f412f8dd97e"
+  sha256 "2b3f19a9413bd3ef950db541988dfc1f29edd8ab38493251c9856c5eafc38b0e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "5393263804c215ca578dc430de0737a244268ce79245d36444507f412f8dd97e"
+    sha256 cellar: :any, ventura: "2b3f19a9413bd3ef950db541988dfc1f29edd8ab38493251c9856c5eafc38b0e"
   end
 
   depends_on "quyleanh/tap/jpeg-turbo"
