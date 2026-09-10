@@ -6,12 +6,12 @@ class Cmake < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cmake-4.4.3.ventura.bottle.1.tar.gz"
-  sha256 "a27795931eb9b1c80968b9d11f4dc1d54cb542db6b8d730740b551eec73a2d38"
+  sha256 "33b14751aa90c22ff0e6cb871e707c0e17f9ef81e124bab8e11dfc198083073e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "a27795931eb9b1c80968b9d11f4dc1d54cb542db6b8d730740b551eec73a2d38"
+    sha256 cellar: :any_skip_relocation, ventura: "33b14751aa90c22ff0e6cb871e707c0e17f9ef81e124bab8e11dfc198083073e"
   end
 
 
