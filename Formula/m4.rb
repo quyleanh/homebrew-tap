@@ -6,12 +6,12 @@ class M4 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/m4-1.4.21.ventura.bottle.1.tar.gz"
-  sha256 "2799151044d75ea790bc6678da3eb56f29fcf61ee822a89e7cb89acdcc170d0d"
+  sha256 "3575f5729b01f65bd5dc3b6968573cc0aff6286bab64397be92cd0058dd228f6"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "2799151044d75ea790bc6678da3eb56f29fcf61ee822a89e7cb89acdcc170d0d"
+    sha256 cellar: "/usr/local/Cellar", ventura: "3575f5729b01f65bd5dc3b6968573cc0aff6286bab64397be92cd0058dd228f6"
   end
 
 
