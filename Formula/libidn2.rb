@@ -6,12 +6,12 @@ class Libidn2 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libidn2-2.3.8.ventura.bottle.1.tar.gz"
-  sha256 "31e01ea7a08f504ec8ff7f8bd1c6ac7d0ad779f550db4b77f5c52d4c46455114"
+  sha256 "c613036292466403f3e9d8df5fbcc5d17f47dd1c30e2a39fc217430326958c4a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "31e01ea7a08f504ec8ff7f8bd1c6ac7d0ad779f550db4b77f5c52d4c46455114"
+    sha256 cellar: "/usr/local/Cellar", ventura: "c613036292466403f3e9d8df5fbcc5d17f47dd1c30e2a39fc217430326958c4a"
   end
 
   depends_on "quyleanh/tap/gettext"
