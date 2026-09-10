@@ -6,12 +6,12 @@ class Giflib < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/giflib-6.1.3.ventura.bottle.1.tar.gz"
-  sha256 "93e8dbe240dd4a3baee18cfb845a31f2333522d9b99596fe390ec1caf257752d"
+  sha256 "060a65a004c9490234251eb6e3b28d311ec52c6973401ff6d17d62e9eafbdf63"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "93e8dbe240dd4a3baee18cfb845a31f2333522d9b99596fe390ec1caf257752d"
+    sha256 cellar: :any, ventura: "060a65a004c9490234251eb6e3b28d311ec52c6973401ff6d17d62e9eafbdf63"
   end
 
 
