@@ -42,7 +42,12 @@ BUILD_TIME_RESERVE_SECONDS="${BUILD_TIME_RESERVE_SECONDS:-1200}"
 # Now we kill the build at the cap, record the real duration, and stop the loop
 # cleanly so everything already published stays published. Must stay below the
 # job timeout in .github/workflows/build.yml.
-BUILD_HARD_CAP_SECONDS="${BUILD_HARD_CAP_SECONDS:-$((6 * 3600))}"
+#
+# Set below the job timeout with room to publish: a dedicated llvm run spends
+# ~10 minutes restoring dependencies first, so a full 6h cap would let the build
+# reach the job timeout instead of being cut short by ours (and ours is the kill
+# that records the measurement).
+BUILD_HARD_CAP_SECONDS="${BUILD_HARD_CAP_SECONDS:-$((5 * 3600 + 2700))}"
 # Optional: restrict a run to one package (workflow_dispatch input). Used for
 # packages that can no longer fit in a shared window — llvm needs ~5h40m on its
 # own, so a normal run defers it and a dedicated dispatch gives it the whole run.
@@ -433,6 +438,11 @@ keg_dir="$(brew --cellar 2>/dev/null)/$pkg"
 #    regenerates it — a leftover means that pass did not run.
 while IFS= read -r f; do
   [ -n "$f" ] || continue
+  # Skip .brew/: that is Homebrew's copy of the formula source, and our generated
+  # install block contains the placeholder tokens as literal Ruby string keys, so
+  # a receipt full of "@@HOMEBREW…" is our own code, not unrelocated content. Every
+  # hit the first run reported was one of these.
+  case "$f" in */.brew/*) continue ;; esac
   if grep -qI "" "$f" 2>/dev/null; then
     echo "  ❌ $pkg: unresolved placeholder in ${f#"$keg_dir"/}"
     failures=$((failures + 1))
@@ -839,10 +849,6 @@ SKIPPED_BUDGET=()
 START_TIME=$(date +%s)
 
 for pkg in "${ORDERED[@]}"; do
-if [ -n "$ONLY_PACKAGE" ] && [ "$pkg" != "$ONLY_PACKAGE" ]; then
-  continue
-fi
-
 CURRENT_TIME=$(date +%s)
 ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
 
@@ -978,6 +984,8 @@ CURRENT_BUILD_STARTED_AT=$BUILD_STARTED_AT
 # dedicated single-package run gets the full window (no other package needs it).
 # A dedicated single-package run owns the whole window, so it keeps the full hard
 # cap; inside a shared run the cap has to leave room to publish and commit.
+# (ONLY_PACKAGE still walks the whole dependency order: brew refuses to build a
+# formula whose dependencies would have to be poured, so they must be restored.)
 BUILD_CAP_SECONDS=$BUILD_HARD_CAP_SECONDS
 BUILD_TIME_LEFT=$((MAX_BUILD_TIME - (BUILD_STARTED_AT - START_TIME)))
 if [ -z "$ONLY_PACKAGE" ] &&
