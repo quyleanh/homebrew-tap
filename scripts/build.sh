@@ -540,18 +540,26 @@ python_probe() {
   brew deps --include-build "$1" 2>/dev/null | grep -q '^python@' || return 0
   PYTHON_PROBE_DONE=1
 
-  local py="$(brew --prefix python@3.13 2>/dev/null)/bin/python3.13"
-  [ -x "$py" ] || py="$(brew --prefix python@3.14 2>/dev/null)/bin/python3.14"
-  [ -x "$py" ] || { echo "  → probe: no python on the prefix"; return 0; }
+  local opt="$(brew --prefix python@3.13 2>/dev/null)"
+  [ -d "$opt" ] || opt="$(brew --prefix python@3.14 2>/dev/null)"
+  [ -d "$opt" ] || { echo "  → probe: no python on the prefix"; return 0; }
 
-  local probe_dir="$(mktemp -d)"
+  local probe_dir
+  probe_dir="$(mktemp -d)"
   mkdir -p "$probe_dir/lib/python3.13/site-packages"
-  local q='import sys,importlib.util as u;print("exec:",sys.executable);print("path:",sys.path);print("pip:",u.find_spec("pip"));print("pip.__main__:",u.find_spec("pip.__main__"))'
-  echo "  → probe (clean env):"
-  "$py" -c "$q" 2>&1 | sed 's/^/     /'
-  echo "  → probe (as Homebrew runs it: cwd=stage, PYTHONPATH=own prefix):"
-  ( cd "$probe_dir" && PYTHONPATH="$probe_dir/lib/python3.13/site-packages" "$py" -c "$q" 2>&1 | sed 's/^/     /' )
-  env | grep -i '^PY' | sed 's/^/     env /'
+  local q='import sys,importlib.util as u;print("   exec:",sys.executable);print("   pip:",u.find_spec("pip"));print("   pip.__main__:",u.find_spec("pip.__main__"))'
+  # Homebrew drives python through libexec/bin, not bin — and on a runner whose
+  # image ships a python.org framework, a symlink that escapes the keg lands there
+  # instead of in our keg, which is exactly where pip stops being importable. So
+  # probe both entry points, under a PYTHONPATH like Homebrew's.
+  local entry
+  for entry in "$opt/libexec/bin/python3" "$opt/bin/python3"; do
+    [ -e "$entry" ] || continue
+    echo "  → probe: $entry -> $(readlink "$entry" || echo '(real file)')"
+    ( cd "$probe_dir" && PYTHONPATH="$probe_dir/lib/python3.13/site-packages" "$entry" -c "$q" 2>&1 ) || true
+  done
+  ls -l "$opt/libexec/bin" 2>/dev/null | sed 's/^/     /' || true
+  env | grep -i '^PY' | sed 's/^/     /' || true
   rm -rf "$probe_dir"
 }
 
