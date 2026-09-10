@@ -6,12 +6,12 @@ class Pkgconf < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf-3.0.7.ventura.bottle.1.tar.gz"
-  sha256 "e165669aa890467113ad4b4d998e2c46a02564e8a90c74cd379b614546e47f48"
+  sha256 "f13960dd227ba08f0331c66ae02ebb36ba8eeee136f00ec581f611534140d533"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "e165669aa890467113ad4b4d998e2c46a02564e8a90c74cd379b614546e47f48"
+    sha256 cellar: "/usr/local/Cellar", ventura: "f13960dd227ba08f0331c66ae02ebb36ba8eeee136f00ec581f611534140d533"
   end
 
 
