@@ -6,12 +6,12 @@ class Pycparser < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pycparser-3.0.ventura.bottle.1.tar.gz"
-  sha256 "3ab506d6127c9e8a78339456e675ec6e5c882edc1ae2580aaec919c12b4709c2"
+  sha256 "a96dcbb1beb730ef6a889541c33a617a7011bf1513dfb56aa25aa85779d0345f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "3ab506d6127c9e8a78339456e675ec6e5c882edc1ae2580aaec919c12b4709c2"
+    sha256 cellar: :any_skip_relocation, ventura: "a96dcbb1beb730ef6a889541c33a617a7011bf1513dfb56aa25aa85779d0345f"
   end
 
 
