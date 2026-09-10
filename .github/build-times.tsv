@@ -28,3 +28,4 @@ cmake	987
 c-ares	95
 ca-certificates	5
 libssh2	52
+readline	51
