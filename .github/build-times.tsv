@@ -27,3 +27,4 @@ cffi	28
 cmake	987
 c-ares	95
 ca-certificates	5
+libssh2	52

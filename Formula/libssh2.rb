@@ -7,12 +7,12 @@ class Libssh2 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2-1.11.1_4.ventura.bottle.1.tar.gz"
-  sha256 "4d4866314ba09c6eae4e1f266943b278f18817010de15a423d6e9f4f89207b0e"
+  sha256 "0df24a72467774bbce25672968a26f714ed23bfae882e5916edee8ed36da2c9b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "4d4866314ba09c6eae4e1f266943b278f18817010de15a423d6e9f4f89207b0e"
+    sha256 cellar: :any, ventura: "0df24a72467774bbce25672968a26f714ed23bfae882e5916edee8ed36da2c9b"
   end
 
   depends_on "quyleanh/tap/openssl@3"
