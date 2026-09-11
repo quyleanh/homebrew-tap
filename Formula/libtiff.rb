@@ -6,12 +6,12 @@ class Libtiff < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtiff-4.7.2.ventura.bottle.1.tar.gz"
-  sha256 "b41e9e606a8be09e05174a798099368d46e8c79590428ec1aa50cbae09514ea4"
+  sha256 "15219501f33382bfc808a57a31cd32a3e4e45c4bc37077e2853ea6a8a545049c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "b41e9e606a8be09e05174a798099368d46e8c79590428ec1aa50cbae09514ea4"
+    sha256 cellar: :any, ventura: "15219501f33382bfc808a57a31cd32a3e4e45c4bc37077e2853ea6a8a545049c"
   end
 
   depends_on "quyleanh/tap/jpeg-turbo"
