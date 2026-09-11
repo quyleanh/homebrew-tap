@@ -30,7 +30,7 @@ ca-certificates	8
 libssh2	55
 readline	67
 sqlite	86
-json-c	40
+json-c	53
 libunistring	304
 gettext	707
 libidn2	67
