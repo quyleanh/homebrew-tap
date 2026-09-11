@@ -6,12 +6,12 @@ class PythonAT314 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.7.ventura.bottle.1.tar.gz"
-  sha256 "2a53f89962c3b2b6c3a0a86f11b5a4189cd88aefeff6ed40e0a16eca402eb5bd"
+  sha256 "4918d1a3474416e35b8123aeb07583c1a3305f1e5dd9d4c5d591e8878ab7d055"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "2a53f89962c3b2b6c3a0a86f11b5a4189cd88aefeff6ed40e0a16eca402eb5bd"
+    sha256 cellar: "/usr/local/Cellar", ventura: "4918d1a3474416e35b8123aeb07583c1a3305f1e5dd9d4c5d591e8878ab7d055"
   end
 
   depends_on "quyleanh/tap/mpdecimal"
