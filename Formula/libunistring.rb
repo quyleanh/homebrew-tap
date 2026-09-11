@@ -6,12 +6,12 @@ class Libunistring < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libunistring-1.4.2.ventura.bottle.1.tar.gz"
-  sha256 "5764ba61e09e30e525ec5995617bc3b0eee5beafb8e2f7e2f1458cf5a82ef8da"
+  sha256 "052365d9be77f2636d51145c647c97ff492e8378fb5c8ab464b6dddaa4af6d7d"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "5764ba61e09e30e525ec5995617bc3b0eee5beafb8e2f7e2f1458cf5a82ef8da"
+    sha256 cellar: :any, ventura: "052365d9be77f2636d51145c647c97ff492e8378fb5c8ab464b6dddaa4af6d7d"
   end
 
 
