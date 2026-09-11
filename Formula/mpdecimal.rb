@@ -6,12 +6,12 @@ class Mpdecimal < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/mpdecimal-4.0.1.ventura.bottle.1.tar.gz"
-  sha256 "ce913f7361613f7bf7581564de959761a1686d6743b41bcb95289727beaa2463"
+  sha256 "ba6cb6c3eaec260da5c9fb4fa5375aa4c287dfe77fdf72b97716c9362ce7d1d0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "ce913f7361613f7bf7581564de959761a1686d6743b41bcb95289727beaa2463"
+    sha256 cellar: :any, ventura: "ba6cb6c3eaec260da5c9fb4fa5375aa4c287dfe77fdf72b97716c9362ce7d1d0"
   end
 
 
