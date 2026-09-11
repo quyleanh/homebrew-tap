@@ -6,12 +6,12 @@ class Sqlite < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.53.4.ventura.bottle.1.tar.gz"
-  sha256 "26be76cbf991bac69b708e3b7c301be8722f9dba87ce00eeac59c98e8623701c"
+  sha256 "1c440a15e0e89c7714594dd8ffd5cb0fd41fe753275e16ae3b56153883f3b547"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "26be76cbf991bac69b708e3b7c301be8722f9dba87ce00eeac59c98e8623701c"
+    sha256 cellar: :any, ventura: "1c440a15e0e89c7714594dd8ffd5cb0fd41fe753275e16ae3b56153883f3b547"
   end
 
   depends_on "quyleanh/tap/readline"
