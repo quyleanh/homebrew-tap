@@ -6,12 +6,12 @@ class Oniguruma < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/oniguruma-6.9.10.ventura.bottle.1.tar.gz"
-  sha256 "cbc2afee8bf0748d0a43e691b8c3502462dba5af99f0e219530e283e25acfbb3"
+  sha256 "2fb3c744c57b86eef87ba5b74656708bbec1c3bbab422b7a58fc175d8053a3cd"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "cbc2afee8bf0748d0a43e691b8c3502462dba5af99f0e219530e283e25acfbb3"
+    sha256 cellar: :any, ventura: "2fb3c744c57b86eef87ba5b74656708bbec1c3bbab422b7a58fc175d8053a3cd"
   end
 
 
