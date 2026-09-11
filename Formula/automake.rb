@@ -7,12 +7,12 @@ class Automake < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/automake-1.18.1_1.ventura.bottle.1.tar.gz"
-  sha256 "c299160d905d83ed3db8cb837525a26dd98bbd71e4b46193cb579f1eae9b1018"
+  sha256 "7efab1da0dd324c87500b9c9131141b34f29ae356404fd946817aecc9e9c8169"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c299160d905d83ed3db8cb837525a26dd98bbd71e4b46193cb579f1eae9b1018"
+    sha256 cellar: :any_skip_relocation, ventura: "7efab1da0dd324c87500b9c9131141b34f29ae356404fd946817aecc9e9c8169"
   end
 
   depends_on "quyleanh/tap/autoconf"
