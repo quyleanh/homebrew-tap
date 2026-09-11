@@ -6,12 +6,12 @@ class Libpng < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libpng-1.6.58.ventura.bottle.1.tar.gz"
-  sha256 "9d0f238c4032f703eb176a5cb52e726f718794a820e44db19e41c30bd1d96a5c"
+  sha256 "33c9e2438e12eb6c6b85b0fc9f7a65ee0b7b20462c15e3e3432eda4351e629e4"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "9d0f238c4032f703eb176a5cb52e726f718794a820e44db19e41c30bd1d96a5c"
+    sha256 cellar: :any, ventura: "33c9e2438e12eb6c6b85b0fc9f7a65ee0b7b20462c15e3e3432eda4351e629e4"
   end
 
 
