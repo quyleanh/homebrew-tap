@@ -28,7 +28,7 @@ cmake	1804
 c-ares	103
 ca-certificates	8
 libssh2	55
-readline	51
+readline	67
 sqlite	66
 json-c	40
 libunistring	304
