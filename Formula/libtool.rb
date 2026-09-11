@@ -6,12 +6,12 @@ class Libtool < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libtool-2.6.2.ventura.bottle.1.tar.gz"
-  sha256 "023ae6b9a0a24f9747b161329ef1f1a0bcc5ee6b17590b649f4e9aae471a8e31"
+  sha256 "d5c0438ee084a332ae76e2eaab24071ee79cbaf31359bd105f79bed41bcdf16f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "023ae6b9a0a24f9747b161329ef1f1a0bcc5ee6b17590b649f4e9aae471a8e31"
+    sha256 cellar: :any, ventura: "d5c0438ee084a332ae76e2eaab24071ee79cbaf31359bd105f79bed41bcdf16f"
   end
 
   depends_on "quyleanh/tap/m4"
