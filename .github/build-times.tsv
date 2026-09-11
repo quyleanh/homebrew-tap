@@ -41,7 +41,7 @@ libtool	48
 oniguruma	50
 mpdecimal	28
 xz	110
-lz4	10
+lz4	11
 zstd	33
 python@3.14	506
 certifi	16
