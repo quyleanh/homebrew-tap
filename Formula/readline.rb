@@ -6,12 +6,12 @@ class Readline < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/readline-8.3.3.ventura.bottle.1.tar.gz"
-  sha256 "66bbb440b3622ed3f91574ce1a16ab79bdb79e83245584940ed621cc29977697"
+  sha256 "4ffa44a107f581b04aa679002b5f24e4da32a26c7545fef8eedf3d6fd10575bd"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "66bbb440b3622ed3f91574ce1a16ab79bdb79e83245584940ed621cc29977697"
+    sha256 cellar: :any, ventura: "4ffa44a107f581b04aa679002b5f24e4da32a26c7545fef8eedf3d6fd10575bd"
   end
 
 
