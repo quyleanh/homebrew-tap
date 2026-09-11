@@ -6,12 +6,12 @@ class CAres < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares-1.34.8.ventura.bottle.1.tar.gz"
-  sha256 "115aaef22b104f6443f3c954581b54a7ccbe67fbd41cf792b69a90b247c97718"
+  sha256 "b280924b13cf90b5dbd1dfd3878abf57304b6bdab8fc638a1fa7be64882d0793"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "115aaef22b104f6443f3c954581b54a7ccbe67fbd41cf792b69a90b247c97718"
+    sha256 cellar: :any, ventura: "b280924b13cf90b5dbd1dfd3878abf57304b6bdab8fc638a1fa7be64882d0793"
   end
 
 
