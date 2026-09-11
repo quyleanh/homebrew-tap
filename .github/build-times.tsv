@@ -39,7 +39,7 @@ autoconf	18
 automake	24
 libtool	48
 oniguruma	50
-mpdecimal	17
+mpdecimal	28
 xz	66
 lz4	10
 zstd	33
