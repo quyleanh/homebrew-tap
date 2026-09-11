@@ -6,12 +6,12 @@ class Cffi < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/cffi-2.1.1.ventura.bottle.1.tar.gz"
-  sha256 "59c58f35c2784326316eef320b995f874b3dbacfb0ec1a11a241b5502f473984"
+  sha256 "43eb3c34752f695d7a460f11e4c5110dece525e92942e1223fdc56f84a163821"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "59c58f35c2784326316eef320b995f874b3dbacfb0ec1a11a241b5502f473984"
+    sha256 cellar: :any_skip_relocation, ventura: "43eb3c34752f695d7a460f11e4c5110dece525e92942e1223fdc56f84a163821"
   end
 
   depends_on "quyleanh/tap/pycparser"
