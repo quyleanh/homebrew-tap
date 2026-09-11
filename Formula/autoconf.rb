@@ -6,12 +6,12 @@ class Autoconf < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/autoconf-2.73.ventura.bottle.1.tar.gz"
-  sha256 "1daf1eae582a2a3ee2d0d55d12a002011ecdaaccac5ab60de48ec383d8595c12"
+  sha256 "55922ba9a8e2b4890e9273ea6897243ebf66226ce0229a52686c486967e017fb"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "1daf1eae582a2a3ee2d0d55d12a002011ecdaaccac5ab60de48ec383d8595c12"
+    sha256 cellar: :any_skip_relocation, ventura: "55922ba9a8e2b4890e9273ea6897243ebf66226ce0229a52686c486967e017fb"
   end
 
   depends_on "quyleanh/tap/m4"
