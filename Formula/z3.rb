@@ -6,12 +6,12 @@ class Z3 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/z3-5.1.0.ventura.bottle.1.tar.gz"
-  sha256 "a7436c3d544d91ceabe6103b65f426a9ef3b580c7ba7bd94193f3a396c50c2d9"
+  sha256 "cbbf0dbeefdb1f7368a03a521b08008be38c3233867c20e3559f09d3226ff584"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "a7436c3d544d91ceabe6103b65f426a9ef3b580c7ba7bd94193f3a396c50c2d9"
+    sha256 cellar: :any, ventura: "cbbf0dbeefdb1f7368a03a521b08008be38c3233867c20e3559f09d3226ff584"
   end
 
 
