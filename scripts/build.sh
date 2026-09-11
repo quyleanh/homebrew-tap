@@ -920,9 +920,11 @@ formula_ref="$pkg"
 # dependency graph.
 [ "$pkg" = "little-cms2" ] && formula_ref="homebrew/core/little-cms2"
 
-# A dedicated --only/only_package dispatch is an explicit request: build it even
-# if the release already has it (that is the point of a dedicated run).
-if [ -z "$ONLY_PACKAGE" ] && ! needs_build "$pkg"; then
+# A dedicated only_package dispatch is an explicit request: build that one package
+# even if the release already has it. Everything else keeps the normal up-to-date
+# check — without it a dedicated run rebuilds the whole dependency chain instead
+# of pouring the bottles it already published, which is what starved llvm of time.
+if [ "$pkg" != "$ONLY_PACKAGE" ] && ! needs_build "$pkg"; then
 SKIPPED+=("$pkg")
 # Published leaves do not need to be installed on the ephemeral builder. Only
 # restore a skipped formula when a later formula in ORDERED declares it.
