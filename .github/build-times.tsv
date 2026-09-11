@@ -26,7 +26,7 @@ pycparser	45
 cffi	28
 cmake	1804
 c-ares	103
-ca-certificates	5
+ca-certificates	8
 libssh2	52
 readline	51
 sqlite	66
