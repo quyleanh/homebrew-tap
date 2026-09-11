@@ -25,7 +25,7 @@ rust	4531
 pycparser	45
 cffi	28
 cmake	1804
-c-ares	95
+c-ares	103
 ca-certificates	5
 libssh2	52
 readline	51
