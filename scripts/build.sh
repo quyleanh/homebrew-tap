@@ -48,6 +48,13 @@ BUILD_TIME_RESERVE_SECONDS="${BUILD_TIME_RESERVE_SECONDS:-1200}"
 # reach the job timeout instead of being cut short by ours (and ours is the kill
 # that records the measurement).
 BUILD_HARD_CAP_SECONDS="${BUILD_HARD_CAP_SECONDS:-$((5 * 3600 + 2700))}"
+# Must match timeout-minutes in .github/workflows/build.yml. The cap has to expire
+# *inside* the job: GitHub's kill at the ceiling takes the build and the trap with
+# it, so a cap that arms later than the ceiling cannot record what it measured.
+JOB_TIMEOUT_SECONDS="${JOB_TIMEOUT_SECONDS:-$((6 * 3600))}"
+# A dedicated run has exactly one bottle to commit and upload at the end (observed
+# at ~2 minutes), so it can spend nearly the whole window on the build itself.
+DEDICATED_PUBLISH_RESERVE_SECONDS="${DEDICATED_PUBLISH_RESERVE_SECONDS:-300}"
 # Optional: restrict a run to one package (workflow_dispatch input). Used for
 # packages that can no longer fit in a shared window — llvm needs ~5h40m on its
 # own, so a normal run defers it and a dedicated dispatch gives it the whole run.
@@ -1021,17 +1028,24 @@ BUILD_STARTED_AT=$(date +%s)
 CURRENT_BUILD_PKG="$pkg"
 CURRENT_BUILD_STARTED_AT=$BUILD_STARTED_AT
 
-# Cap the build so a wildly wrong estimate cannot eat the whole job window. A
-# dedicated single-package run gets the full window (no other package needs it).
-# A dedicated single-package run owns the whole window, so it keeps the full hard
-# cap; inside a shared run the cap has to leave room to publish and commit.
+# Cap the build so a wildly wrong estimate cannot eat the whole job window. The
+# cap must expire *inside* the job in every mode: a kill at the ceiling takes the
+# build and the trap with it, and the run loses the measurement it was meant to
+# make — that is exactly how the first two llvm dispatches died, armed to fire
+# minutes after the ceiling. A dedicated run owns the whole window minus the few
+# minutes needed to publish the one bottle it exists to build.
 # (ONLY_PACKAGE still walks the whole dependency order: brew refuses to build a
 # formula whose dependencies would have to be poured, so they must be restored.)
 BUILD_CAP_SECONDS=$BUILD_HARD_CAP_SECONDS
 BUILD_TIME_LEFT=$((MAX_BUILD_TIME - (BUILD_STARTED_AT - START_TIME)))
-if [ -z "$ONLY_PACKAGE" ] &&
-  [ "$BUILD_CAP_SECONDS" -gt "$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))" ]; then
-  BUILD_CAP_SECONDS=$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))
+if [ -n "$ONLY_PACKAGE" ]; then
+  WINDOW_LEFT=$((JOB_TIMEOUT_SECONDS - (BUILD_STARTED_AT - START_TIME) -
+    DEDICATED_PUBLISH_RESERVE_SECONDS))
+else
+  WINDOW_LEFT=$((BUILD_TIME_LEFT - BUILD_TIME_RESERVE_SECONDS))
+fi
+if [ "$BUILD_CAP_SECONDS" -gt "$WINDOW_LEFT" ]; then
+  BUILD_CAP_SECONDS=$WINDOW_LEFT
 fi
 echo "  → Per-build cap: $((BUILD_CAP_SECONDS / 60))m"
 python_probe "$pkg"
