@@ -7,12 +7,12 @@ class Zstd < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/zstd-1.5.7_1.ventura.bottle.1.tar.gz"
-  sha256 "831479d94c57d94b7f83c8e5f1c748ffe1e0f8030c963a5ab1e15fede71d3b02"
+  sha256 "9510c662c82bdb1b0bd43cea9c47f5eef5d802c34959bc413f8634ca626fdf6b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "831479d94c57d94b7f83c8e5f1c748ffe1e0f8030c963a5ab1e15fede71d3b02"
+    sha256 cellar: :any, ventura: "9510c662c82bdb1b0bd43cea9c47f5eef5d802c34959bc413f8634ca626fdf6b"
   end
 
   depends_on "quyleanh/tap/lz4"
