@@ -6,12 +6,12 @@ class Ninja < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ninja-1.13.2.ventura.bottle.1.tar.gz"
-  sha256 "c91d0d10949dd9495e3f07eb1e95a9b949eeb2cbff786eb3cc4ee7d29693ae72"
+  sha256 "fd1519713db291a29cd9dc01a48aeeb7d112315edc67fe96ab1ebf5d731f8f37"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c91d0d10949dd9495e3f07eb1e95a9b949eeb2cbff786eb3cc4ee7d29693ae72"
+    sha256 cellar: :any_skip_relocation, ventura: "fd1519713db291a29cd9dc01a48aeeb7d112315edc67fe96ab1ebf5d731f8f37"
   end
 
 
