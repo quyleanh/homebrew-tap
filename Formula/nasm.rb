@@ -6,12 +6,12 @@ class Nasm < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/nasm-3.02.ventura.bottle.1.tar.gz"
-  sha256 "d3c4b37ce6c293f8821cb20d0e47d47630d1fd91495d8221e7c8151e71497636"
+  sha256 "e797e9ff4c24c3a9092469306b2b7dd348d6114cdcdfd64575bceaac324ed32d"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "d3c4b37ce6c293f8821cb20d0e47d47630d1fd91495d8221e7c8151e71497636"
+    sha256 cellar: :any_skip_relocation, ventura: "e797e9ff4c24c3a9092469306b2b7dd348d6114cdcdfd64575bceaac324ed32d"
   end
 
 
