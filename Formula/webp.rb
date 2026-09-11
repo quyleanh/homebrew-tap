@@ -6,12 +6,12 @@ class Webp < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/webp-1.6.0.ventura.bottle.1.tar.gz"
-  sha256 "bcbb892ff3e62def280ed4c2f6bc03092124a816bbdb6d1ff76142cea4809e03"
+  sha256 "a0a665738276559026a70a745bd899f67c17000604f0ba2b43a34abf84ae8249"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "bcbb892ff3e62def280ed4c2f6bc03092124a816bbdb6d1ff76142cea4809e03"
+    sha256 cellar: :any, ventura: "a0a665738276559026a70a745bd899f67c17000604f0ba2b43a34abf84ae8249"
   end
 
   depends_on "quyleanh/tap/giflib"
