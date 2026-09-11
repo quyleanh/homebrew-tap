@@ -6,12 +6,12 @@ class Lz4 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lz4-1.10.0.ventura.bottle.1.tar.gz"
-  sha256 "54eac01bcd35caf3eb48ca09b24db0b323ed780c6dc2c92ab60b8638d9f907f7"
+  sha256 "0ab3ed80967680516617d9c8afe7028c5d875c5e2ee58b0a275c0742b6cf5b5b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "54eac01bcd35caf3eb48ca09b24db0b323ed780c6dc2c92ab60b8638d9f907f7"
+    sha256 cellar: :any, ventura: "0ab3ed80967680516617d9c8afe7028c5d875c5e2ee58b0a275c0742b6cf5b5b"
   end
 
 
