@@ -6,12 +6,12 @@ class JpegTurbo < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/jpeg-turbo-3.2.0.ventura.bottle.1.tar.gz"
-  sha256 "da37dcc0f50ebb784880ba38646dbd18afd435a4dd36b8845049ee7424617b44"
+  sha256 "0fe5b02819b3a0fb958e9fa05990c7cf5bca584bb22c59f9ef7e1df071e195ea"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "da37dcc0f50ebb784880ba38646dbd18afd435a4dd36b8845049ee7424617b44"
+    sha256 cellar: :any, ventura: "0fe5b02819b3a0fb958e9fa05990c7cf5bca584bb22c59f9ef7e1df071e195ea"
   end
 
 
