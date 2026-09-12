@@ -117,11 +117,19 @@ for entry in "${todo[@]}"; do
     continue
   fi
 
+  # Asset first, formula second: a pushed formula must never point at an asset that is
+  # not on the release yet — CI's checksum check would fail it, and the version check here
+  # would no longer see a difference, so nothing would ever retry it.
+  if gh release upload stable "$tarball" "$json" --repo "$TAP" --clobber >>"$LOG" 2>&1; then
+    log "✅ uploaded ($(basename "$tarball") + json)"
+  else
+    log "✗ upload failed — leaving the formula uncommitted so the next run retries"
+    continue
+  fi
+
   git add "Formula/${pkg}.rb" && git commit -q -m "chore(bottles): update ${pkg} (${version}) [skip ci]" >>"$LOG" 2>&1 && log "formula committed"
-  gh release upload stable "$tarball" "$json" --repo "$TAP" --clobber >>"$LOG" 2>&1 \
-    && log "✅ uploaded ($(basename "$tarball") + json)" || log "⚠️ upload failed — formula not pushed"
   git pull --rebase -q origin main >>"$LOG" 2>&1
-  git push -q origin main >>"$LOG" 2>&1 && log "✅ pushed" || log "⚠️ push failed"
+  git push -q origin main >>"$LOG" 2>&1 && log "✅ pushed" || log "⚠️ push failed (formula committed locally; next run will push it)"
   published=1
 done
 
