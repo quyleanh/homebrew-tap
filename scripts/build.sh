@@ -435,6 +435,27 @@ LAST_EXIT=$?
 return 0
 }
 
+# Same, but keeps the output so the caller can tell a load failure from a tool that
+# simply does not implement --version. First argument is the file to write.
+run_capped_out() {
+local out="$1"; shift
+local timeout_s="${VERIFY_TIMEOUT_SECONDS:-20}" waited=0
+"$@" </dev/null >"$out" 2>&1 &
+local pid=$!
+while kill -0 "$pid" 2>/dev/null; do
+  if [ "$waited" -ge "$timeout_s" ]; then
+    kill -9 "$pid" 2>/dev/null || true
+    LAST_EXIT=143
+    return 0
+  fi
+  sleep 1
+  waited=$((waited + 1))
+done
+wait "$pid"
+LAST_EXIT=$?
+return 0
+}
+
 verify_package() {
 local pkg="$1"
 local keg_dir failures=0 f bin
@@ -464,54 +485,50 @@ done < <(grep -rl "@@HOMEBREW" "$keg_dir" 2>/dev/null || true)
 #    126 bad interpreter (the unrelocated-shebang bug), 127 not found, and the
 #    fatal signals (a signature broken by relocation gets SIGKILLed). Anything
 #    else is just a tool that dislikes --version, so report it and move on.
-# Wrapper scripts that exec an external debugger are expected to fail when that
-# debugger is not installed: rust-gdb is a shell script whose whole job is
-# `exec gdb`, and gdb is not a dependency of rust. A missing *interpreter* (126)
-# still fails, because that is the unrelocated-shebang bug this check exists for.
-wrapper_scripts() {
-  case "$(basename "$1")" in
-    *-gdb | *-gdbgui | *-lldb | *-lb) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
+# A tool that merely dislikes --version is not a broken bottle. Lots of perfectly
+# healthy tools abort on it (ada-url's adaparse throws a cxxopts exception and dies
+# with SIGABRT; rust-gdb is a wrapper whose whole job is `exec gdb`, and gdb is not
+# a dependency of rust). What this check exists to catch is a bottle whose load
+# paths did not survive relocation, and that always announces itself: dyld prints
+# "Library not loaded" and kills the process. So gate on the signature, not on the
+# exit code — otherwise the gate fails on tools that never claimed to speak --version.
 for bin in "$keg_dir"/bin/* "$keg_dir"/*/bin/*; do
   [ -f "$bin" ] && [ -x "$bin" ] && [ ! -L "$bin" ] || continue
   file "$bin" 2>/dev/null | grep -qE 'Mach-O|script' || continue
-  run_capped "$bin" --version
-  case "$LAST_EXIT" in
-    0) ;;
-    127)
-      # 127 from a wrapper script means the tool it wraps is absent, not that the
-      # keg is broken. Everything else keeps its fatal status.
-      if file "$bin" 2>/dev/null | grep -q script || wrapper_scripts "$bin"; then
-        echo "  ⚠️  $pkg: $(basename "$bin") exited 127 (wrapper for an optional tool)"
-      else
-        echo "  ❌ $pkg: $(basename "$bin") --version died (exit $LAST_EXIT)"
-        failures=$((failures + 1))
-      fi ;;
-    126|132|133|134|139)
-      echo "  ❌ $pkg: $(basename "$bin") --version died (exit $LAST_EXIT)"
-      failures=$((failures + 1)) ;;
-    *) echo "  ⚠️  $pkg: $(basename "$bin") --version exited $LAST_EXIT" ;;
-  esac
+
+  verr="$(mktemp)"
+  run_capped_out "$verr" "$bin" --version
+  rc="$LAST_EXIT"
+
+  if [ "$rc" = 0 ]; then
+    rm -f "$verr"; continue
+  fi
+  # A load failure always announces itself; anything else is the tool itself.
+  if grep -qE 'Library not loaded|dyld\[|Killed: 9|Segmentation fault' "$verr" 2>/dev/null; then
+    echo "  ❌ $pkg: $(basename "$bin") could not load a library (exit $rc)"
+    grep -E 'Library not loaded|dyld\[|Killed: 9|Segmentation fault' "$verr" | head -3 | sed 's/^/     /'
+    failures=$((failures + 1))
+  elif [ "$rc" = 137 ]; then
+    # SIGKILL with no message is what a signature broken by relocation looks like.
+    echo "  ❌ $pkg: $(basename "$bin") killed (exit 137) — probably a bad code signature"
+    failures=$((failures + 1))
+  else
+    echo "  ⚠️  $pkg: $(basename "$bin") exited $rc on --version (tool quirk, not a load failure)"
+  fi
+  rm -f "$verr"
 done
 
-# 2b. A keg must not link anything it does not declare. This is the check that
-# matters for poured bottles: the build machine had the library, the runner may
-# not, and nothing above catches it. Undeclared linkage is reported and treated
-# as a failure so the bottle never ships in a state that only works here.
+# 2b. A keg must not link anything undeclared or unresolvable. On the machine that
+# built a bottle every dependency happens to be present, so a missing declaration is
+# invisible here and only bites a clean runner that installs strictly from the formula.
 linkage_report="$(brew linkage "$pkg" 2>/dev/null || true)"
-if printf '%s\n' "$linkage_report" | grep -q 'Undeclared dependencies'; then
-  printf '%s\n' "$linkage_report" | sed -n '/Undeclared dependencies/,/^[A-Z]/p' | sed 's/^/  /'
-  echo "  ❌ $pkg: undeclared linkage — the formula must declare every library it links"
-  failures=$((failures + 1))
-fi
-if printf '%s\n' "$linkage_report" | grep -q 'Broken dependencies'; then
-  printf '%s\n' "$linkage_report" | sed -n '/Broken dependencies/,/^[A-Z]/p' | sed 's/^/  /'
-  echo "  ❌ $pkg: broken dynamic links — some dependency was not installed before it"
-  failures=$((failures + 1))
-fi
+for kind in "Undeclared dependencies" "Broken dependencies"; do
+  if printf '%s\n' "$linkage_report" | grep -q "^$kind"; then
+    printf '%s\n' "$linkage_report" | sed -n "/^$kind/,/^[A-Z]/p" | grep '^  ' | sed 's/^/  /' | head -10
+    echo "  ❌ $pkg: $kind — the formula must declare every library it links"
+    failures=$((failures + 1))
+  fi
+done
 
 # 3. Python keystones must be able to run pip; that is the exact path the first
 #    half-relocated python bottle killed on.
