@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.quyleanh.homebrew-tap.caffeinate</string>
+
+  <!-- Keep the machine awake so a build (or a remote check from the phone) survives an idle
+       period. -i prevents idle sleep, -s prevents system sleep while on AC. The display is
+       deliberately left alone so it can still blank. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/caffeinate</string>
+    <string>-is</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <!-- caffeinate runs until killed, so KeepAlive just restarts it if it is ever killed. -->
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/quyleanh/Library/Logs/homebrew-tap-caffeinate.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/quyleanh/Library/Logs/homebrew-tap-caffeinate.log</string>
+</dict>
+</plist>
