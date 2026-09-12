@@ -6,12 +6,12 @@ class Node < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.8.2.ventura.bottle.1.tar.gz"
-  sha256 "a5b4c718b57b289560173691f8279aaf3c0029ff8959a3454de2f99668354283"
+  sha256 "eb03b3b22ee26ab7909f0d9ecd8817c4f64bddde2847ef4494a54a4863de2ddd"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "a5b4c718b57b289560173691f8279aaf3c0029ff8959a3454de2f99668354283"
+    sha256 cellar: "/usr/local/Cellar", ventura: "eb03b3b22ee26ab7909f0d9ecd8817c4f64bddde2847ef4494a54a4863de2ddd"
   end
 
   depends_on "quyleanh/tap/ada-url"
