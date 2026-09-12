@@ -14,6 +14,7 @@ class LlvmAT22 < Formula
     sha256 cellar: :any, ventura: "98c5ddd1bdb820d26e0723c8732686dcc04c9ff814a943d21478f8704b8de77b"
   end
 
+  depends_on "quyleanh/tap/libffi"
   depends_on "quyleanh/tap/zstd"
 
   def install

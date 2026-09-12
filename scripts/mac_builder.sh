@@ -117,6 +117,18 @@ for entry in "${todo[@]}"; do
     continue
   fi
 
+  # Gate: refuse to publish a keg that only works on this machine. `brew linkage` reports
+  # both directions — a library we link but do not declare, and a declared dependency whose
+  # path does not resolve — and either one is a SIGABRT on a clean runner. This gate would
+  # have caught the llvm bottle (undeclared libffi, version-pinned zstd path) before it shipped.
+  linkout="$(brew linkage "$pkg" 2>/dev/null || true)"
+  if printf '%s\n' "$linkout" | grep -qE '^(Broken|Undeclared) dependencies'; then
+    printf '%s\n' "$linkout" | sed -n '/^\(Broken\|Undeclared\) dependencies/,/^[A-Z]/p' | sed 's/^/    /' >>"$LOG"
+    log "❌ $pkg: linkage is not clean — NOT publishing; manual review"
+    continue
+  fi
+  log "linkage clean ✓"
+
   # Asset first, formula second: a pushed formula must never point at an asset that is
   # not on the release yet — CI's checksum check would fail it, and the version check here
   # would no longer see a difference, so nothing would ever retry it.

@@ -464,18 +464,54 @@ done < <(grep -rl "@@HOMEBREW" "$keg_dir" 2>/dev/null || true)
 #    126 bad interpreter (the unrelocated-shebang bug), 127 not found, and the
 #    fatal signals (a signature broken by relocation gets SIGKILLed). Anything
 #    else is just a tool that dislikes --version, so report it and move on.
+# Wrapper scripts that exec an external debugger are expected to fail when that
+# debugger is not installed: rust-gdb is a shell script whose whole job is
+# `exec gdb`, and gdb is not a dependency of rust. A missing *interpreter* (126)
+# still fails, because that is the unrelocated-shebang bug this check exists for.
+wrapper_scripts() {
+  case "$(basename "$1")" in
+    *-gdb | *-gdbgui | *-lldb | *-lb) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 for bin in "$keg_dir"/bin/* "$keg_dir"/*/bin/*; do
   [ -f "$bin" ] && [ -x "$bin" ] && [ ! -L "$bin" ] || continue
   file "$bin" 2>/dev/null | grep -qE 'Mach-O|script' || continue
   run_capped "$bin" --version
   case "$LAST_EXIT" in
     0) ;;
-    126|127|132|133|134|139)
+    127)
+      # 127 from a wrapper script means the tool it wraps is absent, not that the
+      # keg is broken. Everything else keeps its fatal status.
+      if file "$bin" 2>/dev/null | grep -q script || wrapper_scripts "$bin"; then
+        echo "  ⚠️  $pkg: $(basename "$bin") exited 127 (wrapper for an optional tool)"
+      else
+        echo "  ❌ $pkg: $(basename "$bin") --version died (exit $LAST_EXIT)"
+        failures=$((failures + 1))
+      fi ;;
+    126|132|133|134|139)
       echo "  ❌ $pkg: $(basename "$bin") --version died (exit $LAST_EXIT)"
       failures=$((failures + 1)) ;;
     *) echo "  ⚠️  $pkg: $(basename "$bin") --version exited $LAST_EXIT" ;;
   esac
 done
+
+# 2b. A keg must not link anything it does not declare. This is the check that
+# matters for poured bottles: the build machine had the library, the runner may
+# not, and nothing above catches it. Undeclared linkage is reported and treated
+# as a failure so the bottle never ships in a state that only works here.
+linkage_report="$(brew linkage "$pkg" 2>/dev/null || true)"
+if printf '%s\n' "$linkage_report" | grep -q 'Undeclared dependencies'; then
+  printf '%s\n' "$linkage_report" | sed -n '/Undeclared dependencies/,/^[A-Z]/p' | sed 's/^/  /'
+  echo "  ❌ $pkg: undeclared linkage — the formula must declare every library it links"
+  failures=$((failures + 1))
+fi
+if printf '%s\n' "$linkage_report" | grep -q 'Broken dependencies'; then
+  printf '%s\n' "$linkage_report" | sed -n '/Broken dependencies/,/^[A-Z]/p' | sed 's/^/  /'
+  echo "  ❌ $pkg: broken dynamic links — some dependency was not installed before it"
+  failures=$((failures + 1))
+fi
 
 # 3. Python keystones must be able to run pip; that is the exact path the first
 #    half-relocated python bottle killed on.
@@ -726,9 +762,10 @@ publish_package() {
     git config user.email "github-actions[bot]@users.noreply.github.com"
     git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE"
 
-    local formula_published=true
+    local formula_published=true commit_made=false
     if ! git diff --staged --quiet; then
       formula_published=false
+      commit_made=true
       echo "  💾 Committing & pushing formula update for $pkg..."
       git commit -m "chore(bottles): update $pkg ($pkg_version) [skip ci]
 
@@ -754,10 +791,17 @@ Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
     # Keep the old asset available until both its replacement and the formula
     # referencing that replacement are published. This avoids a transient 404
     # for users and for later packages in this workflow.
+    # A commit that exists locally but has not landed yet is still a real commit —
+    # the workflow pushes at the end — so it must not count as an unverified
+    # publication. Only the asset deletion below waits for the remote to agree.
     local replacement_verified=false
-    if [ "$upload_success" = true ] && [ "$formula_published" = true ] &&
+    if [ "$upload_success" = true ] && [ "$formula_published$commit_made" = truetrue ] &&
       grep -Fq "$(basename "$bottle_file")" "$REPO_ROOT/Formula/${pkg}.rb"; then
       replacement_verified=true
+      if [ "$commit_made" = true ] && [ "$formula_published" != true ]; then
+        echo "  ℹ️  Commit for $pkg is local; deferring asset cleanup until it lands"
+        return 0
+      fi
       echo "  🔍 Checking for older release assets of $pkg to clean up..."
       local remote_assets
       remote_assets=$(gh release view stable --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || echo "")
