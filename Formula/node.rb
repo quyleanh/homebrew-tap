@@ -2,16 +2,16 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "26.8.1"
+  version "26.8.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.8.1.ventura.bottle.1.tar.gz"
-  sha256 "2f650c161b3cb0696694e1f401ef6b91663f73cfc444e6aa171a911d6d5bd24c"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.8.2.ventura.bottle.1.tar.gz"
+  sha256 "a5b4c718b57b289560173691f8279aaf3c0029ff8959a3454de2f99668354283"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "2f650c161b3cb0696694e1f401ef6b91663f73cfc444e6aa171a911d6d5bd24c"
+    sha256 cellar: "/usr/local/Cellar", ventura: "a5b4c718b57b289560173691f8279aaf3c0029ff8959a3454de2f99668354283"
   end
 
   depends_on "quyleanh/tap/ada-url"

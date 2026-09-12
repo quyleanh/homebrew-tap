@@ -13,7 +13,7 @@
 # CI; it stays at a number that keeps it on the Mac.
 llvm	21000
 llvm@22	21600
-node	9853
+node	9971
 openssl@3	1046
 go	335
 sdl3	110
