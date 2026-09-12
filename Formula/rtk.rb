@@ -2,16 +2,16 @@
 class Rtk < Formula
   desc "CLI proxy to minimize LLM token consumption"
   homepage "https://www.rtk-ai.app/"
-  version "0.48.0"
+  version "0.49.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk-0.48.0.ventura.bottle.1.tar.gz"
-  sha256 "73e6b0eadc67207bfb6aa6a647f857cfbc2c16e19da16f45e75b586b8329a6ba"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rtk-0.49.0.ventura.bottle.1.tar.gz"
+  sha256 "7b43d103ffad1504d9e4a2bce1689691b959ee81348c58365556a796085aedc1"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "73e6b0eadc67207bfb6aa6a647f857cfbc2c16e19da16f45e75b586b8329a6ba"
+    sha256 cellar: :any_skip_relocation, ventura: "7b43d103ffad1504d9e4a2bce1689691b959ee81348c58365556a796085aedc1"
   end
 
 
