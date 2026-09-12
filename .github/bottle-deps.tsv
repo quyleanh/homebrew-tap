@@ -11,3 +11,4 @@
 # The file backfills as packages rebuild. It is not a historical log: one line per package,
 # rewritten in place on every publish.
 xz	5.8.4	
+ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.0 libvpx=1.17.0 openssl@3=3.6.4 opus=1.6.1 sdl2-compat=2.32.72 svt-av1=4.2.0 x264=r3222 x265=4.3
