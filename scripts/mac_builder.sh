@@ -56,7 +56,12 @@ fi
 
 # Cheap guards first: both are required for the publish half and neither is
 # guaranteed under launchd's environment.
-brew --version >/dev/null 2>&1 || { log "✗ brew unusable (vendored-ruby json? see stdckdint shim note) — aborting"; exit 1; }
+# Exercise json specifically: `brew --version` answers fine even when the vendored
+# json gem is dead, and a dead gem makes the version check below return empty — which
+# would skip every package in silence. If this fires, the stdckdint shim under
+# vendor/portable-ruby is gone (a portable-ruby re-pour takes it with it).
+brew info --json=v2 hello 2>/dev/null | jq -e . >/dev/null 2>&1 \
+  || { log "✗ brew info --json is broken (vendored-ruby json / stdckdint shim) — aborting"; exit 1; }
 gh auth token >/dev/null 2>&1  || { log "✗ gh not authenticated — aborting"; exit 1; }
 
 cd "$REPO" || { log "✗ repo missing"; exit 1; }
