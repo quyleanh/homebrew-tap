@@ -54,7 +54,9 @@ BUILD_HARD_CAP_SECONDS="${BUILD_HARD_CAP_SECONDS:-$((5 * 3600 + 2700))}"
 JOB_TIMEOUT_SECONDS="${JOB_TIMEOUT_SECONDS:-$((6 * 3600))}"
 # A dedicated run has exactly one bottle to commit and upload at the end (observed
 # at ~2 minutes), so it can spend nearly the whole window on the build itself.
-DEDICATED_PUBLISH_RESERVE_SECONDS="${DEDICATED_PUBLISH_RESERVE_SECONDS:-300}"
+# A cap-kill still has to kill brew, record the floor, commit and push before GitHub's
+# hard wall; 5 minutes was not enough (run 34605537682 hit the wall 4 min past its cap).
+DEDICATED_PUBLISH_RESERVE_SECONDS="${DEDICATED_PUBLISH_RESERVE_SECONDS:-900}"
 # Optional: restrict a run to one package (workflow_dispatch input). Used for
 # packages that can no longer fit in a shared window — llvm needs ~5h40m on its
 # own, so a normal run defers it and a dedicated dispatch gives it the whole run.

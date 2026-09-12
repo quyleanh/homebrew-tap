@@ -54,3 +54,4 @@ libtiff	63
 little-cms2	88
 z3	1473
 ninja	105
+llvm	33000	# measured on the Intel Mac, 2026-09-12: 9h10m compile (CI cannot fit it in a 6h job)
