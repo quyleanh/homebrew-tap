@@ -2,16 +2,16 @@
 class Hugo < Formula
   desc "Configurable static site generator"
   homepage "https://gohugo.io/"
-  version "0.165.0"
+  version "0.166.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo-0.165.0.ventura.bottle.1.tar.gz"
-  sha256 "7f28490b72f34504cca54e034a1c311d1c762bbb52ff7e29e0f8a026a08cd5a4"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo-0.166.0.ventura.bottle.1.tar.gz"
+  sha256 "c15873cfc7df4045dec8cdc5c3b3b8cd1ddab23a969174e9f09a9313a0429f14"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "7f28490b72f34504cca54e034a1c311d1c762bbb52ff7e29e0f8a026a08cd5a4"
+    sha256 cellar: :any_skip_relocation, ventura: "c15873cfc7df4045dec8cdc5c3b3b8cd1ddab23a969174e9f09a9313a0429f14"
   end
 
 
