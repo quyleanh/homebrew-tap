@@ -49,7 +49,7 @@ class Gh < Formula
     opt_root = "#{HOMEBREW_PREFIX}/opt/"
     sub_ph = lambda { |s|
       r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
-      r.gsub(ver_opt) { "#{opt_root}#{/Users/runner/work/homebrew-tap/homebrew-tap/bottles/gh-2.100.0.ventura.bottle.json}/" }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
     }
 
     macho_magics = [

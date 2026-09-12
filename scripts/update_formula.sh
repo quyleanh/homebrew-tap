@@ -185,7 +185,7 @@ ${deps}
     opt_root = "#{HOMEBREW_PREFIX}/opt/"
     sub_ph = lambda { |s|
       r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
-      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+      r.gsub(ver_opt) { "#{opt_root}#{\$1}/" }
     }
 
     macho_magics = [
