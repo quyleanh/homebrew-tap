@@ -17,9 +17,12 @@ on:
         required: false
         default: ""
 
-  # Run automatically every 12 hours
+  # Weekly. The big packages (llvm family) are built on the Mac — see
+  # scripts/mac_builder.sh — which dispatches a run as soon as it publishes, so the
+  # chain does not sit here waiting for this schedule. This run is the catch-all for
+  # everything that does fit in a job.
   schedule:
-    - cron: '13 4 * * *'
+    - cron: '13 4 * * 1'
 
   # Run when package definitions or the build pipeline changes
   push:

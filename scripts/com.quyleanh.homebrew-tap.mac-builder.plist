@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.quyleanh.homebrew-tap.mac-builder</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/quyleanh/GitHub/homebrew-tap/scripts/mac_builder.sh</string>
+  </array>
+
+  <!-- Daily. launchd fires a missed calendar run on the next wake, which is the point:
+       the machine is not always awake, and a build that is late costs nothing. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict>
+      <key>Hour</key>
+      <integer>10</integer>
+      <key>Minute</key>
+      <integer>0</integer>
+    </dict>
+  </array>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/quyleanh/Library/Logs/homebrew-tap-mac-builder.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/quyleanh/Library/Logs/homebrew-tap-mac-builder.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+</dict>
+</plist>
