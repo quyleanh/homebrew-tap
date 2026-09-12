@@ -34,3 +34,4 @@ nasm
 git-filter-repo
 gitleaks
 potrace
+gh
