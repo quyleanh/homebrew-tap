@@ -1,0 +1,12 @@
+# What each published bottle was built against. Written by scripts/build.sh on publish,
+# read by needs_build() to spot a dependency moving under a package that has not itself
+# changed version — the case Homebrew's version check cannot see, and the reason ffmpeg
+# kept shipping a bottle linked against libx265.216 after x265 moved to 4.3.
+#
+# Format: package <TAB> version-at-publish <TAB> space-separated dep=version pairs
+# Only tap dependencies are recorded: they are the ones this pipeline resolves, versions
+# and bakes into the binaries. An empty third column means "nothing tap-owned was linked",
+# not "unknown" — and unknown is never a reason to rebuild.
+#
+# The file backfills as packages rebuild. It is not a historical log: one line per package,
+# rewritten in place on every publish.

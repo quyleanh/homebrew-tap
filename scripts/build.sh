@@ -29,6 +29,19 @@ PACKAGES_FILE="$REPO_ROOT/packages.txt"
 RESOLVED_FILE="$REPO_ROOT/packages_resolved.txt"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/bottles}"
 BUILD_TIME_ESTIMATES_FILE="$REPO_ROOT/.github/build-times.tsv"
+#
+# Dependency-aware staleness. Homebrew records dependency NAMES but never the versions a
+# bottle was built against, so when a dependency moves on, every bottle that linked the
+# old one still reads as up to date to the version check — which is exactly how ffmpeg
+# shipped linked against libx265.216 after x265 moved to 4.3 and then died on launch
+# everywhere except the machine that built it. Record what each publish actually linked
+# against, and treat a change as a rebuild signal for the packages that link it.
+#
+# Only tap dependencies are recorded: they are the ones this pipeline resolves, versions
+# and bakes into the binaries. The manifest starts empty and backfills as packages
+# rebuild; an unrecorded package is assumed fine rather than rebuilt speculatively, so
+# switching this on does not turn into a rebuild of everything.
+BOTTLE_DEPS_FILE="${BOTTLE_DEPS_FILE:-$REPO_ROOT/.github/bottle-deps.tsv}"
 GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
 FORCE_BUILD="${FORCE_BUILD:-false}"
 MAX_BUILD_TIME="${MAX_BUILD_TIME:-$((5 * 3600))}" # Default: 5 hours in seconds
@@ -670,6 +683,43 @@ echo "  ℹ️  Restored pkgconf opt aliases: pkg-config, pkgconfig"
 
 # ──────────────────────────────────────────────────────────────
 
+# Record the tap dependencies (and their versions at that moment) a package was built
+# against, so a later dependency bump can be recognised as a rebuild signal. One line
+# per package: name, version, then dep=version pairs. Rewritten on every publish.
+record_bottle_deps() {
+  local pkg="$1" pkg_version="$2" deps="" d v
+  while read -r d; do
+    [ -n "$d" ] || continue
+    v=$(get_released_version "$d")
+    [ -n "$v" ] && deps="$deps $d=$v"
+  done < <(grep -o 'depends_on "quyleanh/tap/[^"]*"' "$REPO_ROOT/Formula/${pkg}.rb" 2>/dev/null | sed 's|.*/||; s|"||g')
+  {
+    grep -v "^${pkg}$(printf '\t')" "$BOTTLE_DEPS_FILE" 2>/dev/null || true
+    printf '%s\t%s\t%s\n' "$pkg" "$pkg_version" "${deps# }"
+  } > "$BOTTLE_DEPS_FILE.tmp" && mv "$BOTTLE_DEPS_FILE.tmp" "$BOTTLE_DEPS_FILE"
+  echo "  📝 Recorded build-time deps for $pkg:${deps:+ —$deps}"
+}
+
+# Is this package's published bottle linked against something the tap no longer has at
+# that version? Empty manifest or unknown dep version means we cannot tell, and cannot
+# tell is not a reason to rebuild.
+deps_stale() {
+  local pkg="$1" line dv d v now
+  [ -n "$BOTTLE_DEPS_FILE" ] && [ -f "$BOTTLE_DEPS_FILE" ] || return 1
+  line=$(awk -F'\t' -v p="$pkg" '$1==p{print; exit}' "$BOTTLE_DEPS_FILE")
+  [ -n "$line" ] || return 1
+  for dv in $(printf '%s' "$line" | cut -f3); do
+    d="${dv%%=*}"; v="${dv##*=}"
+    now=$(get_released_version "$d")
+    [ -n "$now" ] || continue
+    if [ "$now" != "$v" ]; then
+      echo "  → $d moved $v -> $now since $pkg was built"
+      return 0
+    fi
+  done
+  return 1
+}
+
 needs_build() {
 local pkg="$1"
 local formula_ref="$pkg"
@@ -719,6 +769,11 @@ if [ "$latest" = "$released" ] && has_released_bottle "$pkg" "$latest"; then
   if ! released_formula_checksum_matches "$pkg" "$latest"; then
     return 0
   fi
+  if deps_stale "$pkg"; then
+    echo "  → Dependency moved since this bottle was built, will build"
+    return 0
+  fi
+
   echo "  → Up to date, skipping ✓"
   return 1
 fi
@@ -777,6 +832,7 @@ publish_package() {
       echo "  ✅ Bottle uploaded to GitHub Release"
       echo "$pkg_version" > "$VERSIONS_CACHE_DIR/$pkg"
       echo "$(basename "$bottle_file")" >> "$RELEASED_ASSETS_FILE"
+      record_bottle_deps "$pkg" "$pkg_version"
     else
       echo "  ⚠️  Failed to upload bottle to GitHub Release"
     fi
@@ -784,7 +840,7 @@ publish_package() {
     # 3. Commit and push formula update immediately
     git config user.name "github-actions[bot]"
     git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE"
+    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE" "$BOTTLE_DEPS_FILE"
 
     local formula_published=true commit_made=false
     if ! git diff --staged --quiet; then
