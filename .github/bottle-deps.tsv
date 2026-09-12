@@ -10,3 +10,4 @@
 #
 # The file backfills as packages rebuild. It is not a historical log: one line per package,
 # rewritten in place on every publish.
+xz	5.8.4	

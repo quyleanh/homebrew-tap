@@ -2,16 +2,16 @@
 class Xz < Formula
   desc "General-purpose data compression with high compression ratio"
   homepage "https://tukaani.org/xz/"
-  version "5.8.3"
+  version "5.8.4"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz-5.8.3.ventura.bottle.1.tar.gz"
-  sha256 "677ded0c79ee4b4d35d94480e9d3d35be449757405b090151321f207676dcf28"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/xz-5.8.4.ventura.bottle.1.tar.gz"
+  sha256 "892b573280d2a1aaa083b68a6a91dec05e47e46b75991db8367bb295ee80f49a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "677ded0c79ee4b4d35d94480e9d3d35be449757405b090151321f207676dcf28"
+    sha256 cellar: :any, ventura: "892b573280d2a1aaa083b68a6a91dec05e47e46b75991db8367bb295ee80f49a"
   end
 
 
@@ -40,7 +40,17 @@ class Xz < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
