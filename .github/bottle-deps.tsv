@@ -19,3 +19,4 @@ ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.1 libvpx=1.17.0 openssl@3=3.6.4 
 simdutf	9.2.0	icu4c@78=78.3
 merve	1.2.2_3	simdutf=9.2.0
 bash	5.3.20	gettext=1.0 ncurses=6.6 readline=8.3.6
+docker	29.8.1	
