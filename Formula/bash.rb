@@ -2,16 +2,16 @@
 class Bash < Formula
   desc "Bourne-Again SHell, a UNIX command interpreter"
   homepage "https://www.gnu.org/software/bash/"
-  version "5.3.15"
+  version "5.3.20"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash-5.3.15.ventura.bottle.1.tar.gz"
-  sha256 "ed6004216c0f5c9a0a6996b110f6cf3795610ccfe54bdd118b27321b537c99d5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/bash-5.3.20.ventura.bottle.1.tar.gz"
+  sha256 "41fe470f26b0cd6344c98dfadb0cec94b864e69e536f4e5857beacf677241b14"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "ed6004216c0f5c9a0a6996b110f6cf3795610ccfe54bdd118b27321b537c99d5"
+    sha256 cellar: "/usr/local/Cellar", ventura: "41fe470f26b0cd6344c98dfadb0cec94b864e69e536f4e5857beacf677241b14"
   end
 
   depends_on "quyleanh/tap/gettext"
@@ -42,7 +42,17 @@ class Bash < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
