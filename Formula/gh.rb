@@ -2,16 +2,16 @@
 class Gh < Formula
   desc "GitHub command-line tool"
   homepage "https://cli.github.com/"
-  version "2.100.0"
+  version "2.101.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gh-2.100.0.ventura.bottle.1.tar.gz"
-  sha256 "0b7fde2f6ecdbafe107cad449aaa2e20e451f65e56dfe9dc538518b9b456811e"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/gh-2.101.0.ventura.bottle.1.tar.gz"
+  sha256 "0970cdcf57bd5ac1b6c3a3c0c928a376ae9b5c3f7898cc0d41699b2d45126c4b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "0b7fde2f6ecdbafe107cad449aaa2e20e451f65e56dfe9dc538518b9b456811e"
+    sha256 cellar: :any_skip_relocation, ventura: "0970cdcf57bd5ac1b6c3a3c0c928a376ae9b5c3f7898cc0d41699b2d45126c4b"
   end
 
 
