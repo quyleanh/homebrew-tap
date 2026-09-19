@@ -22,3 +22,4 @@ bash	5.3.20	gettext=1.0 ncurses=6.6 readline=8.3.6
 docker	29.8.1	
 gh	2.101.0	
 jemalloc	5.4.0	
+googletest	1.18.0	
