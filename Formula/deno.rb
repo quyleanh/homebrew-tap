@@ -2,16 +2,16 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.9.6"
+  version "2.9.7"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.6.ventura.bottle.1.tar.gz"
-  sha256 "336899a18b6db9316baa582c04e2d1c4e3cd94b97c93a56874b4ee882167de77"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.7.ventura.bottle.1.tar.gz"
+  sha256 "0b480b92396f6429dddc04c97613fd10bdd4364ec2fe2f5a973fa23031ad600c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "336899a18b6db9316baa582c04e2d1c4e3cd94b97c93a56874b4ee882167de77"
+    sha256 cellar: :any, ventura: "0b480b92396f6429dddc04c97613fd10bdd4364ec2fe2f5a973fa23031ad600c"
   end
 
   depends_on "quyleanh/tap/little-cms2"
@@ -41,7 +41,17 @@ class Deno < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
