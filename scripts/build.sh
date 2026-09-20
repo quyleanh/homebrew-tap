@@ -76,6 +76,23 @@ DEDICATED_PUBLISH_RESERVE_SECONDS="${DEDICATED_PUBLISH_RESERVE_SECONDS:-900}"
 ONLY_PACKAGE="${ONLY_PACKAGE:-}"
 export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 
+# bindgen resolves libclang from Homebrew's LLVM — deno's recipe points CLANG_BASE_PATH
+# at the tap's llvm — and upstream LLVM's driver does not put the macOS SDK on its
+# header search path. With no sysroot, `#include <stdlib.h>` inside a generated header
+# fails and the build dies inside build.rs: that is exactly how deno 2.9.7 lost on its
+# vendored libnghttp2 crate (`fatal error: 'stdlib.h' file not found`). Homebrew's
+# compiler shims add -isysroot for ordinary C builds, but cargo and bindgen bypass the
+# shims, so the sysroot has to be exported here. SDKROOT is what the clang driver reads;
+# BINDGEN_EXTRA_CLANG_ARGS covers the libclang path bindgen drives itself.
+if [ -z "${SDKROOT:-}" ] && command -v xcrun >/dev/null 2>&1; then
+  SDKROOT="$(xcrun --show-sdk-path 2>/dev/null || true)"
+fi
+if [ -n "${SDKROOT:-}" ]; then
+  export SDKROOT
+  BINDGEN_EXTRA_CLANG_ARGS="-isysroot$SDKROOT${BINDGEN_EXTRA_CLANG_ARGS:+ $BINDGEN_EXTRA_CLANG_ARGS}"
+  export BINDGEN_EXTRA_CLANG_ARGS
+fi
+
 mkdir -p "$OUTPUT_DIR"
 
 echo "=== Homebrew Bottle Builder ==="
@@ -83,6 +100,7 @@ echo "Output dir     : $OUTPUT_DIR"
 echo "Force build    : ${FORCE_BUILD}"
 echo "Max build time : $((MAX_BUILD_TIME / 60)) minutes ($MAX_BUILD_TIME seconds)"
 echo "Publish reserve: $((BUILD_TIME_RESERVE_SECONDS / 60)) minutes"
+echo "SDKROOT        : ${SDKROOT:-<unset>}"
 echo ""
 
 # ──────────────────────────────────────────────────────────────
