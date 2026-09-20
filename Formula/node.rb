@@ -2,27 +2,27 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "26.8.2"
+  version "26.9.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.8.2.ventura.bottle.1.tar.gz"
-  sha256 "eb03b3b22ee26ab7909f0d9ecd8817c4f64bddde2847ef4494a54a4863de2ddd"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.9.0.ventura.bottle.1.tar.gz"
+  sha256 "610a48309baad4853df0698cf91d5607368c862b04b868767469ef1379c7db10"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "eb03b3b22ee26ab7909f0d9ecd8817c4f64bddde2847ef4494a54a4863de2ddd"
+    sha256 cellar: "/usr/local/Cellar", ventura: "610a48309baad4853df0698cf91d5607368c862b04b868767469ef1379c7db10"
   end
 
+  depends_on "quyleanh/tap/abseil"
   depends_on "quyleanh/tap/ada-url"
   depends_on "quyleanh/tap/brotli"
   depends_on "quyleanh/tap/c-ares"
   depends_on "quyleanh/tap/hdrhistogram_c"
+  depends_on "quyleanh/tap/highway"
   depends_on "quyleanh/tap/icu4c@78"
   depends_on "quyleanh/tap/libffi"
   depends_on "quyleanh/tap/libnghttp2"
-  depends_on "quyleanh/tap/libnghttp3"
-  depends_on "quyleanh/tap/libngtcp2"
   depends_on "quyleanh/tap/libuv"
   depends_on "quyleanh/tap/llhttp"
   depends_on "quyleanh/tap/merve"
@@ -57,7 +57,17 @@ class Node < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
