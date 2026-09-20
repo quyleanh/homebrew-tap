@@ -76,22 +76,85 @@ DEDICATED_PUBLISH_RESERVE_SECONDS="${DEDICATED_PUBLISH_RESERVE_SECONDS:-900}"
 ONLY_PACKAGE="${ONLY_PACKAGE:-}"
 export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
 
-# bindgen resolves libclang from Homebrew's LLVM — deno's recipe points CLANG_BASE_PATH
-# at the tap's llvm — and upstream LLVM's driver does not put the macOS SDK on its
-# header search path. With no sysroot, `#include <stdlib.h>` inside a generated header
-# fails and the build dies inside build.rs: that is exactly how deno 2.9.7 lost on its
-# vendored libnghttp2 crate (`fatal error: 'stdlib.h' file not found`). Homebrew's
-# compiler shims add -isysroot for ordinary C builds, but cargo and bindgen bypass the
-# shims, so the sysroot has to be exported here. SDKROOT is what the clang driver reads;
-# BINDGEN_EXTRA_CLANG_ARGS covers the libclang path bindgen drives itself.
+# A Homebrew build does not inherit this script's environment. Homebrew builds with a
+# sanitized env — `brew sh -c env` shows SDKROOT, CPATH, LIBCLANG_PATH and
+# BINDGEN_EXTRA_CLANG_ARGS all gone, because they are on Homebrew's SANITIZED_VARS
+# list — so exporting them here reaches nothing and a package build never sees them.
+#
+# Cargo is the exception that works: it reads $CARGO_HOME/config.toml itself, and an
+# [env] table there is handed to every process cargo runs, build scripts included.
+# Homebrew's sanitizing cannot close that channel. It matters for bindgen: deno 2.9.7
+# vendors libnghttp2, whose build script runs bindgen over a generated header, and the
+# libclang it resolves from Homebrew's LLVM does not put the macOS SDK on its header
+# search path. With no sysroot that header's `#include <stdlib.h>` fails:
+#   nghttp2.h:43:10: fatal error: 'stdlib.h' file not found
+#   libnghttp2-1.68.0/build.rs:289: Failed to generate bindings
+# Homebrew's compiler shims add -isysroot for ordinary C builds, but cargo and bindgen
+# bypass the shims, so the sysroot has to reach them this way instead.
 if [ -z "${SDKROOT:-}" ] && command -v xcrun >/dev/null 2>&1; then
   SDKROOT="$(xcrun --show-sdk-path 2>/dev/null || true)"
 fi
 if [ -n "${SDKROOT:-}" ]; then
   export SDKROOT
-  BINDGEN_EXTRA_CLANG_ARGS="-isysroot$SDKROOT${BINDGEN_EXTRA_CLANG_ARGS:+ $BINDGEN_EXTRA_CLANG_ARGS}"
-  export BINDGEN_EXTRA_CLANG_ARGS
 fi
+
+configure_cargo_build_env() {
+  local cargo_home config block block_file sdk libclang_dir clang_bin
+  sdk="${SDKROOT:-}"
+  [ -n "$sdk" ] || return 0
+  command -v brew >/dev/null 2>&1 || return 0
+
+  # Homebrew points CARGO_HOME at this directory for build phases, so this is the
+  # config.toml cargo will read (PackageManagerCache in Homebrew's source).
+  cargo_home="$(brew --cache 2>/dev/null)/cargo_cache"
+  [ -n "$cargo_home" ] || return 0
+  mkdir -p "$cargo_home" 2>/dev/null || return 0
+  config="$cargo_home/config.toml"
+
+  # Apple's libclang finds the SDK on its own, so prefer it where it exists; the
+  # sysroot argument covers the case where Homebrew's libclang is used anyway.
+  libclang_dir=""
+  clang_bin="$(xcrun --find clang 2>/dev/null || true)"
+  if [ -n "$clang_bin" ]; then
+    libclang_dir="$(cd "$(dirname "$clang_bin")/../lib" 2>/dev/null && pwd)" || libclang_dir=""
+    if [ -z "$libclang_dir" ] || [ ! -f "$libclang_dir/libclang.dylib" ]; then
+      libclang_dir=""
+    fi
+  fi
+
+  block="BINDGEN_EXTRA_CLANG_ARGS = \"-isysroot$sdk\"
+SDKROOT = \"$sdk\""
+  if [ -n "$libclang_dir" ]; then
+    block="$block
+LIBCLANG_PATH = \"$libclang_dir\""
+  fi
+
+  if [ ! -f "$config" ]; then
+    printf '[env]\n%s\n' "$block" > "$config"
+  elif ! grep -q 'BINDGEN_EXTRA_CLANG_ARGS' "$config"; then
+    if grep -qE '^\[env\][[:space:]]*$' "$config"; then
+      # Add our keys inside the existing [env] table rather than after whichever
+      # table happens to sit at the end of the file. `sed r` appends the block
+      # after the matching line; awk -v cannot carry a multi-line value.
+      block_file="$(mktemp)"
+      printf '%s\n' "$block" > "$block_file"
+      if sed "/^\[env\][[:space:]]*\$/r $block_file" "$config" > "$config.new"; then
+        mv "$config.new" "$config"
+      fi
+      rm -f "$block_file" "$config.new"
+    else
+      printf '\n[env]\n%s\n' "$block" >> "$config"
+    fi
+  fi
+
+  if grep -q 'BINDGEN_EXTRA_CLANG_ARGS' "$config" 2>/dev/null; then
+    echo "  ℹ️  cargo build env: bindgen sysroot in $config${libclang_dir:+ (Apple libclang preferred)}"
+    printf '%s\n' "$block" | sed 's/^/     /'
+  else
+    echo "  ⚠️  cargo build env: could not write $config — bindgen may not find the macOS SDK"
+  fi
+}
+configure_cargo_build_env
 
 mkdir -p "$OUTPUT_DIR"
 
