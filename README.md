@@ -53,6 +53,25 @@ This tap uses a custom **"Dependency Hijacking"** architecture to ensure your sy
     *   Rewrite all dependencies to point to `quyleanh/tap/dependency` instead of the default `homebrew/core`.
 5.  **Clean Installation**: When you `brew install`, it downloads the pre-built binary and extracts it directly into your Cellar—no local compiling required.
 
+### Where builds run
+
+| Builder | Trigger | Builds |
+|---------|---------|--------|
+| GitHub Actions, `macos-15-intel` (`.github/workflows/build.yml`) | push to `packages.txt` / `scripts/`, manual dispatch, weekly (Mon 04:13 UTC) | everything that fits in one 6-hour job |
+| This Mac, `scripts/mac_builder.sh` (launchd, daily 20:00 JST) | calendar, with a missed run fired at the next wake | the `llvm` family, which cannot fit in a CI job |
+
+The Mac builder publishes exactly the way CI does (build → `brew bottle` → generate
+formula → upload → commit) and then dispatches a CI run so the packages depending on
+llvm get rebuilt.
+
+Two files under `.github/` are pipeline state, written by the build bots—do not edit them
+by hand:
+
+| File | Purpose |
+|------|---------|
+| `bottle-deps.tsv` | the dependency versions each published bottle was linked against. A dependency moving is a rebuild signal even when the dependent's own version has not changed (this is what caught ffmpeg linked against a stale `x265`). |
+| `build-times.tsv` | measured build durations. Used to decide whether a package still fits in the remaining job window; raised automatically after a build, a cap-kill or a cancellation. |
+
 ---
 
 ## 📝 Managing Packages
@@ -68,8 +87,10 @@ This tap uses a custom **"Dependency Hijacking"** architecture to ensure your sy
 |--------|---------|
 | `scripts/build.sh` | The main build engine. Handles dependency graphs and builds bottles. |
 | `scripts/update_formula.sh` | Post-build script that generates the `.rb` formula files. |
+| `scripts/mac_builder.sh` | Builds the `llvm` family on this Mac and dispatches CI when it publishes. |
 | `scripts/cleanup_release.sh` | Automatically removes old/unused bottles from the GitHub Release to keep it lean. |
 | `scripts/batch_replace_on_mac.sh` | Locally migrates all your existing packages to use this tap. |
+| `scripts/check_homebrew.sh` | Audits an installed machine: broken links, missing dylibs, unrelocated placeholders. |
 
 ---
 
@@ -80,6 +101,9 @@ A: Ensure you have tapped the repo correctly. Try running `brew untap quyleanh/t
 
 **Q: SHA256 Checksum Mismatch?**
 A: This happens if a build was interrupted or an asset was manually changed. The automated pipeline usually fixes this on the next run, but you can also trigger a **Manual Build** with `force_build: true` in the GitHub Actions tab.
+
+**Q: A build log says a package was "Skipped for the time budget"?**
+A: Its measured build time no longer fits the 5-hour window (the biggest ones—`node`, `deno`—routinely do not). Run the workflow manually with `only_package=<package>` to give that one package the whole job, or let the Mac builder take it if it is in the `llvm` family.
 
 ---
 

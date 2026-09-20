@@ -24,6 +24,13 @@ scrcpy
 # Dev / runtimes
 little-cms2
 node
+# node's published bottle links these two, but homebrew/core dropped them from the
+# node formula's dependency list (2026-09-19), so `brew deps` no longer resolves them
+# and the pipeline would silently never refresh them again. Keep them as explicit
+# leaves while a published node still links them; drop them once a node rebuild
+# produces a bottle that no longer does.
+libnghttp3
+libngtcp2
 hugo
 rtk
 go

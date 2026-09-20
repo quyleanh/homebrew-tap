@@ -91,7 +91,6 @@ export GH_TOKEN="$(gh auth token)"
 published=0
 for entry in "${todo[@]}"; do
   pkg="${entry%%:*}"; version="${entry##*:}"
-  slug="${pkg/@/-}"                      # bottle asset names use a dash: llvm-22-22.10.0
 
   log "building $pkg $version (hours; caffeinated)…"
   # brew bottle re-packages the installed keg; it must be the keg we just built, which
@@ -104,9 +103,23 @@ for entry in "${todo[@]}"; do
   [ "$(basename "${keg%/}")" = "$version" ] || { log "✗ $pkg: keg not at $version — not publishing"; continue; }
 
   mkdir -p bottles && ( cd bottles && brew bottle --json --root-url "$ROOT_URL" "homebrew/core/$pkg" >>"$LOG" 2>&1 )
-  tarball="bottles/${slug}-${version}.ventura.bottle.1.tar.gz"
-  json="bottles/${slug}-${version}.ventura.bottle.json"
-  [ -f "$tarball" ] || { log "✗ $pkg: no bottle tarball produced — leaving for manual review"; continue; }
+
+  # brew writes "<name>--<version>.<tag>.bottle[.<rebuild>].tar.gz", so a versioned
+  # formula lands as "llvm@22--22.1.8.ventura.bottle.1.tar.gz". Discover what was
+  # actually written instead of guessing: this used to expect "llvm-22-...", a name
+  # brew never produces, so llvm@22 silently never published. The tap's own form is
+  # the single-dash one the generated wrapper's url points at, so rename to it —
+  # exactly what CI does in build.sh.
+  raw_tarball="$(ls -t bottles/"${pkg}--${version}."*.tar.gz 2>/dev/null | head -1)"
+  raw_json="$(ls -t bottles/"${pkg}--${version}."*.json 2>/dev/null | head -1)"
+  if [ -z "$raw_tarball" ] || [ -z "$raw_json" ]; then
+    log "✗ $pkg: no bottle tarball/json produced — leaving for manual review"
+    continue
+  fi
+  tarball="bottles/$(basename "$raw_tarball" | sed 's/--/-/')"
+  json="bottles/$(basename "$raw_json" | sed 's/--/-/')"
+  [ "$raw_tarball" = "$tarball" ] || mv "$raw_tarball" "$tarball"
+  [ "$raw_json" = "$json" ] || mv "$raw_json" "$json"
   log "bottle ready: $(basename "$tarball") ($(du -h "$tarball" | cut -f1))"
 
   BOTTLES_DIR="$PWD/bottles" ./scripts/update_formula.sh "$json" >>"$LOG" 2>&1 || log "⚠️ update_formula.sh exited non-zero"

@@ -11,13 +11,15 @@
     <string>/Users/quyleanh/GitHub/homebrew-tap/scripts/mac_builder.sh</string>
   </array>
 
-  <!-- Daily. launchd fires a missed calendar run on the next wake, which is the point:
-       the machine is not always awake, and a build that is late costs nothing. -->
+  <!-- Daily at 20:00 local (JST on this machine). launchd fires a missed calendar run
+       on the next wake, which is the point: the machine is not always awake, and a
+       build that is late costs nothing. Evening rather than morning because the
+       machine is usually plugged in then — the script skips itself on battery. -->
   <key>StartCalendarInterval</key>
   <array>
     <dict>
       <key>Hour</key>
-      <integer>10</integer>
+      <integer>20</integer>
       <key>Minute</key>
       <integer>0</integer>
     </dict>
@@ -26,10 +28,9 @@
   <key>RunAtLoad</key>
   <false/>
 
-  <key>StandardOutPath</key>
-  <string>/Users/quyleanh/Library/Logs/homebrew-tap-mac-builder.log</string>
-  <key>StandardErrorPath</key>
-  <string>/Users/quyleanh/Library/Logs/homebrew-tap-mac-builder.log</string>
+  <!-- No StandardOutPath/StandardErrorPath on purpose: mac_builder.sh's log() already
+       appends its output to ~/Library/Logs/homebrew-tap-mac-builder.log, so also
+       redirecting stdout here wrote every line twice. -->
 
   <key>EnvironmentVariables</key>
   <dict>

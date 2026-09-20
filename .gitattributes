@@ -6,3 +6,4 @@
 *.yaml text eol=lf
 *.txt text eol=lf
 *.md text eol=lf
+*.plist text eol=lf
