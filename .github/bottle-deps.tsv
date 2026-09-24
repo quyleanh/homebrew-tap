@@ -30,3 +30,4 @@ meson	1.12.1	ninja=1.13.2 python@3.14=3.14.7
 simdutf	9.2.1	icu4c@78=78.3
 merve	1.2.2_3	simdutf=9.2.1
 wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.4.2 openssl@4=4.0.2
+expat	2.8.5	
