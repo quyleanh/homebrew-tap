@@ -1105,6 +1105,26 @@ echo ""
 
 fetch_released_versions
 
+# What a dedicated dispatch's target actually needs. In a run started for one package,
+# everything else is best-effort: a package the target does not need must not consume
+# the window it was given. Without this, `only_package=expat` walked into llvm first —
+# a package expat does not need, measured at 350m and therefore unable to fit — started
+# it anyway because the budget was switched off wholesale, lost the window to the
+# per-build cap and never reached expat.
+ONLY_PACKAGE_DEPS_FILE=""
+only_package_needs() {
+  [ -n "$ONLY_PACKAGE" ] || return 1
+  [ "$1" = "$ONLY_PACKAGE" ] && return 0
+  [ -f "$ONLY_PACKAGE_DEPS_FILE" ] || return 1
+  grep -qxF "$1" "$ONLY_PACKAGE_DEPS_FILE" 2>/dev/null
+}
+if [ -n "$ONLY_PACKAGE" ]; then
+  ONLY_PACKAGE_DEPS_FILE="$(mktemp)"
+  # --include-build: a build dependency the target needs has to fit too.
+  HOMEBREW_NO_ENV_HINTS=1 brew deps --include-build "$ONLY_PACKAGE" 2>/dev/null > "$ONLY_PACKAGE_DEPS_FILE" || true
+  echo "🎯 Dedicated run for $ONLY_PACKAGE ($(wc -l < "$ONLY_PACKAGE_DEPS_FILE" | tr -d ' ') dependencies may share the window)"
+fi
+
 BUILT=()
 SKIPPED=()
 FAILED=()
@@ -1198,7 +1218,16 @@ REQUIRED_TIME=$((PADDED_ESTIMATE + BUILD_TIME_RESERVE_SECONDS))
 echo "  → Estimated build: $((BUILD_ESTIMATE / 60))m + 25% safety"
 echo "  → Time remaining : $((REMAINING_TIME / 60))m (including publish reserve)"
 
-if [ -z "$ONLY_PACKAGE" ] && [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
+# The budget applies to everything except the package a dedicated run was dispatched
+# for: that one is the whole point of the run and gets whatever is left.
+if [ "$pkg" != "$ONLY_PACKAGE" ] && [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; then
+  # In a dedicated run, a package the target does not need is skipped rather than
+  # deferred — deferring breaks the loop and would strand the target behind it.
+  if [ -n "$ONLY_PACKAGE" ] && ! only_package_needs "$pkg"; then
+    echo "  ⏭️  Skipping $pkg: needs $((REQUIRED_TIME / 60))m, $((REMAINING_TIME / 60))m left, and $ONLY_PACKAGE does not need it"
+    SKIPPED_BUDGET+=("$pkg")
+    continue
+  fi
   # A package that can never fit in one window must not block the queue behind it.
   # Only block (defer the rest) when a later formula genuinely needs it.
   if package_needed_by_later_formula "$pkg"; then
@@ -1413,6 +1442,9 @@ echo ""
 done
 
 rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE" "$NEEDED_DEPENDENCIES_FILE"
+if [ -n "$ONLY_PACKAGE_DEPS_FILE" ]; then
+  rm -f "$ONLY_PACKAGE_DEPS_FILE"
+fi
 
 # ──────────────────────────────────────────────────────────────
 
