@@ -69,10 +69,21 @@ git pull --rebase -q origin main >>"$LOG" 2>&1 || log "⚠️ pull --rebase fail
 
 # "Needs a build" = upstream moved ahead of what the tap's formula pins. That is the
 # same test CI applies; the tap's formula only advances at publish time.
+#
+# The revision belongs in that test. Homebrew's pkg_version is "23.1.1_1" for a
+# revision bump, and comparing versions.stable alone made this script report "up to
+# date" for llvm 23.1.1_1 while CI — which does add the revision — saw the difference,
+# deferred llvm and abandoned every package behind it in the queue. Neither side would
+# ever build it: a deadlock that left a whole week of runs doing nothing.
 todo=()
 for pkg in "${PACKAGES[@]}"; do
-  upstream=$(brew info --json=v2 "homebrew/core/$pkg" 2>/dev/null | jq -r '.formulae[0].versions.stable // empty')
+  info=$(brew info --json=v2 "homebrew/core/$pkg" 2>/dev/null)
+  upstream=$(printf '%s' "$info" | jq -r '.formulae[0].versions.stable // empty')
+  upstream_revision=$(printf '%s' "$info" | jq -r '.formulae[0].revision // 0')
+  [ "${upstream_revision:-0}" -gt 0 ] && upstream="${upstream}_${upstream_revision}"
   pinned=$(grep -m1 -E '^\s*version ' "Formula/${pkg}.rb" 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/')
+  pinned_revision=$(grep -m1 -E '^\s*revision ' "Formula/${pkg}.rb" 2>/dev/null | awk '{print $2}')
+  [ -n "$pinned_revision" ] && pinned="${pinned}_${pinned_revision}"
   [ -z "$upstream" ] && { log "⚠️ cannot read upstream version for $pkg — skipping"; continue; }
   if [ "$upstream" = "$pinned" ]; then
     log "✓ $pkg: up to date (${pinned:-none} == upstream)"
