@@ -99,11 +99,37 @@ if [ "${#todo[@]}" -eq 0 ]; then log "nothing to build"; exit 0; fi
 export GITHUB_REPOSITORY="$TAP"
 export GH_TOKEN="$(gh auth token)"
 
+# `brew install --build-bottle` bails out before it starts when any dependency it would
+# have to install has no bottle for this platform (Homebrew's UnbottledError):
+#
+#   Error: llvm: The following formula cannot be installed from bottle and must be
+#   built from source.
+#     expat
+#
+# homebrew-core no longer ships Intel/Ventura bottles, so a plain dependency bump —
+# expat 2.8.4 to 2.8.5 was the one that stopped llvm — blocks the whole build. Bring
+# the outdated dependencies up to date from source first; after that the check has
+# nothing left to object to. This is the same reason the tap bottles these packages
+# for itself.
+rebuild_outdated_dependencies() {
+  local pkg="$1" dep
+  # --include-build matters: expat is a build dependency of llvm, so plain
+  # `brew deps` does not list it and the check below would skip the one dependency
+  # that is actually blocking the build.
+  for dep in $(brew deps --include-build "$pkg" 2>/dev/null); do
+    brew outdated --quiet "$dep" 2>/dev/null | grep -qx "$dep" || continue
+    log "dependency $dep is outdated with no bottle here — rebuilding it from source first"
+    caffeinate -is brew upgrade --build-from-source "$dep" >>"$LOG" 2>&1 ||
+      log "⚠️ could not rebuild $dep from source; the build below may fail on it"
+  done
+}
+
 published=0
 for entry in "${todo[@]}"; do
   pkg="${entry%%:*}"; version="${entry##*:}"
 
   log "building $pkg $version (hours; caffeinated)…"
+  rebuild_outdated_dependencies "$pkg"
   # brew bottle re-packages the installed keg; it must be the keg we just built, which
   # is why brew install runs first even though it looks redundant.
   # shellcheck disable=SC2086
