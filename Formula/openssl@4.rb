@@ -16,6 +16,11 @@ class OpensslAT4 < Formula
 
   depends_on "quyleanh/tap/ca-certificates"
 
+  # Upstream marks openssl@4 keg-only, and the wrapper must too: linking it symlinks
+  # 7,462 paths over the linked openssl@3, and Homebrew's conflict resolution walks the
+  # other keg directory by directory until the job dies at the ceiling.
+  keg_only :versioned_formula
+
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

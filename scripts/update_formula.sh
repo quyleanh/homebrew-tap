@@ -107,6 +107,26 @@ for json_file in "${JSON_FILES[@]}"; do
       ;;
   esac
 
+  # Respect upstream's keg-only marking. A generated wrapper is a fresh formula, so
+  # anything core deliberately keeps out of HOMEBREW_PREFIX has to stay out here too.
+  # Linking a keg-only formula symlinks its whole keg over whatever it is meant to sit
+  # beside — openssl@3 and openssl@4 share 7,462 paths — and Homebrew's conflict
+  # resolution then walks the other keg directory by directory, which wedged a build
+  # for six hours (the job ceiling) twice. JSON carries the reason symbol, so the
+  # wrapper ends up with the same `keg_only :versioned_formula` / `:provided_by_macos`
+  # line upstream uses.
+  keg_only_line=""
+  keg_only_reason=$(brew info --json=v2 "homebrew/core/$pkg_name" 2>/dev/null |
+    jq -r '.formulae[0].keg_only_reason.reason // empty' 2>/dev/null || true)
+  if [ -z "$keg_only_reason" ]; then
+    keg_only_reason=$(brew info --json=v2 "$pkg_name" 2>/dev/null |
+      jq -r '.formulae[0].keg_only_reason.reason // empty' 2>/dev/null || true)
+  fi
+  if [ -n "$keg_only_reason" ]; then
+    keg_only_line="  keg_only $keg_only_reason"
+    echo "  ℹ️  $pkg_name is keg-only upstream ($keg_only_reason); wrapper will not link it"
+  fi
+
   formula_file="$FORMULA_DIR/${pkg_name}.rb"
 
   # The target machine is macOS 13, so reference the Ventura-compatible alias
@@ -151,6 +171,7 @@ $bottle_rebuild_ruby
   end
 
 ${deps}
+${keg_only_line}
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

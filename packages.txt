@@ -21,6 +21,11 @@ ffmpeg
 libx11
 scrcpy
 
+# Libraries
+# expat has no Intel bottle in homebrew/core, so it rebuilds from source on every
+# upgrade. Bottle it here instead.
+expat
+
 # Dev / runtimes
 little-cms2
 node

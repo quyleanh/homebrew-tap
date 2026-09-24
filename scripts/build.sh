@@ -674,7 +674,18 @@ if [[ "$formula_ref" == "quyleanh/tap/"* ]]; then
   sync_registered_tap_formula "$pkg" || true
 fi
 
-brew install --build-from-source "$formula_ref" || restore_status=$?
+# Cap a restore. This path has no time budget of its own: the loop only checks the
+# clock between packages, so a restore that wedges (Homebrew walking a keg into the
+# one it collides with, say) runs until GitHub kills the job at the six-hour ceiling
+# and takes every package queued behind it along. Timing out turns that into one
+# failed package instead of a lost run.
+RESTORE_TIMEOUT_SECONDS="${RESTORE_TIMEOUT_SECONDS:-1800}"
+
+run_with_cap "$RESTORE_TIMEOUT_SECONDS" brew install --build-from-source "$formula_ref" || restore_status=$?
+if [ "$restore_status" -eq 142 ]; then
+  echo "  ⏱️  Restoring $pkg did not finish within $((RESTORE_TIMEOUT_SECONDS / 60))m; giving up on it"
+  return 1
+fi
 tap_formula_version_installed "$pkg" "$version" || return 1
 
 verify_package "$pkg" || return 1
