@@ -3,19 +3,21 @@ class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
   version "23.1.1"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm-23.1.1.ventura.bottle.1.tar.gz"
-  sha256 "c54778fdaddc46b77426437cb9d56cb93be3848f6c251e98e2a3ee2beccf572f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/llvm-23.1.1_1.ventura.bottle.1.tar.gz"
+  sha256 "0026071aeba4b74adca4c6574d610b567fa274ea6cc8cfe75e3116957aceb7a1"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "c54778fdaddc46b77426437cb9d56cb93be3848f6c251e98e2a3ee2beccf572f"
+    sha256 cellar: :any, ventura: "0026071aeba4b74adca4c6574d610b567fa274ea6cc8cfe75e3116957aceb7a1"
   end
 
   depends_on "quyleanh/tap/zstd"
   depends_on "quyleanh/tap/libffi"
+  keg_only :provided_by_macos
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
