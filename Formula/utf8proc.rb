@@ -2,17 +2,18 @@
 class Utf8proc < Formula
   desc "Clean C library for processing UTF-8 Unicode data"
   homepage "https://juliastrings.github.io/utf8proc/"
-  version "2.11.3"
+  version "2.12.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/utf8proc-2.11.3.ventura.bottle.1.tar.gz"
-  sha256 "33535a747e9ef34ceff4563ccf195ab878b0c552fbac68dfdb37382428dc53ba"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/utf8proc-2.12.0.ventura.bottle.1.tar.gz"
+  sha256 "6d45adc9f5432a63b377b4261b4b7ab006f66524f3eaae39515dee92e0f30256"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "33535a747e9ef34ceff4563ccf195ab878b0c552fbac68dfdb37382428dc53ba"
+    sha256 cellar: :any, ventura: "6d45adc9f5432a63b377b4261b4b7ab006f66524f3eaae39515dee92e0f30256"
   end
+
 
 
 
@@ -40,7 +41,17 @@ class Utf8proc < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
