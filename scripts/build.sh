@@ -693,7 +693,31 @@ fi
 # failed package instead of a lost run.
 RESTORE_TIMEOUT_SECONDS="${RESTORE_TIMEOUT_SECONDS:-1800}"
 
-run_with_cap "$RESTORE_TIMEOUT_SECONDS" brew install --build-from-source "$formula_ref" || restore_status=$?
+# A transient CDN failure must not fail a package. GitHub Releases answers 500 now and
+# then — run #404 lost xz to one, and minutes later the same asset downloaded fine and
+# matched its checksum — and that single blip turned a 48-minute run red and skipped the
+# release cleanup, which only runs when nothing failed. One download gets one retry.
+# The process substitution keeps the command in this shell (so the timeout trap can
+# still kill it) while the output is both logged and kept for inspection.
+local attempt restore_out
+restore_out="$(mktemp)"
+for attempt in 1 2; do
+  restore_status=0
+  run_with_cap "$RESTORE_TIMEOUT_SECONDS" brew install --build-from-source "$formula_ref" \
+    > >(tee "$restore_out") 2>&1 || restore_status=$?
+  if [ "$restore_status" -eq 0 ]; then
+    break
+  fi
+  if [ "$attempt" -eq 1 ] &&
+    grep -qE 'Failed to download resource|curl: \((5|6|7|28|35|56)\)' "$restore_out"; then
+    echo "  ↻ $pkg: download failed (looks transient) — retrying once"
+    sleep 15
+    continue
+  fi
+  break
+done
+rm -f "$restore_out"
+
 if [ "$restore_status" -eq 142 ]; then
   echo "  ⏱️  Restoring $pkg did not finish within $((RESTORE_TIMEOUT_SECONDS / 60))m; giving up on it"
   return 1
