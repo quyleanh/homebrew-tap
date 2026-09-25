@@ -54,14 +54,54 @@ if [ "$CHECK_ONLY" = "0" ] && ! pmset -g batt 2>/dev/null | grep -qi "AC Power";
   log "not on AC power — skipping; will run at next wake"; exit 0
 fi
 
+# Homebrew's vendored portable-ruby was built with HAVE_STDCKDINT_H=1, so
+# ruby/internal/stdckdint.h does `#include <stdckdint.h>` — a C23 header this machine's
+# macOS 13 SDK does not have. Without it every native gem extension fails to compile:
+#
+#   ruby/internal/stdckdint.h:48:11: error: 'stdckdint.h' file not found
+#
+# and `brew bottle` then dies inside `bundle install` (json, pulled in by rubocop),
+# throwing away a twelve-hour build with "no bottle tarball/json produced". A Homebrew
+# update re-pours portable-ruby and deletes this file, so put it back when it is gone.
+# It only has to satisfy Ruby's own use: memory.h calls ckd_add/ckd_mul with the result
+# lvalue's address, exactly like the __builtin_*_overflow form below.
+PORTABLE_RUBY_SHIM="/usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/current/include/ruby-4.0.0/stdckdint.h"
+ensure_portable_ruby_stdckdint_shim() {
+  local dir
+  dir="$(dirname "$PORTABLE_RUBY_SHIM")"
+  [ -d "$dir" ] || return 0
+  grep -q HOMEBREW_PORTABLE_RUBY_STDCKDINT_H "$PORTABLE_RUBY_SHIM" 2>/dev/null && return 0
+  cat > "$PORTABLE_RUBY_SHIM" <<'SHIM'
+/* Minimal C23 <stdckdint.h> for platforms whose SDK does not ship one.
+ *
+ * macOS 13's SDK (Apple clang 15) has no C23 stdckdint.h, but Homebrew's vendored
+ * portable-ruby was built with HAVE_STDCKDINT_H=1, so ruby/internal/stdckdint.h
+ * reaches for <stdckdint.h> unconditionally and native gem extensions fail to
+ * compile. mac_builder.sh rewrites this file because a Homebrew update re-pours
+ * portable-ruby and takes it away again.
+ */
+#ifndef HOMEBREW_PORTABLE_RUBY_STDCKDINT_H
+#define HOMEBREW_PORTABLE_RUBY_STDCKDINT_H
+
+#define __STDC_VERSION_STDCKDINT_H__ 202311L
+
+#define ckd_add(x, y, z) ((bool)__builtin_add_overflow((y), (z), (x)))
+#define ckd_sub(x, y, z) ((bool)__builtin_sub_overflow((y), (z), (x)))
+#define ckd_mul(x, y, z) ((bool)__builtin_mul_overflow((y), (z), (x)))
+
+#endif
+SHIM
+  log "ℹ️  restored the portable-ruby stdckdint.h shim (brew bottle needs it)"
+}
+ensure_portable_ruby_stdckdint_shim
+
 # Cheap guards first: both are required for the publish half and neither is
 # guaranteed under launchd's environment.
 # Exercise json specifically: `brew --version` answers fine even when the vendored
 # json gem is dead, and a dead gem makes the version check below return empty — which
-# would skip every package in silence. If this fires, the stdckdint shim under
-# vendor/portable-ruby is gone (a portable-ruby re-pour takes it with it).
+# would skip every package in silence.
 brew info --json=v2 hello 2>/dev/null | jq -e . >/dev/null 2>&1 \
-  || { log "✗ brew info --json is broken (vendored-ruby json / stdckdint shim) — aborting"; exit 1; }
+  || { log "✗ brew info --json is broken (vendored-ruby json) — aborting"; exit 1; }
 gh auth token >/dev/null 2>&1  || { log "✗ gh not authenticated — aborting"; exit 1; }
 
 cd "$REPO" || { log "✗ repo missing"; exit 1; }
