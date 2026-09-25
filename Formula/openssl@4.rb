@@ -6,19 +6,15 @@ class OpensslAT4 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.2.ventura.bottle.1.tar.gz"
-  sha256 "5dd9e1495fbf65c28e8dd866b68039bcb7131d5326cc499b14d099154f2accc8"
+  sha256 "2fee6f39ec719f72a5bee61f05d04ae3e482e732a9253a91fd4430294d6c1225"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "5dd9e1495fbf65c28e8dd866b68039bcb7131d5326cc499b14d099154f2accc8"
+    sha256 cellar: "/usr/local/Cellar", ventura: "2fee6f39ec719f72a5bee61f05d04ae3e482e732a9253a91fd4430294d6c1225"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
-
-  # Upstream marks openssl@4 keg-only, and the wrapper must too: linking it symlinks
-  # 7,462 paths over the linked openssl@3, and Homebrew's conflict resolution walks the
-  # other keg directory by directory until the job dies at the ceiling.
   keg_only :versioned_formula
 
   def install
