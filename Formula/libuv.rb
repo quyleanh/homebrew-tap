@@ -2,17 +2,18 @@
 class Libuv < Formula
   desc "Multi-platform support library with a focus on asynchronous I/O"
   homepage "https://libuv.org/"
-  version "1.52.1"
+  version "1.53.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libuv-1.52.1.ventura.bottle.1.tar.gz"
-  sha256 "ba8dc7cb8c999bef45684ae270dc7cc8e1ff4e52c618ca11b6e5f6b883c8f1cb"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libuv-1.53.0.ventura.bottle.1.tar.gz"
+  sha256 "5e3698b92ebe5b283288679713818f9e88af491996196f2d7ce893d903213075"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "ba8dc7cb8c999bef45684ae270dc7cc8e1ff4e52c618ca11b6e5f6b883c8f1cb"
+    sha256 cellar: :any, ventura: "5e3698b92ebe5b283288679713818f9e88af491996196f2d7ce893d903213075"
   end
+
 
 
 
@@ -40,7 +41,17 @@ class Libuv < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
