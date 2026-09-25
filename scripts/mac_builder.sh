@@ -27,6 +27,12 @@ export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 # shim at vendor/portable-ruby/current/include/ruby-4.0.0/stdckdint.h fixes it, but a
 # re-pour of portable-ruby would take the shim away, so auto-update stays off here.
 export HOMEBREW_NO_AUTO_UPDATE=1
+# Resolve formula definitions from the local homebrew/core clone instead of Homebrew's
+# API copy. The API cache cannot be refreshed without updating Homebrew itself, and it
+# lags: it still answered llvm 23.1.1_1 while the clone — and the CI runner — had
+# 23.1.2, so this script reported "up to date" and built nothing at all. With this set,
+# a plain git pull on the clone is enough to see upstream.
+export HOMEBREW_NO_INSTALL_FROM_API=1
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TAP="quyleanh/homebrew-tap"
@@ -115,6 +121,23 @@ git pull --rebase -q origin main >>"$LOG" 2>&1 || log "⚠️ pull --rebase fail
 # date" for llvm 23.1.1_1 while CI — which does add the revision — saw the difference,
 # deferred llvm and abandoned every package behind it in the queue. Neither side would
 # ever build it: a deadlock that left a whole week of runs doing nothing.
+# The version comparison below reads that clone and nothing else refreshes it — the
+# auto-update that normally would is off on purpose (see the top of this script).
+refresh_core_clone() {
+  local core_clone
+  core_clone="$(brew --repo homebrew/core 2>/dev/null)"
+  if [ -z "$core_clone" ] || [ ! -d "$core_clone/.git" ]; then
+    log "⚠️ no homebrew/core clone found; version checks read the API, which lags"
+    return 0
+  fi
+  if git -C "$core_clone" pull --ff-only -q >>"$LOG" 2>&1; then
+    log "ℹ️  homebrew/core at $(git -C "$core_clone" rev-parse --short HEAD)"
+  else
+    log "⚠️ could not refresh homebrew/core; version checks may be stale"
+  fi
+}
+refresh_core_clone
+
 todo=()
 for pkg in "${PACKAGES[@]}"; do
   info=$(brew info --json=v2 "homebrew/core/$pkg" 2>/dev/null)
