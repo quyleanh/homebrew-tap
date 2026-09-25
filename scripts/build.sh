@@ -250,6 +250,12 @@ echo "📝 Resolved list written to: packages_resolved.txt"
 echo ""
 
 NEEDED_DEPENDENCIES_FILE="$(mktemp)"
+# Direct dependency edges (package <TAB> dependency), used to work out what a deferred
+# package actually blocks instead of abandoning everything behind it.
+DEPS_GRAPH_FILE="$(mktemp)"
+# Packages that cannot be built in this run because something they need was deferred
+# earlier. Filled in as the loop walks the topological order.
+BLOCKED_FILE="$(mktemp)"
 
 compute_needed_dependencies() {
   echo "🔍 Precomputing needed dependencies for later builds..."
@@ -257,7 +263,7 @@ compute_needed_dependencies() {
   deps_file="$(mktemp)"
   HOMEBREW_NO_ENV_HINTS=1 brew deps --for-each --include-build "${ORDERED[@]}" 2>/dev/null > "$deps_file" || true
 
-  awk -v repo="$REPO_ROOT" -v deps_file="$deps_file" '
+  awk -v repo="$REPO_ROOT" -v deps_file="$deps_file" -v graph_file="$DEPS_GRAPH_FILE" '
     BEGIN {
       while ((getline line < deps_file) > 0) {
         idx = index(line, ":")
@@ -299,6 +305,12 @@ compute_needed_dependencies() {
           close(sfile)
         }
       }
+
+      for (key in dep_map) {
+        split(key, parts, SUBSEP)
+        print parts[1] "\t" parts[2] > graph_file
+      }
+      close(graph_file)
 
       for (i = 1; i <= NR; i++) {
         d = ordered[i]
@@ -748,6 +760,37 @@ fi
 return 0
 }
 
+# ──────────────────────────────────────────────────────────────
+# Deferred packages and what they actually block
+# ──────────────────────────────────────────────────────────────
+# A package whose measured build time cannot fit the window (llvm needs ~12h on the Mac
+# and ~350m is the CI floor) used to take the whole queue with it: the loop broke and
+# every package behind it was abandoned, so a single llvm bump stopped unrelated leaves
+# from ever building. It cannot simply continue either — anything that depends on the
+# deferred package would have to build it from source, which is the wedge the time
+# budget exists to prevent.
+#
+# So track the blocked set instead. ORDERED is topological, which means by the time the
+# loop reaches a package every one of its dependencies has already been classified: if
+# a direct dependency is blocked, this package is blocked too, and direct edges alone
+# give the transitive closure.
+package_is_blocked() {
+  grep -qxF "$1" "$BLOCKED_FILE" 2>/dev/null
+}
+
+block_package() {
+  grep -qxF "$1" "$BLOCKED_FILE" 2>/dev/null || echo "$1" >> "$BLOCKED_FILE"
+}
+
+package_blocked_by_a_deferred_dependency() {
+  [ -s "$BLOCKED_FILE" ] || return 1
+  awk -F'\t' -v p="$1" '
+    NR == FNR { blocked[$1] = 1; next }
+    $1 == p && ($2 in blocked) { found = 1 }
+    END { exit !found }
+  ' "$BLOCKED_FILE" "$DEPS_GRAPH_FILE"
+}
+
 ensure_pkgconf_opt_aliases() {
 local pkgconf_prefix
 local opt_dir
@@ -1151,6 +1194,17 @@ echo "────────────────────────�
 echo "📦 $pkg (Elapsed: $((ELAPSED_TIME / 60))m / $((MAX_BUILD_TIME / 60))m)"
 echo "──────────────────────────────────────"
 
+# Something this package needs was deferred earlier in this run, so it cannot be built
+# either — but that stops here, at whatever transitively depends on that package, rather
+# than at everything left in the queue.
+if package_blocked_by_a_deferred_dependency "$pkg"; then
+  block_package "$pkg"
+  DEFERRED+=("$pkg")
+  echo "  ⏸️  Deferring $pkg: it needs a package this run already deferred"
+  echo ""
+  continue
+fi
+
 formula_ref="$pkg"
 [ "$pkg" = "ffmpeg" ] && formula_ref="quyleanh/tap/ffmpeg"
 # This formula has a missing custom bottle. Build the maintained Homebrew Core
@@ -1228,12 +1282,15 @@ if [ "$pkg" != "$ONLY_PACKAGE" ] && [ "$REQUIRED_TIME" -gt "$REMAINING_TIME" ]; 
     SKIPPED_BUDGET+=("$pkg")
     continue
   fi
-  # A package that can never fit in one window must not block the queue behind it.
-  # Only block (defer the rest) when a later formula genuinely needs it.
+  # A package that cannot fit must not block the queue behind it. Block it — and with
+  # it only the packages that transitively need it — and keep walking; anything that
+  # does not depend on it still gets built in this run.
   if package_needed_by_later_formula "$pkg"; then
-    echo "  ⏸️  Deferring $pkg and the remaining dependency-ordered queue to the next run"
+    echo "  ⏸️  Deferring $pkg: it cannot fit, and later packages need it"
+    echo "      (packages that do not need it will still be built in this run)"
+    block_package "$pkg"
     DEFERRED+=("$pkg")
-    break
+    continue
   fi
   echo "  ⏭️  Skipping $pkg: needs $((REQUIRED_TIME / 60))m, $((REMAINING_TIME / 60))m left, and nothing later depends on it"
   echo "      (estimate $((BUILD_ESTIMATE / 60))m; build it with a dedicated dispatch: only_package=$pkg)"
@@ -1441,7 +1498,7 @@ fi
 echo ""
 done
 
-rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE" "$NEEDED_DEPENDENCIES_FILE"
+rm -rf "$VERSIONS_CACHE_DIR" "$RELEASED_ASSETS_FILE" "$RELEASED_ASSET_DIGESTS_FILE" "$NEEDED_DEPENDENCIES_FILE" "$DEPS_GRAPH_FILE" "$BLOCKED_FILE"
 if [ -n "$ONLY_PACKAGE_DEPS_FILE" ]; then
   rm -f "$ONLY_PACKAGE_DEPS_FILE"
 fi
