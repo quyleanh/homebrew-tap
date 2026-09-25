@@ -174,37 +174,53 @@ export GH_TOKEN="$(gh auth token)"
 # begins. Rebuild whatever brew names from source and try once more, taking the names
 # from the error itself: a first version asked `brew outdated` instead, and in the
 # launchd environment that reported nothing at all while the build failed on expat.
+#
+# The second class is this machine being a *client* of the tap:
+#
+#   Error: ca-certificates is already installed from quyleanh/tap!
+#
+# brew will not put the core formula's newer version over a keg installed from another
+# tap, and it says so instead of upgrading. Take the newer version from the tap the keg
+# already came from — that is the version this machine should be running anyway — and
+# the core build stops wanting to upgrade it at all.
 build_bottle() {
-  local pkg="$1" attempt out unbottled dep
+  local pkg="$1" attempt out unbottled dep from_tap fixed
   out="$(mktemp)"
-  for attempt in 1 2; do
+  for attempt in 1 2 3; do
     : >"$out"
     caffeinate -is brew install --build-bottle "homebrew/core/$pkg" 2>&1 | tee -a "$LOG" >"$out"
-    if ! grep -q "cannot be installed from bottle and must be" "$out"; then
-      rm -f "$out"
-      return 0
+    fixed=0
+
+    if grep -q "cannot be installed from bottle and must be" "$out"; then
+      unbottled=$(awk '
+        /cannot be installed from bottle and must be/ { grab = 1; next }
+        grab && /^  [^ ]/                             { sub(/^ +/, ""); print; next }
+        grab && !/^built from source/                 { grab = 0 }
+      ' "$out")
+      if [ -z "$unbottled" ]; then
+        log "✗ $pkg: could not read the unbottled dependencies out of brew's error"
+      else
+        for dep in $unbottled; do
+          log "dependency $dep has no bottle for this platform — rebuilding it from source"
+          caffeinate -is brew upgrade --build-from-source "$dep" >>"$LOG" 2>&1 ||
+            log "⚠️ could not rebuild $dep from source; the retry will probably fail"
+        done
+        fixed=1
+      fi
     fi
-    if [ "$attempt" = "2" ]; then
-      log "✗ $pkg: still unbottled after rebuilding its dependencies"
-      rm -f "$out"
-      return 0
-    fi
-    unbottled=$(awk '
-      /cannot be installed from bottle and must be/ { grab = 1; next }
-      grab && /^  [^ ]/                             { sub(/^ +/, ""); print; next }
-      grab && !/^built from source/                 { grab = 0 }
-    ' "$out")
-    if [ -z "$unbottled" ]; then
-      log "✗ $pkg: could not read the unbottled dependencies out of brew's error"
-      rm -f "$out"
-      return 0
-    fi
-    for dep in $unbottled; do
-      log "dependency $dep has no bottle for this platform — rebuilding it from source"
-      caffeinate -is brew upgrade --build-from-source "$dep" >>"$LOG" 2>&1 ||
-        log "⚠️ could not rebuild $dep from source; the retry will probably fail"
-    done
+
+    while IFS='|' read -r dep from_tap; do
+      [ -n "$dep" ] || continue
+      log "dependency $dep is installed from $from_tap — upgrading it there"
+      caffeinate -is brew upgrade "$from_tap/$dep" >>"$LOG" 2>&1 ||
+        log "⚠️ could not upgrade $from_tap/$dep; the retry will probably fail"
+      fixed=1
+    done < <(sed -n 's/^Error: \(.*\) is already installed from \(.*\)!$/\1|\2/p' "$out")
+
+    [ "$fixed" = "1" ] || break
   done
+  rm -f "$out"
+  return 0
 }
 
 published=0
