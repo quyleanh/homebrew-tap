@@ -36,3 +36,4 @@ python-setuptools	84.0.0
 libuv	1.53.0	
 simdutf	9.2.1_1	icu4c@78=78.3
 merve	1.2.2_3	simdutf=9.2.1_1
+lld	23.1.2	llvm=23.1.2 zstd=1.5.7_1
