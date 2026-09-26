@@ -18,6 +18,8 @@ class Lld < Formula
   depends_on "quyleanh/tap/zstd"
 
 
+  link_overwrite "bin/lld", "bin/ld64.lld", "bin/ld.lld", "bin/lld-link", "bin/wasm-ld"
+  link_overwrite "include/lld/*", "lib/cmake/lld/*"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

@@ -16,6 +16,10 @@ class OpensslAT3 < Formula
 
   depends_on "quyleanh/tap/ca-certificates"
 
+  link_overwrite "bin/c_rehash", "bin/openssl", "include/openssl/*"
+  link_overwrite "lib/libcrypto*", "lib/libssl*"
+  link_overwrite "lib/pkgconfig/libcrypto.pc", "lib/pkgconfig/libssl.pc", "lib/pkgconfig/openssl.pc"
+  link_overwrite "share/doc/openssl/*", "share/man/man*/*ssl"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

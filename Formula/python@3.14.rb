@@ -20,6 +20,22 @@ class PythonAT314 < Formula
   depends_on "quyleanh/tap/xz"
   depends_on "quyleanh/tap/zstd"
 
+  link_overwrite "bin/idle3"
+  link_overwrite "bin/pip3"
+  link_overwrite "bin/pydoc3"
+  link_overwrite "bin/python3"
+  link_overwrite "bin/python3-config"
+  link_overwrite "bin/wheel3"
+  link_overwrite "share/man/man1/python3.1"
+  link_overwrite "lib/libpython3.so"
+  link_overwrite "lib/pkgconfig/python3.pc"
+  link_overwrite "lib/pkgconfig/python3-embed.pc"
+  link_overwrite "lib/python3.14/site-packages/pip*"
+  link_overwrite "lib/python3.14/site-packages/wheel*"
+  link_overwrite "Frameworks/Python.framework/Headers"
+  link_overwrite "Frameworks/Python.framework/Python"
+  link_overwrite "Frameworks/Python.framework/Resources"
+  link_overwrite "Frameworks/Python.framework/Versions/Current"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

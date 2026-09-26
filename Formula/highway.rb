@@ -16,6 +16,7 @@ class Highway < Formula
 
 
 
+  link_overwrite "include/hwy/*", "lib/pkgconfig/libhwy*"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

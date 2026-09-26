@@ -21,6 +21,8 @@ class Rust < Formula
   depends_on "quyleanh/tap/pkgconf"
   depends_on "quyleanh/tap/sqlite"
 
+  link_overwrite "etc/bash_completion.d/cargo"
+  link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

@@ -19,6 +19,8 @@ class PythonAT313 < Formula
   depends_on "quyleanh/tap/sqlite"
   depends_on "quyleanh/tap/xz"
 
+  link_overwrite "lib/python3.13/site-packages/pip*"
+  link_overwrite "lib/python3.13/site-packages/wheel*"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.

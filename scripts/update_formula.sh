@@ -127,6 +127,29 @@ for json_file in "${JSON_FILES[@]}"; do
     echo "  ℹ️  $pkg_name is keg-only upstream ($keg_only_reason); wrapper will not link it"
   fi
 
+  # Preserve upstream's link_overwrite declarations. Homebrew uses them for files a
+  # formula is allowed to take over from outside its own keg, and without them the link
+  # step can refuse to run at all. node is the clearest case: npm creates
+  # /usr/local/bin/npm as its own absolute symlink as soon as anybody installs a global
+  # package, so a wrapper without `link_overwrite "bin/npm", "bin/npx"` fails with
+  #
+  #   Error: The `brew link` step did not complete successfully
+  #   Could not symlink bin/npm ... already exists
+  #
+  # and leaves `node` unusable until someone runs `brew link --overwrite node`. 43 core
+  # formulae declare this, so a wrapper has to carry it through exactly like keg_only.
+  link_overwrite_lines=""
+  core_formula_source=$(brew cat "homebrew/core/$pkg_name" 2>/dev/null || true)
+  if [ -z "$core_formula_source" ]; then
+    core_formula_file="$(brew --repo homebrew/core 2>/dev/null)/Formula/${pkg_name:0:1}/${pkg_name}.rb"
+    [ -f "$core_formula_file" ] && core_formula_source=$(cat "$core_formula_file")
+  fi
+  link_overwrite_lines=$(printf '%s\n' "$core_formula_source" |
+    grep -E '^[[:space:]]*link_overwrite([[:space:]]|$)' || true)
+  if [ -n "$link_overwrite_lines" ]; then
+    echo "  ℹ️  $pkg_name declares link_overwrite upstream; carrying it into the wrapper"
+  fi
+
   formula_file="$FORMULA_DIR/${pkg_name}.rb"
 
   # The target machine is macOS 13, so reference the Ventura-compatible alias
@@ -172,6 +195,7 @@ $bottle_rebuild_ruby
 
 ${deps}
 ${keg_only_line}
+${link_overwrite_lines}
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

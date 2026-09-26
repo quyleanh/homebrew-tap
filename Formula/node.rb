@@ -36,6 +36,7 @@ class Node < Formula
   depends_on "quyleanh/tap/zstd"
 
 
+  link_overwrite "bin/npm", "bin/npx"
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.
