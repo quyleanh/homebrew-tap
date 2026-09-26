@@ -2,16 +2,17 @@
 class Node < Formula
   desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  version "26.9.0"
+  version "26.10.0"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.9.0.ventura.bottle.1.tar.gz"
-  sha256 "610a48309baad4853df0698cf91d5607368c862b04b868767469ef1379c7db10"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/node-26.10.0_1.ventura.bottle.1.tar.gz"
+  sha256 "00d380035fd1ba3a00932f466975b549c29a6c58042504a95e657412c7816176"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "610a48309baad4853df0698cf91d5607368c862b04b868767469ef1379c7db10"
+    sha256 cellar: "/usr/local/Cellar", ventura: "00d380035fd1ba3a00932f466975b549c29a6c58042504a95e657412c7816176"
   end
 
   depends_on "quyleanh/tap/abseil"
@@ -29,9 +30,11 @@ class Node < Formula
   depends_on "quyleanh/tap/nbytes"
   depends_on "quyleanh/tap/openssl@3"
   depends_on "quyleanh/tap/simdjson"
+  depends_on "quyleanh/tap/simdutf"
   depends_on "quyleanh/tap/sqlite"
   depends_on "quyleanh/tap/uvwasi"
   depends_on "quyleanh/tap/zstd"
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.

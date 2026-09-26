@@ -23,7 +23,6 @@ jemalloc	5.4.0
 googletest	1.18.0	
 abseil	20260817.0	
 highway	1.4.0	
-node	26.9.0	abseil=20260817.0 ada-url=4.0.0 brotli=1.2.0 c-ares=1.34.8 hdrhistogram_c=0.11.10 highway=1.4.0 icu4c@78=78.3 libffi=3.8.0 libnghttp2=1.70.0 libuv=1.52.1 llhttp=9.4.3 merve=1.2.2_3 nbytes=0.1.4 openssl@3=3.6.4 simdjson=4.6.11 sqlite=3.53.4 uvwasi=0.0.23 zstd=1.5.7_1
 deno	2.9.7	little-cms2=2.19.1 sqlite=3.53.4
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.7
 wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.4.2 openssl@4=4.0.2
@@ -37,3 +36,4 @@ libuv	1.53.0
 simdutf	9.2.1_1	icu4c@78=78.3
 merve	1.2.2_3	simdutf=9.2.1_1
 lld	23.1.2	llvm=23.1.2 zstd=1.5.7_1
+node	26.10.0_1	abseil=20260817.0 ada-url=4.0.0 brotli=1.2.0 c-ares=1.34.8 hdrhistogram_c=0.11.10 highway=1.4.0 icu4c@78=78.3 libffi=3.8.0 libnghttp2=1.70.0 libuv=1.53.0 llhttp=9.4.3 merve=1.2.2_3 nbytes=0.1.4 openssl@3=3.6.4 simdjson=4.6.11 simdutf=9.2.1_1 sqlite=3.53.4 uvwasi=0.0.23 zstd=1.5.7_1
