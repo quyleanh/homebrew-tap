@@ -7,12 +7,12 @@ class Ffmpeg < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg-8.1.2_4.ventura.bottle.1.tar.gz"
-  sha256 "73ecfc04a842092e22eae361ff0a80b04af714f33ab05abf9f4ba09f79215a04"
+  sha256 "0a4360b044536b591de0cdb2efe31580f12840adfdb035aac03b8fd83557c23c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "73ecfc04a842092e22eae361ff0a80b04af714f33ab05abf9f4ba09f79215a04"
+    sha256 cellar: "/usr/local/Cellar", ventura: "0a4360b044536b591de0cdb2efe31580f12840adfdb035aac03b8fd83557c23c"
   end
 
   depends_on "quyleanh/tap/dav1d"
@@ -25,6 +25,8 @@ class Ffmpeg < Formula
   depends_on "quyleanh/tap/svt-av1"
   depends_on "quyleanh/tap/x264"
   depends_on "quyleanh/tap/x265"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
