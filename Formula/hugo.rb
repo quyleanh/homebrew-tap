@@ -2,17 +2,19 @@
 class Hugo < Formula
   desc "Configurable static site generator"
   homepage "https://gohugo.io/"
-  version "0.166.0"
+  version "0.167.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo-0.166.0.ventura.bottle.1.tar.gz"
-  sha256 "c15873cfc7df4045dec8cdc5c3b3b8cd1ddab23a969174e9f09a9313a0429f14"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hugo-0.167.0.ventura.bottle.1.tar.gz"
+  sha256 "bcdf2c69cb505023bd5278e765abef63bfc17590889af833be89fd1d51b923f2"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c15873cfc7df4045dec8cdc5c3b3b8cd1ddab23a969174e9f09a9313a0429f14"
+    sha256 cellar: :any_skip_relocation, ventura: "bcdf2c69cb505023bd5278e765abef63bfc17590889af833be89fd1d51b923f2"
   end
+
+
 
 
 
@@ -40,7 +42,17 @@ class Hugo < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
