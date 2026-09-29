@@ -3,19 +3,24 @@ class OpensslAT4 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
   version "4.0.2"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.2.ventura.bottle.1.tar.gz"
-  sha256 "2fee6f39ec719f72a5bee61f05d04ae3e482e732a9253a91fd4430294d6c1225"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.2_1.ventura.bottle.1.tar.gz"
+  sha256 "9a8a442d96c0eb3394f9584881be80182a703fcf1b34e4cb81bb604c7b9d2b56"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "2fee6f39ec719f72a5bee61f05d04ae3e482e732a9253a91fd4430294d6c1225"
+    sha256 cellar: "/usr/local/Cellar", ventura: "9a8a442d96c0eb3394f9584881be80182a703fcf1b34e4cb81bb604c7b9d2b56"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
-  keg_only :versioned_formula
+
+  link_overwrite "bin/openssl", "include/openssl/*", "share/man/man*/*ssl.gz"
+  link_overwrite "lib/libcrypto*", "lib/libssl*", "lib/ossl-modules/legacy.*"
+  link_overwrite "lib/cmake/OpenSSL/OpenSSLConfig.cmake", "lib/cmake/OpenSSL/OpenSSLConfigVersion.cmake"
+  link_overwrite "lib/pkgconfig/libcrypto.pc", "lib/pkgconfig/libssl.pc", "lib/pkgconfig/openssl.pc"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
