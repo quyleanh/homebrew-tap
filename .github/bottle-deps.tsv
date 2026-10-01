@@ -39,3 +39,4 @@ hugo	0.167.0
 openssl@3	3.6.5	ca-certificates=2026-09-25
 libssh2	1.11.1_6	openssl@3=3.6.5
 openssl@4	4.0.3	ca-certificates=2026-09-25
+python@3.13	3.13.16	mpdecimal=4.0.1 openssl@3=3.6.5 sqlite=3.53.4 xz=5.8.4
