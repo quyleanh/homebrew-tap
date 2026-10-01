@@ -7,12 +7,12 @@ class Wget < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/wget-1.25.0_2.ventura.bottle.1.tar.gz"
-  sha256 "c8788efc1ca22e07ec014406c104c043d408cf11f90f5c58f12b6c3dc640497d"
+  sha256 "ae446bf555cc17e711e20e11505c03dad8e9a51bb158b29c3d6798ea1028e130"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "c8788efc1ca22e07ec014406c104c043d408cf11f90f5c58f12b6c3dc640497d"
+    sha256 cellar: "/usr/local/Cellar", ventura: "ae446bf555cc17e711e20e11505c03dad8e9a51bb158b29c3d6798ea1028e130"
   end
 
   depends_on "quyleanh/tap/gettext"
