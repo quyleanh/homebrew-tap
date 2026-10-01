@@ -3,16 +3,16 @@ class Libssh2 < Formula
   desc "C library implementing the SSH2 protocol"
   homepage "https://libssh2.org/"
   version "1.11.1"
-  revision 5
+  revision 6
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2-1.11.1_5.ventura.bottle.1.tar.gz"
-  sha256 "b6b910f07fcf22f24f7b23207f181c7df7269fe582b13e54cd824af1f9052187"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libssh2-1.11.1_6.ventura.bottle.1.tar.gz"
+  sha256 "06c959aa4fb57e00cc5d1e35149b94f8d7614b8d0f3aa52cd6f75e8739d0d543"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "b6b910f07fcf22f24f7b23207f181c7df7269fe582b13e54cd824af1f9052187"
+    sha256 cellar: :any, ventura: "06c959aa4fb57e00cc5d1e35149b94f8d7614b8d0f3aa52cd6f75e8739d0d543"
   end
 
   depends_on "quyleanh/tap/openssl@3"
