@@ -2,17 +2,16 @@
 class OpensslAT4 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl-library.org"
-  version "4.0.2"
-  revision 1
+  version "4.0.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.2_1.ventura.bottle.1.tar.gz"
-  sha256 "9a8a442d96c0eb3394f9584881be80182a703fcf1b34e4cb81bb604c7b9d2b56"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.3.ventura.bottle.1.tar.gz"
+  sha256 "ae01da0f7d89bfb9cf892da6179e5ffefc88d39556e566105ca7bdbe0cfe5b27"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "9a8a442d96c0eb3394f9584881be80182a703fcf1b34e4cb81bb604c7b9d2b56"
+    sha256 cellar: "/usr/local/Cellar", ventura: "ae01da0f7d89bfb9cf892da6179e5ffefc88d39556e566105ca7bdbe0cfe5b27"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
