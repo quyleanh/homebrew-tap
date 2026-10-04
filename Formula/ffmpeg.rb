@@ -7,12 +7,12 @@ class Ffmpeg < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ffmpeg-8.1.2_4.ventura.bottle.1.tar.gz"
-  sha256 "177ffac06151f966710aa47120867da60b03aa7b36916f2ae7cb3ed84b615b92"
+  sha256 "b91a90f641c34bd00c27f92bf969f2c8d917e9f9e23c7c3ff953103876237785"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "177ffac06151f966710aa47120867da60b03aa7b36916f2ae7cb3ed84b615b92"
+    sha256 cellar: "/usr/local/Cellar", ventura: "b91a90f641c34bd00c27f92bf969f2c8d917e9f9e23c7c3ff953103876237785"
   end
 
   depends_on "quyleanh/tap/dav1d"
