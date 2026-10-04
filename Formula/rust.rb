@@ -2,27 +2,28 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  version "1.98.1"
+  version "1.99.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.98.1.ventura.bottle.1.tar.gz"
-  sha256 "426ff7ca20cd6ed0de414450a83ec9b6f82833fab69a7d817d3eb8c712ef2a40"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.99.0.ventura.bottle.1.tar.gz"
+  sha256 "decd8f36aec31e5fbd48ad86517f5301073817a6393cfa80bb9448bb89b87e32"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "426ff7ca20cd6ed0de414450a83ec9b6f82833fab69a7d817d3eb8c712ef2a40"
+    sha256 cellar: :any, ventura: "decd8f36aec31e5fbd48ad86517f5301073817a6393cfa80bb9448bb89b87e32"
   end
 
   depends_on "quyleanh/tap/libgit2"
   depends_on "quyleanh/tap/libssh2"
-  depends_on "quyleanh/tap/llvm@22"
+  depends_on "quyleanh/tap/llvm"
   depends_on "quyleanh/tap/openssl@3"
   depends_on "quyleanh/tap/pkgconf"
   depends_on "quyleanh/tap/sqlite"
 
   link_overwrite "etc/bash_completion.d/cargo"
   link_overwrite "bin/cargo-fmt", "bin/git-rustfmt", "bin/rustfmt", "bin/rustfmt-*"
+
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.
@@ -47,7 +48,17 @@ class Rust < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
