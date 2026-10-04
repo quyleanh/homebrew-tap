@@ -45,3 +45,4 @@ rust	1.99.0	libgit2=1.9.7 libssh2=1.11.1_6 llvm=23.1.2 openssl@3=3.6.5 pkgconf=3
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8
 sdl3	3.4.18	
 sdl2-compat	2.32.74	sdl3=3.4.18
+xorgproto	2026.1	
