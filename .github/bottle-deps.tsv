@@ -21,7 +21,6 @@ abseil	20260817.0
 highway	1.4.0	
 deno	2.9.7	little-cms2=2.19.1 sqlite=3.53.4
 expat	2.8.5	
-rtk	0.50.0	
 ca-certificates	2026-09-25	
 utf8proc	2.12.0	
 python-setuptools	84.0.0	
@@ -48,3 +47,4 @@ xorgproto	2026.1
 ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.1 libvpx=1.17.0 openssl@3=3.6.5 opus=1.6.1 sdl2-compat=2.32.74 svt-av1=4.2.0 x264=r3222 x265=4.3
 hdrhistogram_c	0.12.0	
 lima	2.2.1	
+rtk	0.51.0	
