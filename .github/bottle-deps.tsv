@@ -43,3 +43,4 @@ cmake	4.4.4
 python@3.14	3.14.8	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@3=3.6.5 sqlite=3.53.4 xz=5.8.4 zstd=1.5.7_1
 rust	1.99.0	libgit2=1.9.7 libssh2=1.11.1_6 llvm=23.1.2 openssl@3=3.6.5 pkgconf=3.0.7 sqlite=3.53.4
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8
+sdl3	3.4.18	
