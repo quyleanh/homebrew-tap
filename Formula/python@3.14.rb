@@ -2,18 +2,19 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.7"
+  version "3.14.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.7.ventura.bottle.1.tar.gz"
-  sha256 "4918d1a3474416e35b8123aeb07583c1a3305f1e5dd9d4c5d591e8878ab7d055"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8.ventura.bottle.1.tar.gz"
+  sha256 "61b338d897a865b0b4397e6f4050e9afaa82254176638de5d7b5fa7c8cb052e0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "4918d1a3474416e35b8123aeb07583c1a3305f1e5dd9d4c5d591e8878ab7d055"
+    sha256 cellar: "/usr/local/Cellar", ventura: "61b338d897a865b0b4397e6f4050e9afaa82254176638de5d7b5fa7c8cb052e0"
   end
 
+  depends_on "quyleanh/tap/ca-certificates"
   depends_on "quyleanh/tap/mpdecimal"
   depends_on "quyleanh/tap/openssl@3"
   depends_on "quyleanh/tap/sqlite"
@@ -36,6 +37,7 @@ class PythonAT314 < Formula
   link_overwrite "Frameworks/Python.framework/Python"
   link_overwrite "Frameworks/Python.framework/Resources"
   link_overwrite "Frameworks/Python.framework/Versions/Current"
+
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.
@@ -60,7 +62,17 @@ class PythonAT314 < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64

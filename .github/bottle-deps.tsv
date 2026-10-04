@@ -41,3 +41,4 @@ wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.4.2 openssl
 docker	29.8.2	
 gh	2.102.0	
 cmake	4.4.4	
+python@3.14	3.14.8	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@3=3.6.5 sqlite=3.53.4 xz=5.8.4 zstd=1.5.7_1
