@@ -40,3 +40,4 @@ ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.1 libvpx=1.17.0 openssl@3=3.6.5 
 wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.4.2 openssl@4=4.0.3
 docker	29.8.2	
 gh	2.102.0	
+cmake	4.4.4	
