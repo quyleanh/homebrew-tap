@@ -985,28 +985,53 @@ publish_package() {
       upload_files+=("$json_file")
     fi
 
-    local upload_success=false
-    if gh release upload stable "${upload_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber; then
-      upload_success=true
+    # A transient failure here costs far more than the upload. Run #413 lost the
+    # connection to api.github.com ("error connecting to api.github.com"), and because
+    # the bottle never arrived the package counted as failed and four dependents failed
+    # behind it. gh's errors of this kind are momentary, so try three times before
+    # believing one.
+    local upload_success=false upload_attempt
+    for upload_attempt in 1 2 3; do
+      if gh release upload stable "${upload_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber; then
+        upload_success=true
+        break
+      fi
+      echo "  ⚠️  Upload attempt $upload_attempt failed"
+      if [ "$upload_attempt" -lt 3 ]; then
+        sleep 15
+      fi
+    done
+    if [ "$upload_success" = true ]; then
       echo "  ✅ Bottle uploaded to GitHub Release"
       echo "$pkg_version" > "$VERSIONS_CACHE_DIR/$pkg"
       echo "$(basename "$bottle_file")" >> "$RELEASED_ASSETS_FILE"
       record_bottle_deps "$pkg" "$pkg_version"
     else
-      echo "  ⚠️  Failed to upload bottle to GitHub Release"
+      echo "  ⚠️  Failed to upload bottle to GitHub Release after 3 attempts"
     fi
 
-    # 3. Commit and push formula update immediately
+    # 3. Commit and push formula update immediately — but only the formula when the
+    # bottle actually reached the release. Run #413 hit a transient "error connecting to
+    # api.github.com" while uploading libpng, still committed the formula, and left it
+    # pointing at a 404 until a later run repaired it. The measurements are still worth
+    # keeping: learning that llvm takes twelve hours costs twelve hours.
     git config user.name "github-actions[bot]"
     git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE" "$BOTTLE_DEPS_FILE"
+    local commit_subject="chore(bottles): update $pkg ($pkg_version) [skip ci]"
+    if [ "$upload_success" = true ]; then
+      git add "$REPO_ROOT/Formula" "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE" "$BOTTLE_DEPS_FILE"
+    else
+      echo "  ⚠️  Upload failed — recording measurements only, leaving the formula alone"
+      commit_subject="chore(build-state): record measurements for $pkg ($pkg_version) [skip ci]"
+      git add "$RESOLVED_FILE" "$BUILD_TIME_ESTIMATES_FILE" "$BOTTLE_DEPS_FILE"
+    fi
 
     local formula_published=true commit_made=false
     if ! git diff --staged --quiet; then
       formula_published=false
       commit_made=true
       echo "  💾 Committing & pushing formula update for $pkg..."
-      git commit -m "chore(bottles): update $pkg ($pkg_version) [skip ci]
+      git commit -m "$commit_subject
 
 Built by GitHub Actions
 Runner: macos-15-intel (Sequoia, Intel x86_64)" || true
@@ -1474,6 +1499,21 @@ if ! publish_package "$pkg" "$pkg_version" "$ventura_bottle_path" "$ventura_json
   echo "  ❌ Publication was not fully verified for $pkg"
   FAILED+=("$pkg")
   echo ""
+  # The keg left behind by a source build is recorded as homebrew/core, and a keg from
+  # another tap blocks every dependent: brew answers "libpng is already installed from
+  # homebrew/core!" and the dependent cannot restore at all. Run #413 lost libpng to one
+  # transient upload error and then lost webp, libtiff, little-cms2 and deno to that
+  # message. Put the *published* bottle back — the older one, since the new upload just
+  # failed and the formula was deliberately left alone — so dependents still have a
+  # tap-owned dependency to build against.
+  if package_needed_by_later_formula "$pkg"; then
+    published_version=$(get_released_version "$pkg")
+    if [ -n "$published_version" ] && [ -f "$REPO_ROOT/Formula/$pkg.rb" ]; then
+      echo "  ℹ️  Reinstalling the published tap bottle ($published_version) so dependents can restore"
+      restore_tap_formula "$pkg" "$published_version" "quyleanh/tap/$pkg" ||
+        echo "  ⚠️  Could not reinstall the published tap bottle for $pkg"
+    fi
+  fi
   continue
 fi
 
