@@ -2,22 +2,23 @@
 class Scrcpy < Formula
   desc "Display and control your Android device"
   homepage "https://github.com/Genymobile/scrcpy"
-  version "4.1"
-  revision 1
+  version "5.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy-4.1_1.ventura.bottle.1.tar.gz"
-  sha256 "cab8d0f786e8a59b75f5b6fc77673afa14c034699b1eea373cb4a5fc6a996c27"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy-5.0.ventura.bottle.1.tar.gz"
+  sha256 "d6d9c2072fc194ff475fbf2e83c982d859a82fb400ffa0b392f5e8a5b8c4efa5"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "cab8d0f786e8a59b75f5b6fc77673afa14c034699b1eea373cb4a5fc6a996c27"
+    sha256 cellar: "/usr/local/Cellar", ventura: "d6d9c2072fc194ff475fbf2e83c982d859a82fb400ffa0b392f5e8a5b8c4efa5"
   end
 
   depends_on "quyleanh/tap/ffmpeg"
   depends_on "quyleanh/tap/libusb"
   depends_on "quyleanh/tap/sdl3"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -43,7 +44,17 @@ class Scrcpy < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
