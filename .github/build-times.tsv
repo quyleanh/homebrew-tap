@@ -76,7 +76,7 @@ deno	3592
 openssl@4	919
 meson	40
 wget	176
-expat	32
+expat	37
 utf8proc	9
 python-setuptools	13
 libuv	25

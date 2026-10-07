@@ -2,20 +2,21 @@
 class Expat < Formula
   desc "XML 1.0 parser"
   homepage "https://libexpat.github.io/"
-  version "2.8.5"
+  version "2.9.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/expat-2.8.5.ventura.bottle.1.tar.gz"
-  sha256 "56e1b3a92968c2c92cec97ec6efb496f82a655953f88fdb87d49487ba376eb09"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/expat-2.9.0.ventura.bottle.1.tar.gz"
+  sha256 "5677e0c23d5f0be5a104c85d41a02781ddfca80fba05b13480c616981ea2c32c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "56e1b3a92968c2c92cec97ec6efb496f82a655953f88fdb87d49487ba376eb09"
+    sha256 cellar: :any, ventura: "5677e0c23d5f0be5a104c85d41a02781ddfca80fba05b13480c616981ea2c32c"
   end
 
 
   keg_only :provided_by_macos
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
