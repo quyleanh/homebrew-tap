@@ -3,18 +3,21 @@ class Libevent < Formula
   desc "Asynchronous event library"
   homepage "https://libevent.org/"
   version "2.1.13"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent-2.1.13.ventura.bottle.1.tar.gz"
-  sha256 "f98371c01f4228b22bd1521e6ad57a7dc52159433a446644f493c65cc35ebc39"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent-2.1.13_1.ventura.bottle.1.tar.gz"
+  sha256 "6df9ff7f14dceb94be2f64a2880bc31c0e283dbba4d7f5d936a380aacfd2f425"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "f98371c01f4228b22bd1521e6ad57a7dc52159433a446644f493c65cc35ebc39"
+    sha256 cellar: :any, ventura: "6df9ff7f14dceb94be2f64a2880bc31c0e283dbba4d7f5d936a380aacfd2f425"
   end
 
-  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/openssl@4"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -40,7 +43,17 @@ class Libevent < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
