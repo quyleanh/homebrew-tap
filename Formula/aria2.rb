@@ -3,23 +3,25 @@ class Aria2 < Formula
   desc "Download with resuming and segmented downloading"
   homepage "https://aria2.github.io/"
   version "1.37.0"
-  revision 2
+  revision 3
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2-1.37.0_2.ventura.bottle.1.tar.gz"
-  sha256 "3591524130c1c82e23a235de89752d9d8744896f9776c87a9af1937d76cb5e51"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2-1.37.0_3.ventura.bottle.1.tar.gz"
+  sha256 "5a839b1300f5b9292e713df5400d8ca62e7e54718ef3997eedc3835ba9a6189b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "3591524130c1c82e23a235de89752d9d8744896f9776c87a9af1937d76cb5e51"
+    sha256 cellar: "/usr/local/Cellar", ventura: "5a839b1300f5b9292e713df5400d8ca62e7e54718ef3997eedc3835ba9a6189b"
   end
 
   depends_on "quyleanh/tap/c-ares"
   depends_on "quyleanh/tap/gettext"
   depends_on "quyleanh/tap/libssh2"
-  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/openssl@4"
   depends_on "quyleanh/tap/sqlite"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -45,7 +47,17 @@ class Aria2 < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
