@@ -46,7 +46,6 @@ lima	2.2.1
 rtk	0.51.0	
 docker-compose	5.6.0	
 libpng	1.6.59	
-simdjson	5.0.2	
 yt-dlp	2026.8.19_2	certifi=2026.7.22 cffi=2.1.1 deno=2.9.7 pycparser=3.0 python@3.14=3.14.8
 scrcpy	5.0	ffmpeg=8.1.2_4 libusb=1.0.30 sdl3=3.4.18
 expat	2.9.0	
@@ -57,3 +56,4 @@ libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.0.3
 libevent	2.1.13_1	openssl@4=4.0.3
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8_1
 sphinx-doc	9.1.0_5	certifi=2026.7.22 python@3.14=3.14.8_1
+simdjson	5.0.3	
