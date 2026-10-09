@@ -55,3 +55,4 @@ expat	2.9.0
 libssh2	1.11.1_7	openssl@4=4.0.3
 go	1.27.2	
 python@3.14	3.14.8_1	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.53.4 xz=5.8.4 zstd=1.5.7_1
+libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.0.3
