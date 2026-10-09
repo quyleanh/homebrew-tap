@@ -3,20 +3,21 @@ class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
   version "3.14.8"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8.ventura.bottle.1.tar.gz"
-  sha256 "61b338d897a865b0b4397e6f4050e9afaa82254176638de5d7b5fa7c8cb052e0"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8_1.ventura.bottle.1.tar.gz"
+  sha256 "d6490f7f61742e4dd7e5abd0bf740c4e78714adb30f683d5945f989d66b4b177"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "61b338d897a865b0b4397e6f4050e9afaa82254176638de5d7b5fa7c8cb052e0"
+    sha256 cellar: "/usr/local/Cellar", ventura: "d6490f7f61742e4dd7e5abd0bf740c4e78714adb30f683d5945f989d66b4b177"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
   depends_on "quyleanh/tap/mpdecimal"
-  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/openssl@4"
   depends_on "quyleanh/tap/sqlite"
   depends_on "quyleanh/tap/xz"
   depends_on "quyleanh/tap/zstd"
