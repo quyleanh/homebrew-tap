@@ -2,16 +2,16 @@
 class Docker < Formula
   desc "Pack, ship and run any application as a lightweight container"
   homepage "https://www.docker.com/"
-  version "29.8.2"
+  version "29.9.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-29.8.2.ventura.bottle.1.tar.gz"
-  sha256 "e2008f758daf8523a9b90782bfc21d734ca7260776bb521675db2e9f6528915d"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/docker-29.9.0.ventura.bottle.1.tar.gz"
+  sha256 "cfc8ff998f3bf3b867e4ffcf3765326dcc24d4e655a24c13009541dfb9cb8d2a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "e2008f758daf8523a9b90782bfc21d734ca7260776bb521675db2e9f6528915d"
+    sha256 cellar: :any_skip_relocation, ventura: "cfc8ff998f3bf3b867e4ffcf3765326dcc24d4e655a24c13009541dfb9cb8d2a"
   end
 
 
