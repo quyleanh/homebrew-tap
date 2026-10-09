@@ -2,16 +2,16 @@
 class Scrcpy < Formula
   desc "Display and control your Android device"
   homepage "https://github.com/Genymobile/scrcpy"
-  version "5.0"
+  version "5.0.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy-5.0.ventura.bottle.1.tar.gz"
-  sha256 "d6d9c2072fc194ff475fbf2e83c982d859a82fb400ffa0b392f5e8a5b8c4efa5"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/scrcpy-5.0.1.ventura.bottle.1.tar.gz"
+  sha256 "d269f8a80931a4483ee542de2393ce17cf736b63d31064382976e6806cfcc9d7"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "d6d9c2072fc194ff475fbf2e83c982d859a82fb400ffa0b392f5e8a5b8c4efa5"
+    sha256 cellar: "/usr/local/Cellar", ventura: "d269f8a80931a4483ee542de2393ce17cf736b63d31064382976e6806cfcc9d7"
   end
 
   depends_on "quyleanh/tap/ffmpeg"
