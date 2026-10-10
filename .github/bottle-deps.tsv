@@ -51,7 +51,6 @@ libssh2	1.11.1_7	openssl@4=4.0.3
 go	1.27.2	
 libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.0.3
 libevent	2.1.13_1	openssl@4=4.0.3
-meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8_1
 sphinx-doc	9.1.0_5	certifi=2026.7.22 python@3.14=3.14.8_1
 simdjson	5.0.3	
 aria2	1.37.0_3	c-ares=1.34.8 gettext=1.0 libssh2=1.11.1_7 openssl@4=4.0.3 sqlite=3.53.4
@@ -60,3 +59,4 @@ scrcpy	5.0.1	ffmpeg=8.1.2_4 libusb=1.0.30 sdl3=3.4.18
 docker	29.9.0	
 python@3.14	3.14.8_2	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.53.4 xz=5.8.4 zstd=1.5.7_1
 pycparser	3.1	
+meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8_2
