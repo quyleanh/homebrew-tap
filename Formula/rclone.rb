@@ -2,17 +2,19 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  version "1.75.1"
+  version "1.75.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone-1.75.1.ventura.bottle.1.tar.gz"
-  sha256 "c48b239d508fd884018c1bb17e627197af48df9bb9155d5a9ff2f4c426104e56"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rclone-1.75.2.ventura.bottle.1.tar.gz"
+  sha256 "a0c326401532bb7fa10bba8345cadd96287198ff36abdb8ea1dce92b8da7ec1e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c48b239d508fd884018c1bb17e627197af48df9bb9155d5a9ff2f4c426104e56"
+    sha256 cellar: :any_skip_relocation, ventura: "a0c326401532bb7fa10bba8345cadd96287198ff36abdb8ea1dce92b8da7ec1e"
   end
+
+
 
 
 
@@ -40,7 +42,17 @@ class Rclone < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
