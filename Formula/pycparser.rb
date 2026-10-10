@@ -2,17 +2,19 @@
 class Pycparser < Formula
   desc "C parser in Python"
   homepage "https://github.com/eliben/pycparser"
-  version "3.0"
+  version "3.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pycparser-3.0.ventura.bottle.1.tar.gz"
-  sha256 "e4e38ac272250143da270cbb3e945fba5857cca43ec36de53b9f0e689b5ef742"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pycparser-3.1.ventura.bottle.1.tar.gz"
+  sha256 "0de77f6344853a8c09c7faecacaa30cc5b15dd2608e2608a5e2381d6f1d2982a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "e4e38ac272250143da270cbb3e945fba5857cca43ec36de53b9f0e689b5ef742"
+    sha256 cellar: :any_skip_relocation, ventura: "0de77f6344853a8c09c7faecacaa30cc5b15dd2608e2608a5e2381d6f1d2982a"
   end
+
+
 
 
 
@@ -40,7 +42,17 @@ class Pycparser < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
