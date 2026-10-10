@@ -3,16 +3,16 @@ class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
   version "3.14.8"
-  revision 1
+  revision 2
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8_1.ventura.bottle.1.tar.gz"
-  sha256 "d6490f7f61742e4dd7e5abd0bf740c4e78714adb30f683d5945f989d66b4b177"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8_2.ventura.bottle.1.tar.gz"
+  sha256 "6053e92a8300c0e2135ac724969456e21927a591fce22739df966f02d024bd8c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "d6490f7f61742e4dd7e5abd0bf740c4e78714adb30f683d5945f989d66b4b177"
+    sha256 cellar: "/usr/local/Cellar", ventura: "6053e92a8300c0e2135ac724969456e21927a591fce22739df966f02d024bd8c"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
@@ -22,22 +22,8 @@ class PythonAT314 < Formula
   depends_on "quyleanh/tap/xz"
   depends_on "quyleanh/tap/zstd"
 
-  link_overwrite "bin/idle3"
-  link_overwrite "bin/pip3"
-  link_overwrite "bin/pydoc3"
-  link_overwrite "bin/python3"
-  link_overwrite "bin/python3-config"
-  link_overwrite "bin/wheel3"
-  link_overwrite "share/man/man1/python3.1"
-  link_overwrite "lib/libpython3.so"
-  link_overwrite "lib/pkgconfig/python3.pc"
-  link_overwrite "lib/pkgconfig/python3-embed.pc"
   link_overwrite "lib/python3.14/site-packages/pip*"
   link_overwrite "lib/python3.14/site-packages/wheel*"
-  link_overwrite "Frameworks/Python.framework/Headers"
-  link_overwrite "Frameworks/Python.framework/Python"
-  link_overwrite "Frameworks/Python.framework/Resources"
-  link_overwrite "Frameworks/Python.framework/Versions/Current"
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
