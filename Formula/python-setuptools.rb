@@ -3,16 +3,18 @@ class PythonSetuptools < Formula
   desc "Easily download, build, install, upgrade, and uninstall Python packages"
   homepage "https://setuptools.pypa.io/"
   version "84.0.0"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python-setuptools-84.0.0.ventura.bottle.1.tar.gz"
-  sha256 "82f4b08f4e8c23eea8bd90d38aa65396a3d518c9ed8755ea902ff8b3aa0795b2"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python-setuptools-84.0.0_1.ventura.bottle.1.tar.gz"
+  sha256 "230cacc4c37a9ad006f151001a25d88e397847b4d2462954b768998d3ca0793b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "82f4b08f4e8c23eea8bd90d38aa65396a3d518c9ed8755ea902ff8b3aa0795b2"
+    sha256 cellar: :any_skip_relocation, ventura: "230cacc4c37a9ad006f151001a25d88e397847b4d2462954b768998d3ca0793b"
   end
+
 
 
 

@@ -78,7 +78,7 @@ meson	40
 wget	176
 expat	37
 utf8proc	9
-python-setuptools	13
+python-setuptools	17
 libuv	25
 xorgproto	29
 hdrhistogram_c	11
