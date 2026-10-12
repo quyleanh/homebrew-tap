@@ -2,16 +2,16 @@
 class Pycparser < Formula
   desc "C parser in Python"
   homepage "https://github.com/eliben/pycparser"
-  version "3.1"
+  version "3.11"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pycparser-3.1.ventura.bottle.1.tar.gz"
-  sha256 "0de77f6344853a8c09c7faecacaa30cc5b15dd2608e2608a5e2381d6f1d2982a"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pycparser-3.11.ventura.bottle.1.tar.gz"
+  sha256 "b4adaf8d9d361abbfff56ded41b193b6de57812b042c5a26955b862d9c6589c3"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "0de77f6344853a8c09c7faecacaa30cc5b15dd2608e2608a5e2381d6f1d2982a"
+    sha256 cellar: :any_skip_relocation, ventura: "b4adaf8d9d361abbfff56ded41b193b6de57812b042c5a26955b862d9c6589c3"
   end
 
 
