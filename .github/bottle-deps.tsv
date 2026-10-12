@@ -65,3 +65,4 @@ python-setuptools	84.0.0_1
 certifi	2026.7.22_1	ca-certificates=2026-09-25
 pycparser	3.11	
 python@3.14	3.14.8_2	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.54.0 xz=5.8.4 zstd=1.5.7_1
+cffi	2.1.1_1	pycparser=3.11
