@@ -64,3 +64,4 @@ sqlite	3.54.0	readline=8.3.6
 pkgconf	3.0.8	
 python@3.15	3.15.0	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.54.0 xz=5.8.4 zstd=1.5.7_1
 python-setuptools	84.0.0_1	
+certifi	2026.7.22_1	ca-certificates=2026-09-25
