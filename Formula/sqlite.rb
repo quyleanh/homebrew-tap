@@ -2,19 +2,21 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  version "3.53.4"
+  version "3.54.0"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.53.4.ventura.bottle.1.tar.gz"
-  sha256 "1c8e08c0f5739e1f32d32ae0f06827c18725f19e057bb6ddc91adc30aa406752"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.54.0.ventura.bottle.1.tar.gz"
+  sha256 "2439236608d02120c945f0a864b6f57935a79ef0f5711bc389469549a1483d5b"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "1c8e08c0f5739e1f32d32ae0f06827c18725f19e057bb6ddc91adc30aa406752"
+    sha256 cellar: :any, ventura: "2439236608d02120c945f0a864b6f57935a79ef0f5711bc389469549a1483d5b"
   end
 
   depends_on "quyleanh/tap/readline"
+  keg_only :provided_by_macos
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -40,7 +42,17 @@ class Sqlite < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64

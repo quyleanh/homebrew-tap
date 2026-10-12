@@ -61,3 +61,4 @@ pycparser	3.1
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8_2
 sphinx-doc	9.1.0_5	certifi=2026.7.22 python@3.14=3.14.8_2
 rclone	1.75.2	
+sqlite	3.54.0	readline=8.3.6
