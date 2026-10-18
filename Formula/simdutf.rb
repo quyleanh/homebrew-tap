@@ -2,20 +2,20 @@
 class Simdutf < Formula
   desc "Unicode conversion routines, fast"
   homepage "https://simdutf.github.io/simdutf/"
-  version "9.2.1"
-  revision 1
+  version "9.3.2"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf-9.2.1_1.ventura.bottle.1.tar.gz"
-  sha256 "014e53d1cee3453b3a33deea4ce3be4fe9bbfe8b1fe1254010a7d4fef1222eeb"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/simdutf-9.3.2.ventura.bottle.1.tar.gz"
+  sha256 "478cf5f0c283362ed714132223f164760553f12120cb77f20dadd750e7b32d0a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "014e53d1cee3453b3a33deea4ce3be4fe9bbfe8b1fe1254010a7d4fef1222eeb"
+    sha256 cellar: :any, ventura: "478cf5f0c283362ed714132223f164760553f12120cb77f20dadd750e7b32d0a"
   end
 
   depends_on "quyleanh/tap/icu4c@78"
+
 
 
   def install
