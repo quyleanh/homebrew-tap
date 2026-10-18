@@ -70,3 +70,4 @@ python@3.14	3.14.8_2	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 
 z3	5.3.1	
 xcb-proto	1.17.0_1	
 simdutf	9.3.2	icu4c@78=78.3
+ada-url	4.0.0_1	fmt=12.2.0 simdutf=9.3.2

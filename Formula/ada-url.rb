@@ -3,18 +3,22 @@ class AdaUrl < Formula
   desc "WHATWG-compliant and fast URL parser written in modern C++"
   homepage "https://ada-url.com"
   version "4.0.0"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url-4.0.0.ventura.bottle.1.tar.gz"
-  sha256 "0a477c570692ab9c893c3a2c3852632e41cc572eaa2029e1aca83d718fb9c40d"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url-4.0.0_1.ventura.bottle.1.tar.gz"
+  sha256 "dac1f2391a7bd200b1da348b7026f4af8d435d89f8b1f3958572d318d4d6621a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "0a477c570692ab9c893c3a2c3852632e41cc572eaa2029e1aca83d718fb9c40d"
+    sha256 cellar: :any, ventura: "dac1f2391a7bd200b1da348b7026f4af8d435d89f8b1f3958572d318d4d6621a"
   end
 
   depends_on "quyleanh/tap/fmt"
+  depends_on "quyleanh/tap/simdutf"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -40,7 +44,17 @@ class AdaUrl < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
