@@ -69,3 +69,4 @@ pkgconf	3.0.9
 python@3.15	3.15.0	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.54.1 xz=5.8.4 zstd=1.5.7_1
 python@3.14	3.14.8_2	ca-certificates=2026-09-25 mpdecimal=4.0.1 openssl@4=4.0.3 sqlite=3.54.1 xz=5.8.4 zstd=1.5.7_1
 z3	5.3.1	
+xcb-proto	1.17.0_1	
