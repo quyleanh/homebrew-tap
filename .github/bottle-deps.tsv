@@ -67,3 +67,4 @@ aria2	1.37.0_3	c-ares=1.34.8 gettext=1.0 libssh2=1.11.1_7 openssl@4=4.0.3 sqlite
 hugo	0.168.0	
 simdjson	5.0.4	
 sqlite	3.54.1	readline=8.3.6
+libunistring	1.5	
