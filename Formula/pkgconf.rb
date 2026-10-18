@@ -2,16 +2,16 @@
 class Pkgconf < Formula
   desc "Package compiler and linker metadata toolkit"
   homepage "https://github.com/pkgconf/pkgconf"
-  version "3.0.8"
+  version "3.0.9"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf-3.0.8.ventura.bottle.1.tar.gz"
-  sha256 "8e84c1fa556f79fcb85e311f2bcee088b2f425ba00f81900e8b64e86545bb731"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/pkgconf-3.0.9.ventura.bottle.1.tar.gz"
+  sha256 "210090290e5f4655e55d4e0b7389d3ab2e467228e44760843942768001ba137a"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "8e84c1fa556f79fcb85e311f2bcee088b2f425ba00f81900e8b64e86545bb731"
+    sha256 cellar: "/usr/local/Cellar", ventura: "210090290e5f4655e55d4e0b7389d3ab2e467228e44760843942768001ba137a"
   end
 
 
