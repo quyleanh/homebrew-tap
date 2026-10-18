@@ -47,7 +47,6 @@ libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.0.3
 libevent	2.1.13_1	openssl@4=4.0.3
 tmux	3.8	jemalloc=5.4.0 libevent=2.1.13_1 ncurses=6.6 utf8proc=2.12.0
 scrcpy	5.0.1	ffmpeg=8.1.2_4 libusb=1.0.30 sdl3=3.4.18
-docker	29.9.0	
 meson	1.12.1	ninja=1.13.2 python@3.14=3.14.8_2
 rclone	1.75.2	
 python-setuptools	84.0.0_1	
@@ -71,3 +70,4 @@ hdrhistogram_c	0.12.1
 merve	1.2.2_4	simdutf=9.3.2
 simdjson	5.0.5	
 wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.5 openssl@4=4.0.3
+docker	29.9.1	
