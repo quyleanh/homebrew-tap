@@ -59,7 +59,6 @@ sphinx-doc	9.1.0_5	certifi=2026.7.22_1 python@3.15=3.15.0
 fzf	0.74.5	
 aria2	1.37.0_3	c-ares=1.34.8 gettext=1.0 libssh2=1.11.1_7 openssl@4=4.0.3 sqlite=3.54.0
 hugo	0.168.0	
-simdjson	5.0.4	
 sqlite	3.54.1	readline=8.3.6
 libunistring	1.5	
 pkgconf	3.0.9	
@@ -71,3 +70,4 @@ simdutf	9.3.2	icu4c@78=78.3
 ada-url	4.0.0_1	fmt=12.2.0 simdutf=9.3.2
 hdrhistogram_c	0.12.1	
 merve	1.2.2_4	simdutf=9.3.2
+simdjson	5.0.5	
