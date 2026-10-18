@@ -2,16 +2,16 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  version "3.54.0"
+  version "3.54.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.54.0.ventura.bottle.1.tar.gz"
-  sha256 "2439236608d02120c945f0a864b6f57935a79ef0f5711bc389469549a1483d5b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sqlite-3.54.1.ventura.bottle.1.tar.gz"
+  sha256 "c5cc37c8e69a4b6ae00860b6c08aaa507b050334ed126616994bf6bf4c25ff94"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "2439236608d02120c945f0a864b6f57935a79ef0f5711bc389469549a1483d5b"
+    sha256 cellar: :any, ventura: "c5cc37c8e69a4b6ae00860b6c08aaa507b050334ed126616994bf6bf4c25ff94"
   end
 
   depends_on "quyleanh/tap/readline"
