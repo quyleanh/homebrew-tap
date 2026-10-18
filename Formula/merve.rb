@@ -3,19 +3,20 @@ class Merve < Formula
   desc "C++ lexer for extracting named exports from CommonJS modules"
   homepage "https://github.com/nodejs/merve"
   version "1.2.2"
-  revision 3
+  revision 4
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/merve-1.2.2_3.ventura.bottle.1.tar.gz"
-  sha256 "db8b9d71947012ad2cadfe58efd0bbae4ceea2cc2c95167b58a31ff1086439c7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/merve-1.2.2_4.ventura.bottle.1.tar.gz"
+  sha256 "1c6fd4af87a3f4c569e7a86cc210f0069007533ab716cd5db2d5105cf61d3dca"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "db8b9d71947012ad2cadfe58efd0bbae4ceea2cc2c95167b58a31ff1086439c7"
+    sha256 cellar: :any, ventura: "1c6fd4af87a3f4c569e7a86cc210f0069007533ab716cd5db2d5105cf61d3dca"
   end
 
   depends_on "quyleanh/tap/simdutf"
+
 
 
   def install
