@@ -2,16 +2,16 @@
 class HdrhistogramC < Formula
   desc "C port of the HdrHistogram"
   homepage "https://github.com/HdrHistogram/HdrHistogram_c"
-  version "0.12.0"
+  version "0.12.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hdrhistogram_c-0.12.0.ventura.bottle.1.tar.gz"
-  sha256 "bcea952b0c1f3e1fff68b386651c2478c9c348aec3de6b41a3769c8d817da16f"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/hdrhistogram_c-0.12.1.ventura.bottle.1.tar.gz"
+  sha256 "0274b9f5fb4cc0398f1ec83da081097cb1ae175e1d41f18d63df84f62f66ec5d"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "bcea952b0c1f3e1fff68b386651c2478c9c348aec3de6b41a3769c8d817da16f"
+    sha256 cellar: :any, ventura: "0274b9f5fb4cc0398f1ec83da081097cb1ae175e1d41f18d63df84f62f66ec5d"
   end
 
 
