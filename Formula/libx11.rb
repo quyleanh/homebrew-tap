@@ -2,20 +2,22 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  version "1.8.13"
+  version "1.8.14"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libx11-1.8.13.ventura.bottle.1.tar.gz"
-  sha256 "64fcf7f33750f573335d6936930e99f3d74c0b7e78ae2c1ecfde75a5a44b2443"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libx11-1.8.14.ventura.bottle.1.tar.gz"
+  sha256 "d909a653c18db4d278200afb0a6ac5dfb238ee94b270bfc1948fd960a9d2e83c"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "64fcf7f33750f573335d6936930e99f3d74c0b7e78ae2c1ecfde75a5a44b2443"
+    sha256 cellar: "/usr/local/Cellar", ventura: "d909a653c18db4d278200afb0a6ac5dfb238ee94b270bfc1948fd960a9d2e83c"
   end
 
   depends_on "quyleanh/tap/libxcb"
   depends_on "quyleanh/tap/xorgproto"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
@@ -41,7 +43,17 @@ class Libx11 < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
