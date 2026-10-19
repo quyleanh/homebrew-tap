@@ -7,12 +7,12 @@ class SphinxDoc < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/sphinx-doc-9.1.0_5.ventura.bottle.1.tar.gz"
-  sha256 "ab6fc68704af1487dd0ad8fef5ec794d32f5133a77b20827941dcb8bd432e56b"
+  sha256 "0535320dd99efeb25bb41cbd52ba39e6f06c0b39572932fa631aed5c9cf5000e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "ab6fc68704af1487dd0ad8fef5ec794d32f5133a77b20827941dcb8bd432e56b"
+    sha256 cellar: :any_skip_relocation, ventura: "0535320dd99efeb25bb41cbd52ba39e6f06c0b39572932fa631aed5c9cf5000e"
   end
 
   depends_on "quyleanh/tap/certifi"
