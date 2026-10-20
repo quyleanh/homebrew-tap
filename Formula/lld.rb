@@ -2,24 +2,24 @@
 class Lld < Formula
   desc "LLVM Project Linker"
   homepage "https://lld.llvm.org/"
-  version "23.1.2"
+  version "23.1.3"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld-23.1.2.ventura.bottle.1.tar.gz"
-  sha256 "3daaf9b1b91b8ea2fa23be88116d0676cff268b05edafb40ef8249636d1f69bd"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/lld-23.1.3.ventura.bottle.1.tar.gz"
+  sha256 "46eade19a6036d4caef20b0e19d0389b1137fbc26f11cfe3345d677e1446b0db"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "3daaf9b1b91b8ea2fa23be88116d0676cff268b05edafb40ef8249636d1f69bd"
+    sha256 cellar: :any, ventura: "46eade19a6036d4caef20b0e19d0389b1137fbc26f11cfe3345d677e1446b0db"
   end
 
   depends_on "quyleanh/tap/llvm"
   depends_on "quyleanh/tap/zstd"
 
-
   link_overwrite "bin/lld", "bin/ld64.lld", "bin/ld.lld", "bin/lld-link", "bin/wasm-ld"
   link_overwrite "include/lld/*", "lib/cmake/lld/*"
+
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
     # We find the first directory containing common Homebrew paths and install its contents.
