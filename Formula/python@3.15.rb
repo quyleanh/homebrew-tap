@@ -3,15 +3,16 @@ class PythonAT315 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
   version "3.15.0"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.15-3.15.0.ventura.bottle.1.tar.gz"
-  sha256 "9cd4b33089c2161580dec5ebfb159159cf7b92958bbc3ccaabf9a42a13c4ca2b"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.15-3.15.0_1.ventura.bottle.1.tar.gz"
+  sha256 "299700824040765df0b1c6d1902cd8e328a66559fd0b32a8d3a606c579be6ff9"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "9cd4b33089c2161580dec5ebfb159159cf7b92958bbc3ccaabf9a42a13c4ca2b"
+    sha256 cellar: "/usr/local/Cellar", ventura: "299700824040765df0b1c6d1902cd8e328a66559fd0b32a8d3a606c579be6ff9"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
