@@ -2,20 +2,22 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.com/"
-  version "2.9.7"
+  version "2.9.8"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.7.ventura.bottle.1.tar.gz"
-  sha256 "0b480b92396f6429dddc04c97613fd10bdd4364ec2fe2f5a973fa23031ad600c"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/deno-2.9.8.ventura.bottle.1.tar.gz"
+  sha256 "f54da6f7b092f56c27fc8758ea0bd282522724b8f706661b40b5a6c33cbf1887"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "0b480b92396f6429dddc04c97613fd10bdd4364ec2fe2f5a973fa23031ad600c"
+    sha256 cellar: :any, ventura: "f54da6f7b092f56c27fc8758ea0bd282522724b8f706661b40b5a6c33cbf1887"
   end
 
   depends_on "quyleanh/tap/little-cms2"
   depends_on "quyleanh/tap/sqlite"
+
+
 
   def install
     # The bottle tarball contains the entire Cellar hierarchy.
