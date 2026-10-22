@@ -7,19 +7,19 @@ class YtDlp < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.8.19_2.ventura.bottle.1.tar.gz"
-  sha256 "7c7a9409d6596da8574479e66b8601eefcd708c47c3dc4f9fa54056f8cc3e4a2"
+  sha256 "c1cffb621e348bb7b6f8b091351f6bea1ed59848e7433173ce6f09bda48e7252"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "7c7a9409d6596da8574479e66b8601eefcd708c47c3dc4f9fa54056f8cc3e4a2"
+    sha256 cellar: :any_skip_relocation, ventura: "c1cffb621e348bb7b6f8b091351f6bea1ed59848e7433173ce6f09bda48e7252"
   end
 
   depends_on "quyleanh/tap/certifi"
   depends_on "quyleanh/tap/cffi"
   depends_on "quyleanh/tap/deno"
   depends_on "quyleanh/tap/pycparser"
-  depends_on "quyleanh/tap/python@3.14"
+  depends_on "quyleanh/tap/python@3.15"
 
 
 
