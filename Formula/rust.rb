@@ -2,22 +2,22 @@
 class Rust < Formula
   desc "Safe, concurrent, practical language"
   homepage "https://www.rust-lang.org/"
-  version "1.99.0"
+  version "1.99.1"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.99.0.ventura.bottle.1.tar.gz"
-  sha256 "decd8f36aec31e5fbd48ad86517f5301073817a6393cfa80bb9448bb89b87e32"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.99.1.ventura.bottle.1.tar.gz"
+  sha256 "413c2721c3a26597d6ebf5752dd8d44e5239b0a940d47d46a60c99b5714154e0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "decd8f36aec31e5fbd48ad86517f5301073817a6393cfa80bb9448bb89b87e32"
+    sha256 cellar: :any, ventura: "413c2721c3a26597d6ebf5752dd8d44e5239b0a940d47d46a60c99b5714154e0"
   end
 
   depends_on "quyleanh/tap/libgit2"
   depends_on "quyleanh/tap/libssh2"
   depends_on "quyleanh/tap/llvm"
-  depends_on "quyleanh/tap/openssl@3"
+  depends_on "quyleanh/tap/openssl@4"
   depends_on "quyleanh/tap/pkgconf"
   depends_on "quyleanh/tap/sqlite"
 
