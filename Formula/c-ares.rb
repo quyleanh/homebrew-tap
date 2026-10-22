@@ -2,17 +2,19 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  version "1.34.8"
+  version "1.34.9"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares-1.34.8.ventura.bottle.1.tar.gz"
-  sha256 "b280924b13cf90b5dbd1dfd3878abf57304b6bdab8fc638a1fa7be64882d0793"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/c-ares-1.34.9.ventura.bottle.1.tar.gz"
+  sha256 "96910b7459cc61f6dc370a28bde7ef5fd4283416e369fc84a125fb5250a719f5"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "b280924b13cf90b5dbd1dfd3878abf57304b6bdab8fc638a1fa7be64882d0793"
+    sha256 cellar: :any, ventura: "96910b7459cc61f6dc370a28bde7ef5fd4283416e369fc84a125fb5250a719f5"
   end
+
+
 
 
 
@@ -40,7 +42,17 @@ class CAres < Formula
       # per openjdk dependency at bottle time, so it cannot be resolved generically.)
       "@@HOMEBREW_PERL@@" => "#{HOMEBREW_PREFIX}/opt/perl/bin/perl",
     }
-    sub_ph = lambda { |s| placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) } }
+    # A dependency recorded through a version-qualified opt path (opt/zstd/1.5.7_1/lib)
+    # only ever resolves on the machine that built the bottle: elsewhere opt/<name> points
+    # at whatever version is installed, so the extra segment makes the path simply wrong
+    # and dyld aborts. Normalise it to the canonical opt path. The version segment must
+    # start with a digit so real path segments (opt/python@3.14/lib) are left alone.
+    ver_opt = Regexp.new("#{Regexp.escape(HOMEBREW_PREFIX.to_s)}/opt/([A-Za-z0-9@+.-]+)/(\d[^/]*)/")
+    opt_root = "#{HOMEBREW_PREFIX}/opt/"
+    sub_ph = lambda { |s|
+      r = placeholders.reduce(s) { |acc, (k, v)| acc.gsub(k, v) }
+      r.gsub(ver_opt) { "#{opt_root}#{$1}/" }
+    }
 
     macho_magics = [
       0xfeedfacf, 0xcffaedfe, # 64-bit MH_MAGIC_64 & MH_CIGAM_64
