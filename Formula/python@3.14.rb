@@ -2,17 +2,16 @@
 class PythonAT314 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  version "3.14.8"
-  revision 2
+  version "3.14.9"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.8_2.ventura.bottle.1.tar.gz"
-  sha256 "13f95a9f248a7b62c3c8757e56b788ffc836e30101fc9c8e62303c1093322ae7"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/python@3.14-3.14.9.ventura.bottle.1.tar.gz"
+  sha256 "43f9da7ebd22b5e97dddc5312b79a780bb56a1c0502072c3ee7fab7638489c7d"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "13f95a9f248a7b62c3c8757e56b788ffc836e30101fc9c8e62303c1093322ae7"
+    sha256 cellar: "/usr/local/Cellar", ventura: "43f9da7ebd22b5e97dddc5312b79a780bb56a1c0502072c3ee7fab7638489c7d"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
