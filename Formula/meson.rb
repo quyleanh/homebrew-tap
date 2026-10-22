@@ -6,16 +6,16 @@ class Meson < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/meson-1.12.1.ventura.bottle.1.tar.gz"
-  sha256 "cedc81ac183b8f1eded74eecd5df9733fc4cd60112813f68b38dc2e5425377d6"
+  sha256 "2d09ba8491158be18be5c9799102a6aeb1d4ae7ca9ef286a55deb8282f6523e0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "cedc81ac183b8f1eded74eecd5df9733fc4cd60112813f68b38dc2e5425377d6"
+    sha256 cellar: :any_skip_relocation, ventura: "2d09ba8491158be18be5c9799102a6aeb1d4ae7ca9ef286a55deb8282f6523e0"
   end
 
   depends_on "quyleanh/tap/ninja"
-  depends_on "quyleanh/tap/python@3.14"
+  depends_on "quyleanh/tap/python@3.15"
 
 
 
