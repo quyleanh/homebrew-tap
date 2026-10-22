@@ -6,12 +6,12 @@ class OpensslAT4 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/openssl@4-4.0.3.ventura.bottle.1.tar.gz"
-  sha256 "ae01da0f7d89bfb9cf892da6179e5ffefc88d39556e566105ca7bdbe0cfe5b27"
+  sha256 "381a211b2bcad4f32ab27ac5ba029961bd9c7d4db3bf0bc87407bbc9d70d09b0"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "ae01da0f7d89bfb9cf892da6179e5ffefc88d39556e566105ca7bdbe0cfe5b27"
+    sha256 cellar: "/usr/local/Cellar", ventura: "381a211b2bcad4f32ab27ac5ba029961bd9c7d4db3bf0bc87407bbc9d70d09b0"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
