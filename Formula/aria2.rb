@@ -7,12 +7,12 @@ class Aria2 < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/aria2-1.37.0_3.ventura.bottle.1.tar.gz"
-  sha256 "0f1dac33f93e6624a0771d3f639534961bd4bcd9b8b1c4156a4c2325985e4b74"
+  sha256 "351771f5ae57773c10b97e9d357a787e8a12a5c28e792e9218f80210f0b66c15"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: "/usr/local/Cellar", ventura: "0f1dac33f93e6624a0771d3f639534961bd4bcd9b8b1c4156a4c2325985e4b74"
+    sha256 cellar: "/usr/local/Cellar", ventura: "351771f5ae57773c10b97e9d357a787e8a12a5c28e792e9218f80210f0b66c15"
   end
 
   depends_on "quyleanh/tap/c-ares"
