@@ -2,17 +2,18 @@
 class CaCertificates < Formula
   desc "Mozilla CA certificate store"
   homepage "https://curl.se/docs/caextract.html"
-  version "2026-09-25"
+  version "2026-10-20"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates-2026-09-25.ventura.bottle.1.tar.gz"
-  sha256 "eff89a94137e4dc6c15f84caf0fc4765f7cbd4618a825dec7b8eaba98a20f979"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ca-certificates-2026-10-20.ventura.bottle.1.tar.gz"
+  sha256 "48a9935107ffb2ada92ba550d4ae0a927d29fc6ee8c7ff7130202368494b2b2e"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "eff89a94137e4dc6c15f84caf0fc4765f7cbd4618a825dec7b8eaba98a20f979"
+    sha256 cellar: :any_skip_relocation, ventura: "48a9935107ffb2ada92ba550d4ae0a927d29fc6ee8c7ff7130202368494b2b2e"
   end
+
 
 
 
