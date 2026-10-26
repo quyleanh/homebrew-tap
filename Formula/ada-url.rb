@@ -7,12 +7,12 @@ class AdaUrl < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/ada-url-4.0.0_1.ventura.bottle.1.tar.gz"
-  sha256 "dac1f2391a7bd200b1da348b7026f4af8d435d89f8b1f3958572d318d4d6621a"
+  sha256 "f46a31c1788385ae7e4d9a72485960d7534a1cdbce1bd0cc031115044ed5bfdd"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "dac1f2391a7bd200b1da348b7026f4af8d435d89f8b1f3958572d318d4d6621a"
+    sha256 cellar: :any, ventura: "f46a31c1788385ae7e4d9a72485960d7534a1cdbce1bd0cc031115044ed5bfdd"
   end
 
   depends_on "quyleanh/tap/fmt"
