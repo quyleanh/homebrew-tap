@@ -7,12 +7,12 @@ class Libevent < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/libevent-2.1.13_1.ventura.bottle.1.tar.gz"
-  sha256 "6df9ff7f14dceb94be2f64a2880bc31c0e283dbba4d7f5d936a380aacfd2f425"
+  sha256 "a39349b70c6da8a6f9e6e451a5bb5f1ed634272e9114836c6fdeb7c2acdf696f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "6df9ff7f14dceb94be2f64a2880bc31c0e283dbba4d7f5d936a380aacfd2f425"
+    sha256 cellar: :any, ventura: "a39349b70c6da8a6f9e6e451a5bb5f1ed634272e9114836c6fdeb7c2acdf696f"
   end
 
   depends_on "quyleanh/tap/openssl@4"

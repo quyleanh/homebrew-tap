@@ -32,7 +32,6 @@ ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.1 libvpx=1.17.0 openssl@3=3.6.5 
 lima	2.2.1	
 libpng	1.6.59	
 expat	2.9.0	
-libevent	2.1.13_1	openssl@4=4.0.3
 tmux	3.8	jemalloc=5.4.0 libevent=2.1.13_1 ncurses=6.6 utf8proc=2.12.0
 scrcpy	5.0.1	ffmpeg=8.1.2_4 libusb=1.0.30 sdl3=3.4.18
 rclone	1.75.2	
@@ -75,3 +74,4 @@ cffi	2.1.1_1	pycparser=3.12
 z3	5.3.2	
 libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.1.0
 rust	1.99.1	libgit2=1.9.7_2 libssh2=1.11.1_7 llvm=23.1.4 openssl@4=4.1.0 pkgconf=3.0.10 sqlite=3.54.1
+libevent	2.1.13_1	openssl@4=4.1.0
