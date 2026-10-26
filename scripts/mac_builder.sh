@@ -198,16 +198,23 @@ build_bottle() {
   # build is a core source build, and the tap bottle is reinstalled after it publishes.
   brew uninstall --force --ignore-dependencies "$pkg" >>"$LOG" 2>&1 || true
   out="$(mktemp)"
+  # MAC_BUILDER_IGNORE_DEPS=1 builds against the dependencies already installed. That is
+  # the right thing for node: its core formula wants libgit2, rust, googletest, abseil,
+  # aklomp-base64, icu4c@79 and highway, none of which have Intel bottles, so brew would
+  # spend hours building them from source — and what the tap actually ships depends on
+  # *its* versions of those, which are the same versions and are already bottled.
+  local ignore_deps=()
+  [ "${MAC_BUILDER_IGNORE_DEPS:-0}" = "1" ] && ignore_deps=(--ignore-dependencies)
   for attempt in 1 2 3; do
     : >"$out"
-    caffeinate -is brew install --build-bottle "homebrew/core/$pkg" 2>&1 | tee -a "$LOG" >"$out"
+    caffeinate -is brew install --build-bottle "${ignore_deps[@]}" "homebrew/core/$pkg" 2>&1 | tee -a "$LOG" >"$out"
     fixed=0
 
-    if grep -q "cannot be installed from bottle and must be" "$out"; then
+    if grep -qE "cannot be installed from bottles? and must be" "$out"; then
       unbottled=$(awk '
-        /cannot be installed from bottle and must be/ { grab = 1; next }
-        grab && /^  [^ ]/                             { sub(/^ +/, ""); print; next }
-        grab && !/^built from source/                 { grab = 0 }
+        /cannot be installed from bottles? and must be/ { grab = 1; next }
+        grab && /^  [^ ]/                               { sub(/^ +/, ""); print; next }
+        grab && !/^built from source/                   { grab = 0 }
       ' "$out")
       if [ -z "$unbottled" ]; then
         log "✗ $pkg: could not read the unbottled dependencies out of brew's error"
