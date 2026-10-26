@@ -74,3 +74,4 @@ gh	2.103.0
 openssl@4	4.1.0	ca-certificates=2026-10-20
 libssh2	1.11.1_7	openssl@4=4.1.0
 lz4	1.10.0	
+zstd	1.5.7_1	lz4=1.10.0 xz=5.8.4
