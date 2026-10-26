@@ -32,7 +32,6 @@ ffmpeg	8.1.2_4	dav1d=1.5.4 lame=4.0 libvmaf=3.2.1 libvpx=1.17.0 openssl@3=3.6.5 
 lima	2.2.1	
 libpng	1.6.59	
 expat	2.9.0	
-libssh2	1.11.1_7	openssl@4=4.0.3
 libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.0.3
 libevent	2.1.13_1	openssl@4=4.0.3
 tmux	3.8	jemalloc=5.4.0 libevent=2.1.13_1 ncurses=6.6 utf8proc=2.12.0
@@ -73,3 +72,4 @@ docker	29.9.2
 docker-compose	5.6.1	
 gh	2.103.0	
 openssl@4	4.1.0	ca-certificates=2026-10-20
+libssh2	1.11.1_7	openssl@4=4.1.0
