@@ -39,6 +39,8 @@ env:
 
 permissions:
   contents: write  # Required to commit formula updates and manage releases
+  actions: write   # Required for the scheduled run to hand a budget-skipped package to
+                   # a dedicated only_package run (see the end of scripts/build.sh)
 
 concurrency:
   group: build-bottles-stable-release

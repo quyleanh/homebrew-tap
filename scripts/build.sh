@@ -1608,6 +1608,26 @@ ls -lh "$OUTPUT_DIR/"*.tar.gz 2>/dev/null || echo "No bottles in output dir."
 echo "BUILT_COUNT=${#BUILT[@]}"   >> "${GITHUB_OUTPUT:-/dev/null}"
 echo "FAILED_COUNT=${#FAILED[@]}" >> "${GITHUB_OUTPUT:-/dev/null}"
 
+# A package whose build never fits a shared window is never rebuilt, so its bottle rots.
+# node sat at "Skipped for the time budget" for weeks while simdjson went 4.6.11 -> 5.0.5,
+# and the bottle left on the release needed a library that no longer exists anywhere:
+#
+#   dyld: Library not loaded: /usr/local/opt/simdjson/lib/libsimdjson.33.dylib
+#
+# The scheduled run hands the first such package to a dedicated run, which has the whole
+# window to itself and cannot be skipped for time; that run then hands over the next one,
+# so the backlog drains without anybody remembering to dispatch it. Manual runs stay
+# manual — a push should not spawn extra jobs.
+if [ "${#SKIPPED_BUDGET[@]}" -gt 0 ] &&
+  [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] &&
+  [ -n "${GITHUB_REPOSITORY:-}" ] &&
+  [ "${SKIPPED_BUDGET[0]}" != "$ONLY_PACKAGE" ]; then
+  echo "ℹ️  Handing ${SKIPPED_BUDGET[0]} to a dedicated run: it does not fit a shared window"
+  gh workflow run build.yml --repo "$GITHUB_REPOSITORY" -f only_package="${SKIPPED_BUDGET[0]}" ||
+    echo "  ⚠️  Could not dispatch the dedicated run for ${SKIPPED_BUDGET[0]}"
+  echo ""
+fi
+
 if [ ${#FAILED[@]} -gt 0 ]; then
 echo ""
 echo "⚠️  Some packages failed. Check logs above."
