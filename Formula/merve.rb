@@ -7,12 +7,12 @@ class Merve < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/merve-1.2.2_4.ventura.bottle.1.tar.gz"
-  sha256 "1c6fd4af87a3f4c569e7a86cc210f0069007533ab716cd5db2d5105cf61d3dca"
+  sha256 "62665250a757a1d33498a8081236cd540099c3869ef83eeacadba24ec3fbd25f"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "1c6fd4af87a3f4c569e7a86cc210f0069007533ab716cd5db2d5105cf61d3dca"
+    sha256 cellar: :any, ventura: "62665250a757a1d33498a8081236cd540099c3869ef83eeacadba24ec3fbd25f"
   end
 
   depends_on "quyleanh/tap/simdutf"
