@@ -37,7 +37,11 @@ export HOMEBREW_NO_INSTALL_FROM_API=1
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TAP="quyleanh/homebrew-tap"
 ROOT_URL="https://github.com/${TAP}/releases/download/stable"
-PACKAGES=(llvm llvm@22)
+# Packages that cannot fit a CI window. llvm and llvm@22 are known slow; node joined them
+# the hard way — its recorded estimate is 211m, but run #438 was still building at 5h52m
+# and died on GitHub's six-hour job ceiling, so CI can never finish it. Here there is no
+# ceiling. Override for a one-off: MAC_BUILDER_PACKAGES="node" scripts/mac_builder.sh
+read -r -a PACKAGES <<<"${MAC_BUILDER_PACKAGES:-llvm llvm@22 node}"
 LOG="${MAC_BUILDER_LOG:-$HOME/Library/Logs/homebrew-tap-mac-builder.log}"
 LOCK="${MAC_BUILDER_LOCK:-$HOME/Library/Logs/homebrew-tap-mac-builder.lock}"
 
