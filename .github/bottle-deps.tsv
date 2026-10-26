@@ -40,7 +40,6 @@ hugo	0.168.0
 sqlite	3.54.1	readline=8.3.6
 libunistring	1.5	
 xcb-proto	1.17.0_1	
-simdutf	9.3.2	icu4c@78=78.3
 ada-url	4.0.0_1	fmt=12.2.0 simdutf=9.3.2
 hdrhistogram_c	0.12.1	
 merve	1.2.2_4	simdutf=9.3.2
@@ -76,3 +75,4 @@ rust	1.99.1	libgit2=1.9.7_2 libssh2=1.11.1_7 llvm=23.1.4 openssl@4=4.1.0 pkgconf
 libevent	2.1.13_1	openssl@4=4.1.0
 meson	1.12.1	ninja=1.13.2 python@3.15=3.15.1
 icu4c@79	79.1	
+simdutf	9.3.2_1	icu4c@79=79.1
