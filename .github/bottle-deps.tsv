@@ -41,7 +41,6 @@ fzf	0.74.5
 hugo	0.168.0	
 sqlite	3.54.1	readline=8.3.6
 libunistring	1.5	
-z3	5.3.1	
 xcb-proto	1.17.0_1	
 simdutf	9.3.2	icu4c@78=78.3
 ada-url	4.0.0_1	fmt=12.2.0 simdutf=9.3.2
@@ -75,3 +74,4 @@ certifi	2026.10.23	ca-certificates=2026-10-20
 pycparser	3.12	
 python@3.14	3.14.10	ca-certificates=2026-10-20 mpdecimal=4.0.1 openssl@4=4.1.0 sqlite=3.54.1 xz=5.8.4 zstd=1.5.7_1
 cffi	2.1.1_1	pycparser=3.12
+z3	5.3.2	
