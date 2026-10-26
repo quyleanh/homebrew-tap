@@ -189,6 +189,14 @@ export GH_TOKEN="$(gh auth token)"
 # the core build stops wanting to upgrade it at all.
 build_bottle() {
   local pkg="$1" attempt out unbottled dep from_tap fixed
+  # brew refuses to put homebrew/core/<x> over a keg from another tap:
+  #
+  #   Error: node was installed from the quyleanh/tap tap
+  #   but you are trying to install it from the homebrew/core tap.
+  #
+  # This machine is a client of the tap, so its keg is tap-owned. Remove it first: the
+  # build is a core source build, and the tap bottle is reinstalled after it publishes.
+  brew uninstall --force --ignore-dependencies "$pkg" >>"$LOG" 2>&1 || true
   out="$(mktemp)"
   for attempt in 1 2 3; do
     : >"$out"
@@ -296,6 +304,17 @@ for entry in "${todo[@]}"; do
   git add "Formula/${pkg}.rb" && git commit -q -m "chore(bottles): update ${pkg} (${version}) [skip ci]" >>"$LOG" 2>&1 && log "formula committed"
   git pull --rebase -q origin main >>"$LOG" 2>&1
   git push -q origin main >>"$LOG" 2>&1 && log "✅ pushed" || log "⚠️ push failed (formula committed locally; next run will push it)"
+  # Leave this machine on the tap's own keg. The build above is recorded as
+  # homebrew/core, and brew will not later put the tap's version over it (same
+  # cross-tap rule that made the build fail at the start), so replace it now that the
+  # bottle exists. For node this is the difference between a working `npx` and none.
+  log "reinstalling the tap bottle for $pkg…"
+  brew uninstall --force --ignore-dependencies "$pkg" >>"$LOG" 2>&1 || true
+  if brew install --build-from-source "quyleanh/tap/$pkg" >>"$LOG" 2>&1; then
+    log "✅ $pkg reinstalled from the tap"
+  else
+    log "⚠️  could not reinstall $pkg from the tap; the core-built keg stays"
+  fi
   published=1
 done
 
