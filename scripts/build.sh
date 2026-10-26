@@ -22,6 +22,17 @@
 
 set -euo pipefail
 
+# Prefer the system curl over Homebrew's. The brewed curl is a formula, and formula
+# libraries are exactly what this script rebuilds and removes: run #432 uninstalled
+# libssh2 (to rebuild it against a new openssl@4) and every download after that died with
+#
+#   dyld: Library not loaded: /usr/local/opt/libssh2/lib/libssh2.1.dylib
+#     Referenced from: /usr/local/Cellar/curl/8.21.0/bin/curl
+#
+# which turned one uninstall into "could not restore" for about twenty packages. The
+# system curl links only against system libraries, so it cannot be broken this way.
+unset HOMEBREW_FORCE_BREWED_CURL
+
 SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_DIR="$(cd "$SCRIPT_DIR" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -1361,9 +1372,15 @@ if [ "$pkg" = "ffmpeg" ]; then
   fi
 fi
 
-# Uninstall for a clean build
-
-brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
+# Uninstall for a clean build — unless Homebrew's curl links against this package.
+# Removing such a keg takes the network down with it (run #432: libssh2, then every
+# download failed on the missing library), and brew's downloads are finished before it
+# swaps kegs, so letting brew replace the keg itself is both safe and sufficient.
+if [ -d "$(brew --cellar)/curl" ] && brew deps curl 2>/dev/null | grep -qxF "$pkg"; then
+  echo "  ℹ️  $pkg: curl links against it; letting brew replace the keg instead of removing it first"
+else
+  brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
+fi
 
 if [ "$pkg" = "ffmpeg" ]; then
   formula_revision=$(brew info --json=v2 quyleanh/tap/ffmpeg 2>/dev/null |
