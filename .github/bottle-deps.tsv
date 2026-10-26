@@ -75,3 +75,4 @@ libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.1.0
 rust	1.99.1	libgit2=1.9.7_2 libssh2=1.11.1_7 llvm=23.1.4 openssl@4=4.1.0 pkgconf=3.0.10 sqlite=3.54.1
 libevent	2.1.13_1	openssl@4=4.1.0
 meson	1.12.1	ninja=1.13.2 python@3.15=3.15.1
+icu4c@79	79.1	
