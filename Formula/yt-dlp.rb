@@ -2,17 +2,17 @@
 class YtDlp < Formula
   desc "Feature-rich command-line audio/video downloader"
   homepage "https://github.com/yt-dlp/yt-dlp"
-  version "2026.8.19"
-  revision 2
+  version "2026.10.21"
+  revision 1
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.8.19_2.ventura.bottle.1.tar.gz"
-  sha256 "c1cffb621e348bb7b6f8b091351f6bea1ed59848e7433173ce6f09bda48e7252"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.10.21_1.ventura.bottle.1.tar.gz"
+  sha256 "cdf2461ebf5af79082087a1673e1a201324ecfee02ba03737ced848feca98add"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "c1cffb621e348bb7b6f8b091351f6bea1ed59848e7433173ce6f09bda48e7252"
+    sha256 cellar: :any_skip_relocation, ventura: "cdf2461ebf5af79082087a1673e1a201324ecfee02ba03737ced848feca98add"
   end
 
   depends_on "quyleanh/tap/certifi"
