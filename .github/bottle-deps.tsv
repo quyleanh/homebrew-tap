@@ -42,7 +42,6 @@ libunistring	1.5
 xcb-proto	1.17.0_1	
 hdrhistogram_c	0.12.1	
 simdjson	5.0.5	
-wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.5 openssl@4=4.0.3
 libx11	1.8.14	libxcb=1.17.0 xorgproto=2026.1
 pkgconf	3.0.10	
 c-ares	1.34.9	
@@ -77,3 +76,4 @@ brotli	1.2.1
 sphinx-doc	9.2.0	certifi=2026.10.23 python@3.15=3.15.1
 merve	1.2.2_4	simdutf=9.3.2_1
 aria2	1.37.0_3	c-ares=1.34.9 gettext=1.0 libssh2=1.11.1_7 openssl@4=4.1.0 sqlite=3.54.1
+wget	1.25.0_2	gettext=1.0 libidn2=2.3.8 libpsl=0.23.3 libunistring=1.5 openssl@4=4.1.0
