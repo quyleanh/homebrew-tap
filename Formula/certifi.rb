@@ -2,16 +2,16 @@
 class Certifi < Formula
   desc "Mozilla CA bundle for Python"
   homepage "https://github.com/certifi/python-certifi"
-  version "2026.10.19"
+  version "2026.10.23"
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
-  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi-2026.10.19.ventura.bottle.1.tar.gz"
-  sha256 "bbb2da78165b75c0042be0bb78ed4e3388790d0c059f6fe311c9df1ff5a85509"
+  url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/certifi-2026.10.23.ventura.bottle.1.tar.gz"
+  sha256 "4ebf3a4a2965c33c844c1eac8d3cbb1cb0c2f25924da473eaca7d3582c383cc3"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "bbb2da78165b75c0042be0bb78ed4e3388790d0c059f6fe311c9df1ff5a85509"
+    sha256 cellar: :any_skip_relocation, ventura: "4ebf3a4a2965c33c844c1eac8d3cbb1cb0c2f25924da473eaca7d3582c383cc3"
   end
 
   depends_on "quyleanh/tap/ca-certificates"
