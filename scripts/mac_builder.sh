@@ -33,11 +33,6 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 # 23.1.2, so this script reported "up to date" and built nothing at all. With this set,
 # a plain git pull on the clone is enough to see upstream.
 export HOMEBREW_NO_INSTALL_FROM_API=1
-# Same reason as build.sh: the brewed curl is a formula, and this script upgrades
-# dependencies (which removes the old keg). If anything curl links against — libssh2,
-# openssl — is being replaced, every later download would die on the missing library.
-# The system curl cannot be broken that way.
-unset HOMEBREW_FORCE_BREWED_CURL
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TAP="quyleanh/homebrew-tap"

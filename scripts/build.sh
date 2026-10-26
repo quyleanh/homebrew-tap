@@ -22,17 +22,6 @@
 
 set -euo pipefail
 
-# Prefer the system curl over Homebrew's. The brewed curl is a formula, and formula
-# libraries are exactly what this script rebuilds and removes: run #432 uninstalled
-# libssh2 (to rebuild it against a new openssl@4) and every download after that died with
-#
-#   dyld: Library not loaded: /usr/local/opt/libssh2/lib/libssh2.1.dylib
-#     Referenced from: /usr/local/Cellar/curl/8.21.0/bin/curl
-#
-# which turned one uninstall into "could not restore" for about twenty packages. The
-# system curl links only against system libraries, so it cannot be broken this way.
-unset HOMEBREW_FORCE_BREWED_CURL
-
 SCRIPT_DIR="$(dirname "$0")"
 SCRIPT_DIR="$(cd "$SCRIPT_DIR" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -686,15 +675,29 @@ local version="$2"
 local formula_ref="$3"
 local restore_status=0
 
+# The keg has to go before the tap's bottle can go in — brew will not put a keg from one
+# tap over a keg from another — but taking it away first is what broke run #432 and run
+# #436. brew's HTTP client on these runners is the brewed curl, and that curl is itself a
+# formula this pipeline replaces; with libssh2 uninstalled every later fetch died with
+#
+#   dyld: Library not loaded: /usr/local/opt/libssh2/lib/libssh2.1.dylib
+#     Referenced from: /usr/local/Cellar/curl/8.21.0/bin/curl
+#
+# Unsetting HOMEBREW_FORCE_BREWED_CURL does not help: the runner's brew.env puts it back
+# before brew starts. Register the formula and download the artifact first instead —
+# nothing needs the network once the keg is gone, and brew finds the download in its
+# cache.
+if [[ "$formula_ref" == "quyleanh/tap/"* ]]; then
+  sync_registered_tap_formula "$pkg" || true
+fi
+
+brew fetch --force --build-from-source "$formula_ref" >/dev/null 2>&1 || true
+
 # A GitHub runner may already have the same formula name from Homebrew Core.
 # Remove it before installing the tap-owned keg.
 brew uninstall --force --ignore-dependencies "$pkg" 2>/dev/null || true
 if [ "$pkg" = "openssl@3" ]; then
   prepare_openssl_link_for_restore
-fi
-
-if [[ "$formula_ref" == "quyleanh/tap/"* ]]; then
-  sync_registered_tap_formula "$pkg" || true
 fi
 
 # Cap a restore. This path has no time budget of its own: the loop only checks the
@@ -1379,6 +1382,10 @@ fi
 if [ -d "$(brew --cellar)/curl" ] && brew deps curl 2>/dev/null | grep -qxF "$pkg"; then
   echo "  ℹ️  $pkg: curl links against it; letting brew replace the keg instead of removing it first"
 else
+  # Download before the keg goes away, for the same reason as the restore path: brew's
+  # curl links against libraries this pipeline replaces, so the fetch has to happen while
+  # they are still installed.
+  brew fetch --force --build-bottle "$pkg" >/dev/null 2>&1 || true
   brew uninstall --ignore-dependencies "$pkg" 2>/dev/null || true
 fi
 
