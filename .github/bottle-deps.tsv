@@ -54,7 +54,6 @@ ca-certificates	2026-10-20
 go	1.27.3	
 python-setuptools	84.2.1	
 lld	23.1.4	llvm=23.1.4 zstd=1.5.7_1
-rust	1.99.1	libgit2=1.9.7_2 libssh2=1.11.1_7 llvm=23.1.4 openssl@4=4.0.3 pkgconf=3.0.10 sqlite=3.54.1
 deno	2.9.8	little-cms2=2.19.1 sqlite=3.54.1
 meson	1.12.1	ninja=1.13.2 python@3.15=3.15.0_1
 sphinx-doc	9.2.0	certifi=2026.10.19 python@3.15=3.15.0_1
@@ -75,3 +74,4 @@ python@3.14	3.14.10	ca-certificates=2026-10-20 mpdecimal=4.0.1 openssl@4=4.1.0 s
 cffi	2.1.1_1	pycparser=3.12
 z3	5.3.2	
 libgit2	1.9.7_2	libssh2=1.11.1_7 llhttp=9.4.3 openssl@4=4.1.0
+rust	1.99.1	libgit2=1.9.7_2 libssh2=1.11.1_7 llvm=23.1.4 openssl@4=4.1.0 pkgconf=3.0.10 sqlite=3.54.1

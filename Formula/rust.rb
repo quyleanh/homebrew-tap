@@ -6,12 +6,12 @@ class Rust < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/rust-1.99.1.ventura.bottle.1.tar.gz"
-  sha256 "413c2721c3a26597d6ebf5752dd8d44e5239b0a940d47d46a60c99b5714154e0"
+  sha256 "a295878f232e82056b8aac1624d7e2f4da1350e620b0a3dcf681d65de913ac99"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any, ventura: "413c2721c3a26597d6ebf5752dd8d44e5239b0a940d47d46a60c99b5714154e0"
+    sha256 cellar: :any, ventura: "a295878f232e82056b8aac1624d7e2f4da1350e620b0a3dcf681d65de913ac99"
   end
 
   depends_on "quyleanh/tap/libgit2"
