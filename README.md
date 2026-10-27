@@ -105,6 +105,9 @@ A: This happens if a build was interrupted or an asset was manually changed. The
 **Q: A build log says a package was "Skipped for the time budget"?**
 A: Its measured build time no longer fits the 5-hour window (the biggest ones—`node`, `deno`—routinely do not). Run the workflow manually with `only_package=<package>` to give that one package the whole job, or let the Mac builder take it if it is in the `llvm` family.
 
+**Q: Where is `node`? It used to be in this tap.**
+A: It was removed on purpose. Upstream node 26.12 needs `python@3.15`, `icu4c@79`, `rust` and more, none of which homebrew-core ships Intel/Ventura bottles for; `python@3.15` does not build on macOS 13 at all (it needs a newer clang with tail-call support), and node itself does not finish inside CI's six-hour ceiling. The last bottle that shipped went ABI-stale — it still asked for `libsimdjson.33` and `libsimdutf.36` after those libraries moved — so it installed a `node` that could not start. Use a self-contained node instead: the official nodejs.org tarball or `nvm`. Nothing this tap ships depends on node, and a self-contained node cannot be broken by a Homebrew upgrade.
+
 ---
 
 ## ⚖️ License

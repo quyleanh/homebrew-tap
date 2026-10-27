@@ -28,7 +28,13 @@ expat
 
 # Dev / runtimes
 little-cms2
-node
+# node is deliberately not built here any more. Upstream node 26.12 needs dependencies
+# (python@3.15, icu4c@79, rust, ...) that homebrew-core ships no Intel/Ventura bottles
+# for, python@3.15 does not build on macOS 13 at all, and CI cannot finish node inside
+# its six-hour ceiling. The bottle that was published went ABI-stale — it still asked
+# for libsimdjson.33 and libsimdutf.36 after those libraries moved — so the tap stopped
+# offering node rather than offering a package that cannot start. Use a self-contained
+# node (nodejs.org tarball or nvm) instead; it cannot rot this way.
 hugo
 rtk
 go
