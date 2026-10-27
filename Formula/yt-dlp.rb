@@ -7,12 +7,12 @@ class YtDlp < Formula
   
   # Use a dummy URL to download the pre-built .tar.gz file directly
   url "https://github.com/quyleanh/homebrew-tap/releases/download/stable/yt-dlp-2026.10.21_1.ventura.bottle.1.tar.gz"
-  sha256 "cdf2461ebf5af79082087a1673e1a201324ecfee02ba03737ced848feca98add"
+  sha256 "44bc292aec3bce06499057c725356ab34340f4ba4c765f0395aff9ef6e318be5"
 
   bottle do
     root_url "https://github.com/quyleanh/homebrew-tap/releases/download/stable"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, ventura: "cdf2461ebf5af79082087a1673e1a201324ecfee02ba03737ced848feca98add"
+    sha256 cellar: :any_skip_relocation, ventura: "44bc292aec3bce06499057c725356ab34340f4ba4c765f0395aff9ef6e318be5"
   end
 
   depends_on "quyleanh/tap/certifi"
