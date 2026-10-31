@@ -1,8 +1,63 @@
 # 🍺 homebrew-tap
 
+> **Status (October 2026): this tap is retired.** The machine it served now uses official
+> upstream binaries and MacPorts; see [Current setup](#-current-setup-october-2026-this-tap-is-retired).
+> CI and the Mac builder are disabled and nothing in this repository needs maintaining.
+
 A high-performance, private Homebrew Tap providing pre-built binary bottles for Intel-based Macs.
 
 This repository solves the "end-of-life" problem for older Intel Macs (like the MacBook Pro 2017) by providing a continuous build pipeline that hosts binaries on GitHub Releases, bypassing the need for long local compilations.
+
+---
+
+## ✅ Current setup (October 2026): this tap is retired
+
+The reason this tap existed — re-supplying Intel/Ventura bottles that Homebrew no longer
+builds — is gone. The machine now uses, in order of preference:
+
+1. **official upstream binaries** where the project publishes a macOS amd64 build,
+2. **MacPorts**, which still ships `darwin_22` (macOS 13) x86_64 binary archives,
+3. **Homebrew only for casks** (prebuilt app downloads — no compiling).
+
+| Source | What comes from it |
+|---|---|
+| Official upstream binaries → `~/.local/bin` | node, deno, go, gh, jq, fzf, gitleaks, rclone, yt-dlp, docker, docker-compose, colima, limactl, nasm, git-filter-repo, hugo, rtk |
+| MacPorts → `/opt/local/bin` (binary-only) | ffmpeg, bash, tmux, aria2, tree, argon2, potrace |
+| Homebrew → `/usr/local` | casks only (`brew list --cask`); `wget` is the last formula left |
+
+### Maintenance
+
+```bash
+prebuilt-install                                # update the official binaries (resolves newest releases)
+sudo /opt/local/bin/port -b upgrade outdated    # update MacPorts — -b means never compile
+brew upgrade --cask                             # update GUI apps
+```
+
+- `prebuilt-install` is `~/.local/bin/prebuilt-install`, generated from
+  [`scripts/prebuilt-install.sh`](./scripts/prebuilt-install.sh). `prebuilt-install --check`
+  resolves and prints the newest versions without downloading anything.
+- **MacPorts needs `sudo`** for `install` / `upgrade` / `uninstall`, because `/opt/local`
+  is root-owned by design. Read-only commands (`port info`, `port search`, `port list`) do
+  not need it. There is no supported way to avoid this with the default prefix.
+- **Do not run bare `brew upgrade`.** It would try to rebuild formulae that have no Ventura
+  bottles. Use `brew upgrade --cask`, and leave the remaining formula alone.
+
+### PATH
+
+`~/.zshrc` ends with this, so the official binaries and MacPorts take precedence over
+Homebrew's `/usr/local/bin` — which stays in `PATH` for casks:
+
+```bash
+export PATH="$HOME/.local/bin:/opt/local/bin:$PATH"
+```
+
+### What was given up, and why it is fine
+
+`llvm`/`llvm@22` were dropped (unused — `CC`/`CXX` were empty), which retired the 12-hour
+Mac builds with them. `node` is no longer packaged here: upstream node needs dependencies
+that have no Intel/Ventura bottles, `python@3.15` cannot compile on macOS 13, and a CI job
+cannot finish node inside its six-hour ceiling — the published bottle went ABI-stale. It is
+now an official nodejs.org build under `~/.local`, which no Homebrew upgrade can break.
 
 ---
 
