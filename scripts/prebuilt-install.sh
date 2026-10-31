@@ -4,13 +4,17 @@
 # Why this exists: on macOS 13 Intel, Homebrew no longer ships bottles and MacPorts only
 # covers what it packages — but most tools publish an official darwin/amd64 binary
 # themselves. Those need no package manager, no bottle farm and no compiling, and several
-# of them update themselves afterwards (deno upgrade, rclone selfupdate, yt-dlp -U).
+# update themselves afterwards (deno upgrade, rclone selfupdate, yt-dlp -U).
 #
-# Layout:  ~/.local/opt/<tool>/<tool>   and a symlink at ~/.local/bin/<tool>
+# Versions are resolved from each project's *latest* release at run time, so this doubles
+# as the updater: re-run it and everything moves to the newest official build.
+#
+# Layout:  ~/.local/opt/<tool>/        and symlinks in ~/.local/bin/
 # Nothing here touches /usr/local (Homebrew) or /opt/local (MacPorts).
 #
 # Usage:
-#   scripts/prebuilt-install.sh            # install everything missing
+#   scripts/prebuilt-install.sh            # install/update everything
+#   scripts/prebuilt-install.sh --check    # resolve newest versions, download nothing
 #   scripts/prebuilt-install.sh jq gh      # only these
 #   scripts/prebuilt-install.sh --list     # show the manifest
 #   PREBUILT_DEST=/somewhere scripts/prebuilt-install.sh
@@ -20,96 +24,156 @@ DEST="${PREBUILT_DEST:-$HOME/.local}"
 BIN="$DEST/bin"
 OPT="$DEST/opt"
 
-# name|url|binary-name-in-archive|how
-#   how: auto (by extension) or "single" for a bare executable, or "go" for the go tarball
+# name|source|asset-pattern|how
+#   source: gh:<owner>/<repo> | godev | nodejs | nasm | dockerstatic | raw:<url>
+#   how:    auto (by extension) | single (bare executable) | tree (archive holds bin/)
 MANIFEST=$(cat <<'EOF'
-jq|https://github.com/jqlang/jq/releases/latest/download/jq-macos-amd64|jq|single
-fzf|https://github.com/junegunn/fzf/releases/latest/download/fzf-0.74.5-darwin_amd64.tar.gz|fzf|auto
-gh|https://github.com/cli/cli/releases/latest/download/gh_2.103.3_macOS_amd64.zip|gh|auto
-gitleaks|https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_8.30.1_darwin_x64.tar.gz|gitleaks|auto
-rclone|https://github.com/rclone/rclone/releases/latest/download/rclone-v1.75.2-osx-amd64.zip|rclone|auto
-yt-dlp|https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos|yt-dlp|single
-git-filter-repo|https://raw.githubusercontent.com/newren/git-filter-repo/main/git-filter-repo|git-filter-repo|single
-docker-compose|https://github.com/docker/compose/releases/latest/download/docker-compose-darwin-x86_64|docker-compose|single
-colima|https://github.com/abiosoft/colima/releases/latest/download/colima-Darwin-x86_64|colima|single
-limactl|https://github.com/lima-vm/lima/releases/latest/download/lima-2.2.1-Darwin-x86_64.tar.gz|limactl|auto
-nasm|https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/macosx/nasm-2.16.03-macosx.zip|nasm|auto
-deno|https://github.com/denoland/deno/releases/latest/download/deno-x86_64-apple-darwin.zip|deno|auto
-docker|https://download.docker.com/mac/static/stable/x86_64/docker-29.9.2.tgz|docker|auto
-go|https://go.dev/dl/go1.27.3.darwin-amd64.tar.gz|go|tree
+jq|gh:jqlang/jq|^jq-macos-amd64$|single
+fzf|gh:junegunn/fzf|fzf-.*-darwin_amd64\.tar\.gz$|auto
+gh|gh:cli/cli|gh_.*_macOS_amd64\.zip$|auto
+gitleaks|gh:gitleaks/gitleaks|gitleaks_.*_darwin_x64\.tar\.gz$|auto
+rclone|gh:rclone/rclone|rclone-.*-osx-amd64\.zip$|auto
+yt-dlp|gh:yt-dlp/yt-dlp|^yt-dlp_macos$|single
+docker-compose|gh:docker/compose|docker-compose-darwin-x86_64$|single
+colima|gh:abiosoft/colima|colima-Darwin-x86_64$|single
+limactl|gh:lima-vm/lima|lima-.*-Darwin-x86_64\.tar\.gz$|auto
+deno|gh:denoland/deno|^deno-x86_64-apple-darwin\.zip$|auto
+nasm|nasm|nasm-.*-macosx\.zip$|auto
+docker|dockerstatic|docker-[0-9.]+\.tgz$|auto
+go|godev|darwin-amd64\.tar\.gz$|tree
+node|nodejs|darwin-x64\.tar\.gz$|tree
+git-filter-repo|raw:https://raw.githubusercontent.com/newren/git-filter-repo/main/git-filter-repo|git-filter-repo$|single
 EOF
 )
 
-usage() { sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
 
-extract_and_install() {
-  local name="$1" url="$2" want="$3" how="$4"
-  local tmp rc=0
+# Resolve the newest official darwin/amd64 asset URL for one manifest row.
+resolve_url() {
+  local src="$1" pat="$2"
+  case "$src" in
+    gh:*)
+      local repo="${src#gh:}" json=""
+      if command -v gh >/dev/null 2>&1; then
+        json=$(gh api "repos/$repo/releases/latest" 2>/dev/null)
+      fi
+      [ -n "$json" ] || json=$(curl -sS --max-time 25 "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null)
+      printf '%s' "$json" | jq -r --arg p "$pat" '[.assets[] | select(.name | test($p))] | first | .browser_download_url // empty' 2>/dev/null
+      ;;
+    raw:*) printf '%s' "${src#raw:}" ;;
+    godev)
+      curl -sS --max-time 25 "https://go.dev/dl/?mode=json" 2>/dev/null |
+        jq -r '[.[] | select(.stable)][0].files[] | select(.os=="darwin" and .arch=="amd64" and .kind=="archive") | "https://go.dev/dl/"+.filename' 2>/dev/null | head -1
+      ;;
+    nodejs)
+      curl -sS --max-time 25 "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt" 2>/dev/null |
+        awk '/darwin-x64\.tar\.gz$/ { print "https://nodejs.org/dist/latest-v26.x/" $2; exit }'
+      ;;
+    nasm)
+      local v
+      v=$(curl -sS --max-time 25 "https://www.nasm.us/pub/nasm/releasebuilds/" 2>/dev/null |
+        grep -oE '2\.[0-9]+\.[0-9]+' | sort -uV | tail -1)
+      [ -n "$v" ] && printf 'https://www.nasm.us/pub/nasm/releasebuilds/%s/macosx/nasm-%s-macosx.zip' "$v" "$v"
+      ;;
+    dockerstatic)
+      local v
+      v=$(curl -sS --max-time 25 "https://download.docker.com/mac/static/stable/x86_64/" 2>/dev/null |
+        grep -oE 'docker-[0-9]+\.[0-9]+\.[0-9]+\.tgz' | sort -uV | tail -1)
+      [ -n "$v" ] && printf 'https://download.docker.com/mac/static/stable/x86_64/%s' "$v"
+      ;;
+  esac
+}
+
+install_one() {
+  local name="$1" url="$2" how="$3"
+  local tmp rc=0 found
   tmp="$(mktemp -d)"
-  echo "  ↓ $name"
   if ! curl -fsSL --retry 3 --max-time 900 -o "$tmp/artifact" "$url"; then
     echo "    ✗ download failed: $url"; rm -rf "$tmp"; return 1
   fi
+  mkdir -p "$OPT/$name"
   case "$how" in
-    tree)
-      # Go ships a full toolchain tree (GOROOT), not a single binary.
-      mkdir -p "$tmp/x"
-      if ! tar xzf "$tmp/artifact" -C "$tmp/x"; then echo "    ✗ extract failed"; rm -rf "$tmp"; return 1; fi
-      rm -rf "$OPT/$name"; mv "$tmp/x/$name" "$OPT/$name"
-      ln -sfn "$OPT/$name/bin/$name" "$BIN/$name"
-      rm -rf "$tmp"
-      echo "    ✓ $BIN/$name → $("$BIN/$name" version 2>&1 | head -1)"
-      return 0 ;;
     single)
-      install -m 755 "$tmp/artifact" "$OPT/$name/$name" 2>/dev/null ||
-        { mkdir -p "$OPT/$name"; install -m 755 "$tmp/artifact" "$OPT/$name/$name"; } ;;
+      install -m 755 "$tmp/artifact" "$OPT/$name/$name" || rc=1
+      [ "$rc" -eq 0 ] || { rm -rf "$tmp"; return 1; }
+      ln -sfn "$OPT/$name/$name" "$BIN/$name"
+      ;;
+    tree)
+      mkdir -p "$tmp/x"
+      case "$url" in
+        *.tar.gz|*.tgz) tar xzf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
+        *.tar.xz) tar xJf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
+        *) echo "    ✗ unknown archive: $url"; rc=1 ;;
+      esac
+      [ "$rc" -eq 0 ] || { echo "    ✗ extract failed"; rm -rf "$tmp"; return 1; }
+      local binroot
+      binroot=$(find "$tmp/x" -maxdepth 2 -type d -name bin 2>/dev/null | head -1)
+      [ -n "$binroot" ] || { echo "    ✗ no bin/ in archive"; rm -rf "$tmp"; return 1; }
+      rm -rf "$OPT/$name"; mv "$(dirname "$binroot")" "$OPT/$name"
+      for b in "$OPT/$name"/bin/*; do [ -x "$b" ] && ln -sfn "$b" "$BIN/$(basename "$b")"; done
+      rm -rf "$tmp"
+      echo "    ✓ $name → $(ls "$OPT/$name/bin" | tr '\n' ' ')($("$OPT/$name/bin/$name" --version 2>/dev/null | head -1 || echo ''))"
+      return 0
+      ;;
     *)
+      mkdir -p "$tmp/x"
       case "$url" in
         *.zip) unzip -q "$tmp/artifact" -d "$tmp/x" || rc=1 ;;
-        *.tar.gz|*.tgz) mkdir -p "$tmp/x" && tar xzf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
-        *.tar.xz) mkdir -p "$tmp/x" && tar xJf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
-        *) echo "    ✗ unknown archive type: $url"; rc=1 ;;
+        *.tar.gz|*.tgz) tar xzf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
+        *.tar.xz) tar xJf "$tmp/artifact" -C "$tmp/x" || rc=1 ;;
+        *) echo "    ✗ unknown archive: $url"; rc=1 ;;
       esac
-      if [ "$rc" -ne 0 ]; then echo "    ✗ extract failed"; rm -rf "$tmp"; return 1; fi
-      mkdir -p "$OPT/$name"
-      local found
-      found=$(find "$tmp/x" -type f -name "$(basename "$want")" -perm -u+x 2>/dev/null | head -1)
-      [ -n "$found" ] || found=$(find "$tmp/x" -type f -name "$(basename "$want")" 2>/dev/null | head -1)
-      if [ -z "$found" ]; then
-        echo "    ✗ $want not found in archive"; rm -rf "$tmp"; return 1
-      fi
-      install -m 755 "$found" "$OPT/$name/$name" ;;
+      [ "$rc" -eq 0 ] || { echo "    ✗ extract failed"; rm -rf "$tmp"; return 1; }
+      found=$(find "$tmp/x" -type f -name "$name" -perm -u+x 2>/dev/null | head -1)
+      [ -n "$found" ] || found=$(find "$tmp/x" -type f -name "$name" 2>/dev/null | head -1)
+      [ -n "$found" ] || { echo "    ✗ $name not found in $url"; rm -rf "$tmp"; return 1; }
+      install -m 755 "$found" "$OPT/$name/$name" || rc=1
+      [ "$rc" -eq 0 ] || { rm -rf "$tmp"; return 1; }
+      ln -sfn "$OPT/$name/$name" "$BIN/$name"
+      ;;
   esac
-  ln -sfn "$OPT/$name/$name" "$BIN/$name"
   rm -rf "$tmp"
-  echo "    ✓ $BIN/$name → $("$BIN/$name" --version 2>&1 | head -1 || echo 'installed')"
+  echo "    ✓ $name → $("$BIN/$name" --version 2>&1 | head -1)"
 }
 
 main() {
-  local -a wanted=()
+  local mode="install" only=()
   case "${1:-}" in
-    --list) printf '%s\n' "$MANIFEST" | cut -d'|' -f1,2 | column -t -s'|'; return 0 ;;
     --help|-h) usage; return 0 ;;
-    "") while IFS='|' read -r n _; do wanted+=("$n"); done <<<"$MANIFEST" ;;
-    *) wanted=("$@") ;;
+    --list) printf '%s\n' "$MANIFEST" | cut -d'|' -f1,2,3 | column -t -s'|'; return 0 ;;
+    --check) mode="check"; shift ;;
+    *) while [ $# -gt 0 ]; do only+=("$1"); shift; done ;;
   esac
 
   mkdir -p "$BIN" "$OPT"
-  local failures=0 installed=0
-  while IFS='|' read -r name url want how; do
+  local failures=0 processed=0
+  while IFS='|' read -r name src pat how; do
     [ -n "${name:-}" ] || continue
-    if [ "${#wanted[@]}" -gt 0 ]; then
+    if [ "${#only[@]}" -gt 0 ]; then
       local hit=0
-      for w in "${wanted[@]}"; do [ "$w" = "$name" ] && hit=1; done
+      for w in "${only[@]}"; do [ "$w" = "$name" ] && hit=1; done
       [ "$hit" = "1" ] || continue
     fi
-    extract_and_install "$name" "$url" "$want" "$how" || failures=$((failures + 1))
-    installed=$((installed + 1))
+    printf '  %-16s ' "$name"
+    local url
+    url=$(resolve_url "$src" "$pat")
+    if [ -z "$url" ]; then
+      echo "✗ no release asset matches $pat"; failures=$((failures + 1)); continue
+    fi
+    if [ "$mode" = "check" ]; then
+      echo "$url"; processed=$((processed + 1)); continue
+    fi
+    install_one "$name" "$url" "$how" || failures=$((failures + 1))
+    processed=$((processed + 1))
   done <<<"$MANIFEST"
 
   echo ""
-  echo "installed: $installed  failed: $failures"
-  echo "PATH note: $BIN must come before /opt/local/bin and /usr/local/bin"
+  if [ "$mode" = "check" ]; then
+    echo "resolved: $processed  unresolved: $failures"
+  else
+    echo "processed: $processed  failed: $failures"
+    echo "PATH note: $BIN must come before /opt/local/bin and /usr/local/bin"
+  fi
   [ "$failures" -eq 0 ]
 }
 
