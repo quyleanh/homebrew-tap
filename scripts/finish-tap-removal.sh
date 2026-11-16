@@ -20,8 +20,8 @@ fail() { echo "✗ $*" >&2; exit 1; }
 
 [ -x "$BREW" ] || fail "Homebrew not found at $BREW"
 [ -x "$PORT" ] || fail "MacPorts not found at $PORT"
-$PORT -q installed 2>/dev/null | grep -q '^wget @'      || fail "MacPorts wget not installed yet"
-$PORT -q installed 2>/dev/null | grep -q '^python314 @' || fail "MacPorts python314 not installed yet"
+$PORT installed wget      2>/dev/null | grep -q 'wget @'       || fail "MacPorts wget not installed yet"
+$PORT installed python314 2>/dev/null | grep -q 'python314 @' || fail "MacPorts python314 not installed yet"
 [ -x /opt/local/bin/python3 ] || fail "python3 not selected — run: sudo $PORT select --set python3 python314"
 
 wget_path=$(command -v wget 2>/dev/null || true)
@@ -39,8 +39,10 @@ echo "  ✓ wget    → $wget_path"
 echo "  ✓ python3 → $py_path ($(python3 -V 2>&1))"
 echo ""
 echo "Removing the tap's kegs…"
+# --force is needed because a keg with more than one installed version (xz 5.8.2 and
+# 5.8.3 were both present) otherwise refuses to go.
 # shellcheck disable=SC2046
-$BREW uninstall --ignore-dependencies $($BREW list --full-name 2>/dev/null | grep '^quyleanh/tap/') || true
+$BREW uninstall --force --ignore-dependencies $($BREW list --full-name 2>/dev/null | grep '^quyleanh/tap/') || true
 $BREW autoremove 2>/dev/null || true
 $BREW untap quyleanh/tap 2>/dev/null || true
 

@@ -23,7 +23,7 @@ builds — is gone. The machine now uses, in order of preference:
 |---|---|
 | Official upstream binaries → `~/.local/bin` | node, deno, go, gh, jq, fzf, gitleaks, rclone, yt-dlp, docker, docker-compose, colima, limactl, nasm, git-filter-repo, hugo, rtk |
 | MacPorts → `/opt/local/bin` (binary-only) | ffmpeg, bash, tmux, aria2, tree, argon2, potrace |
-| Homebrew → `/usr/local` | casks only (`brew list --cask`); `wget` is the last formula left |
+| Homebrew → `/usr/local` | **casks only** — zero formulae, Cellar empty |
 
 ### Maintenance
 
@@ -45,8 +45,8 @@ brew upgrade --cask                             # update GUI apps
   upgrade — nothing breaks. Either wait, or let that one port compile:
   `sudo /opt/local/bin/port install <port>`. Check what is available with
   `curl -s https://mse.uk.packages.macports.org/<port>/ | grep darwin_22`.
-- **Do not run bare `brew upgrade`.** It would try to rebuild formulae that have no Ventura
-  bottles. Use `brew upgrade --cask`, and leave the remaining formula alone.
+- `brew upgrade` no longer has any formula to rebuild: the tap is untapped and the Cellar is
+  empty. `brew upgrade --cask` is all that is needed.
 
 ### PATH
 
