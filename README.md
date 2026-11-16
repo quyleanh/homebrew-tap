@@ -39,6 +39,12 @@ brew upgrade --cask                             # update GUI apps
 - **MacPorts needs `sudo`** for `install` / `upgrade` / `uninstall`, because `/opt/local`
   is root-owned by design. Read-only commands (`port info`, `port search`, `port list`) do
   not need it. There is no supported way to avoid this with the default prefix.
+- **`port -b upgrade` can fail with a 404 on an archive.** That is not DNS and not a broken
+  install: the MacPorts buildbot lags new releases for macOS 13 by days, so the newest
+  version of a port may have no `darwin_22` archive yet. With `-b` it simply skips that
+  upgrade — nothing breaks. Either wait, or let that one port compile:
+  `sudo /opt/local/bin/port install <port>`. Check what is available with
+  `curl -s https://mse.uk.packages.macports.org/<port>/ | grep darwin_22`.
 - **Do not run bare `brew upgrade`.** It would try to rebuild formulae that have no Ventura
   bottles. Use `brew upgrade --cask`, and leave the remaining formula alone.
 
