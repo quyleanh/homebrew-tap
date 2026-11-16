@@ -57,6 +57,11 @@ Homebrew's `/usr/local/bin` — which stays in `PATH` for casks:
 export PATH="$HOME/.local/bin:/opt/local/bin:$PATH"
 ```
 
+This line must sit **before** oh-my-zsh is sourced. Its plugins check `$commands[]`
+when they load, so with the export at the end of the file the tmux plugin reports
+"tmux not found" in every new terminal even though `tmux` is installed and on `PATH`
+a moment later.
+
 ### What was given up, and why it is fine
 
 `llvm`/`llvm@22` were dropped (unused — `CC`/`CXX` were empty), which retired the 12-hour
